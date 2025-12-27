@@ -1,20 +1,179 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Sirona - Sistema Seguro de Historiales Médicos
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+Sirona es un sistema de historiales médicos basado en principios de **Zero Trust** y requisitos de **Common Criteria**, diseñado para proteger la información de médicos, pacientes, secretarios y administradores.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## Tecnologías
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+- Backend: **Python + FastAPI**
+- Frontend: **React + TypeScript (Vite, SWC)**
+- Base de datos: **MongoDB** (operativa y de auditoría separadas)
+- Control de versiones: **Git en Azure DevOps**
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+---
+
+## Cómo empezar
+
+### Requisitos
+
+- Python 3.11+
+- Node.js 18+
+- Git
+- Docker (opcional, para MongoDB y despliegue)
+
+### Clonar el repositorio
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd sirona
+```
+
+### Ejecutar backend (FastAPI)
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate # En Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+### Ejecutar frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## Estándares de nombres
+
+### Backend (Python / FastAPI)
+
+- **Archivos y carpetas:** `snake_case`  
+  - Ejemplos: `auth_service.py`, `patient_history/`, `audit_repository.py`
+- **Funciones y variables:** `snake_case`  
+  - Ejemplos: `crear_paciente()`, `obtener_usuario_por_email()`
+- **Clases:** `PascalCase`  
+  - Ejemplos: `UserRepository`, `AuditLogService`
+- **Constantes:** `UPPER_SNAKE_CASE`  
+  - Ejemplos: `JWT_EXP_MINUTES`, `RATE_LIMIT_PER_MIN`
+
+### Frontend (React / TypeScript)
+
+- **Componentes (archivos):** `PascalCase`  
+  - Ejemplos: `LoginForm.tsx`, `PatientHistoryPage.tsx`
+- **Hooks personalizados:** `camelCase` y comienzan con `use`  
+  - Ejemplos: `useAuthContext.ts`, `useRateLimitWarning.ts`
+- **Funciones y variables normales:** `camelCase`  
+  - Ejemplos: `handleLoginSubmit`, `isAdminRole`
+- **Carpetas de módulos:** `kebab-case` o minúsculas  
+  - Ejemplos: `auth/`, `patient-history/`, `admin-dashboard/`
+
+---
+
+## Convenciones de Git y commits
+
+### Idioma
+
+- **Commits, ramas y nombres técnicos: en español.**
+- Comentarios en código también en español, centrados en explicar decisiones de seguridad y diseño.
+
+### Formato de mensajes de commit
+
+Usar el formato:
+
+```
+<tipo>(<ámbito>): <resumen corto en español>
+```
+
+**Tipos recomendados:**
+
+- `feat`   → nueva funcionalidad
+- `fix`    → corrección de error
+- `sec`    → cambio de seguridad (MFA, TLS, cifrado, rate limiting)
+- `docs`   → documentación
+- `refactor` → cambio interno sin cambiar comportamiento
+- `test`   → pruebas
+- `chore`  → tareas de mantenimiento (configuración, formateo, etc.)
+
+**Ámbitos sugeridos:**
+
+- `backend`, `frontend`, `auth`, `auditoria`, `db`, `devops`, `infra`
+
+**Ejemplos:**
+
+```
+feat(auth): agregar flujo de mfa con prueba de vida
+sec(gateway): aplicar rate limiting al endpoint de login
+fix(frontend): corregir manejo de token jwt expirado
+docs(readme): documentar estándares de nombres y commits
+chore(devops): actualizar archivos gitignore de python y node
+test(auth): añadir pruebas unitarias para política de contraseñas
+```
+
+---
+
+## Estrategia de ramas
+
+- Rama principal: `main`  
+  - Siempre estable, lista para despliegue.  
+  - Sin pushes directos: solo merges por Pull Request.
+
+- Ramas de feature por PBI (Product Backlog Item):
+
+```
+feature/PBI-3-auth-mfa
+feature/PBI-5-rate-limiting
+feature/PBI-10-logs-worm
+feature/PBI-15-cifrado-bd
+```
+
+- Opcional: ramas de corrección urgente:
+
+```
+hotfix/error-login
+```
+
+---
+
+## Build y pruebas
+
+### Backend
+
+```bash
+cd backend
+pytest # Pruebas automáticas
+ruff . # Linter / estilo (si se configura)
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm run lint
+npm run test # Si se configuran pruebas
+```
+
+---
+
+## Contribuir (equipo interno)
+
+1. Crear rama desde `main` siguiendo la convención (`feature/...` o `hotfix/...`).
+2. Implementar cambios respetando los estándares de nombres y seguridad.
+3. Ejecutar pruebas (backend y/o frontend).
+4. Crear Pull Request en Azure DevOps:
+   - Descripción clara.
+   - Referencia al PBI (ej.: `PBI-3`).
+5. Esperar revisión de al menos 1 integrante del equipo antes de hacer merge.
+
+---
+
+## Seguridad
+
+- Todas las APIs deben usar **TLS 1.3** en entornos de despliegue.
+- Autenticación con **MFA** para administradores y accesos desde redes no confiables.
+- **Rate limiting** en el Gateway para mitigar ataques de fuerza bruta/DoS.
+- Logs de auditoría enviados a almacenamiento **WORM**.
+- Base de datos de historiales cifrada en reposo con **AES-256**.
