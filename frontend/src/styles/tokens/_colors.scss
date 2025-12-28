@@ -1,0 +1,52 @@
+$primary-color: #8b7bd0; // morado pastel
+$secondary-color: #8fd3b6; // verde pastel
+$accent-color: #e74c3c;
+$background-color: #ecf0f1;
+$text-color: #2c3e50;
+$border-color: #bdc3c7;
+
+$success-color: #2ecc71;
+$warning-color: #f39c12;
+$error-color: #e74c3c;
+
+$on-primary-color: #ffffff;
+$on-secondary-color: #0f1c1a;
+
+$primary-color: #8b7bd0; // morado pastel
+$secondary-color: #8fd3b6; // verde pastel
+$accent-color: #e74c3c;
+$background-color: #ecf0f1;
+$text-color: #2c3e50;
+$border-color: #bdc3c7;
+
+$success-color: #2ecc71;
+$warning-color: #f39c12;
+$error-color: #e74c3c;
+
+$on-primary-color: #ffffff;
+$on-secondary-color: #0f1c1a;
+
+@use 'sass:color';
+// Estados (calculados en build para buen contraste)
+$primary-color-hover: color.mix($primary-color, #000, 12%);
+$primary-color-active: color.mix($primary-color, #000, 20%);
+$secondary-color-hover: color.mix($secondary-color, #000, 10%);
+$secondary-color-active: color.mix($secondary-color, #000, 18%);
+
+:root {
+  --primary-color: #{$primary-color};
+  --secondary-color: #{$secondary-color};
+  --accent-color: #{$accent-color};
+  --background-color: #{$background-color};
+  --text-color: #{$text-color};
+  --border-color: #{$border-color};
+  --success-color: #{$success-color};
+  --warning-color: #{$warning-color};
+  --error-color: #{$error-color};
+  --on-primary-color: #{$on-primary-color};
+  --on-secondary-color: #{$on-secondary-color};
+  --primary-color-hover: #{$primary-color-hover};
+  --primary-color-active: #{$primary-color-active};
+  --secondary-color-hover: #{$secondary-color-hover};
+  --secondary-color-active: #{$secondary-color-active};
+}

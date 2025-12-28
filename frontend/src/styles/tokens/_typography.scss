@@ -1,0 +1,44 @@
+// Typography tokens
+$font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$font-family-heading: 'Source Sans 3', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-sm: 14px;
+$line-height-base: 1.5;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+
+// Expose CSS variables
+:root {
+  --font-body: #{$font-family-base};
+  --font-heading: #{$font-family-heading};
+}
+
+// Headings
+$font-size-h1: 2rem;
+$font-size-h2: 1.75rem;
+$font-size-h3: 1.5rem;
+$font-size-h4: 1.25rem;
+$font-size-h5: 1rem;
+$font-size-h6: 0.875rem;
+
+// Utility classes
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-weight-normal {
+  font-weight: $font-weight-normal;
+}
+
+.font-weight-bold {
+  font-weight: $font-weight-bold;
+}

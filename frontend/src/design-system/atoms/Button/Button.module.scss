@@ -1,0 +1,56 @@
+.button {
+  appearance: none;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-default);
+  cursor: pointer;
+  font-size: var(--font-size-medium);
+  font-weight: 600;
+  padding: 0.625rem 1rem;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+
+  // base neutral; los variantes controlan colores
+  background-color: transparent;
+  color: var(--text-color);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--on-primary-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-color-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--primary-color-active);
+  }
+}
+
+.secondary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--on-secondary-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--secondary-color-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--secondary-color-active);
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
