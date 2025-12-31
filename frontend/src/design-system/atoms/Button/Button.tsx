@@ -8,6 +8,8 @@ type ButtonProps = {
   disabled?: boolean;
   onClick?: () => void;
   fullWidth?: boolean;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -17,6 +19,8 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   onClick,
   fullWidth = false,
+  startIcon,
+  endIcon,
 }) => {
   return (
     <button
@@ -29,7 +33,9 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled}
       onClick={onClick}
     >
+      {startIcon && <span className={styles.startIcon}>{startIcon}</span>}
       {children}
+      {endIcon && <span className={styles.endIcon}>{endIcon}</span>}
     </button>
   );
 };

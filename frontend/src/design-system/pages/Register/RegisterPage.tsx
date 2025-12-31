@@ -3,13 +3,11 @@ import styles from './RegisterPage.module.scss';
 import { RegisterForm } from '../../molecules/RegisterForm/RegisterForm';
 import type { RegisterData } from '../../molecules/RegisterForm/RegisterForm';
 import { ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-type Props = {
-  onNavigateLogin?: () => void;
-};
-
-export const RegisterPage: React.FC<Props> = ({ onNavigateLogin }) => {
+export const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (data: RegisterData) => {
     setLoading(true);
@@ -25,6 +23,9 @@ export const RegisterPage: React.FC<Props> = ({ onNavigateLogin }) => {
       // await fetch('/api/auth/register', { method: 'POST', body: form });
       await new Promise((r) => setTimeout(r, 800));
       console.log('Register data', data);
+      
+      // Tras registro exitoso, redirigir a login
+      navigate('/login');
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,7 @@ export const RegisterPage: React.FC<Props> = ({ onNavigateLogin }) => {
           <button
             type="button"
             className={styles.ctaLink}
-            onClick={() => onNavigateLogin?.()}
+            onClick={() => navigate('/login')}
           >
             ¿Ya tienes cuenta? Inicia sesión
           </button>

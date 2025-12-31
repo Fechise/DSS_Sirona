@@ -4,17 +4,22 @@
   border-radius: 8px;
   box-shadow: var(--shadow-default);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-size: var(--font-size-medium);
   font-weight: 600;
   padding: 0.625rem 1rem;
-  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 
   // base neutral; los variantes controlan colores
   background-color: transparent;
   color: var(--text-color);
 
   &:hover:not(:disabled) {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
   }
 
   &:disabled {
@@ -30,6 +35,7 @@
 
   &:hover:not(:disabled) {
     background-color: var(--primary-color-hover);
+        color: var(--on-secondary-color); // texto oscuro para contraste con hover claro
   }
 
   &:active:not(:disabled) {
@@ -44,13 +50,20 @@
 
   &:hover:not(:disabled) {
     background-color: var(--secondary-color-hover);
+    color: var(--on-secondary-color); // texto oscuro para contraste con hover claro
   }
 
   &:active:not(:disabled) {
     background-color: var(--secondary-color-active);
+    color: var(--on-primary-color);
   }
 }
 
 .fullWidth {
   width: 100%;
+}
+
+.startIcon,
+.endIcon {
+  display: flex;
 }
