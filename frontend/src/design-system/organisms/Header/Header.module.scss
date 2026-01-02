@@ -33,6 +33,12 @@
   gap: 1rem;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .email {
   font-size: 0.875rem;
   color: var(--text-color);

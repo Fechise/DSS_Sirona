@@ -3,6 +3,7 @@ import styles from './RegisterForm.module.scss';
 import { Input } from '../../atoms/Input/Input';
 import { Button } from '../../atoms/Button/Button';
 import { Upload, Camera } from 'lucide-react';
+import { PasswordStrengthIndicator, validatePasswordStrength } from '../PasswordStrengthIndicator/PasswordStrengthIndicator';
 
 export type RegisterData = {
   fullName: string;
@@ -34,22 +35,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit, loading = false }) => 
     cedulaImage?: string;
   }>({});
 
-  const passwordFeedback = React.useMemo(() => {
-    const checks = [
-      { key: 'length', ok: password.length >= 12, label: '12+ caracteres' },
-      { key: 'upper', ok: /[A-Z]/.test(password), label: 'Una mayúscula' },
-      { key: 'lower', ok: /[a-z]/.test(password), label: 'Una minúscula' },
-      { key: 'digit', ok: /\d/.test(password), label: 'Un número' },
-      { key: 'special', ok: /[^\w\s]/.test(password), label: 'Un símbolo' },
-      { key: 'noSpace', ok: !/\s/.test(password), label: 'Sin espacios' },
-    ];
-    const passed = checks.filter(c => c.ok).length;
-    const unmet = checks.filter(c => !c.ok).map(c => c.label);
-    let level: 'weak' | 'medium' | 'strong' = 'weak';
-    if (passed >= 4) level = 'medium';
-    if (passed >= 5 && password.length >= 14) level = 'strong';
-    return { level, unmet, passed };
-  }, [password]);
+  const passwordValidation = React.useMemo(() => validatePasswordStrength(password), [password]);
 
   const validate = () => {
     const next: typeof errors = {};
@@ -61,8 +47,8 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit, loading = false }) => 
     if (!confirmPassword) next.confirmPassword = 'Repite la contraseña.';
     else if (confirmPassword !== password) next.confirmPassword = 'Las contraseñas no coinciden.';
     // Política FIA_SOS.1: mínimos de calidad
-    if (passwordFeedback.unmet.length) {
-      next.password = `La contraseña no cumple: ${passwordFeedback.unmet.join(', ')}`;
+    if (!passwordValidation.valid) {
+      next.password = `La contraseña no cumple: ${passwordValidation.unmet.join(', ')}`;
     }
     if (!cedulaImage) next.cedulaImage = 'La imagen de la cédula es obligatoria.';
     setErrors(next);
@@ -131,27 +117,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit, loading = false }) => 
           error={errors.password}
           autoComplete="new-password"
         />
-        <div className={styles.strengthRow} aria-live="polite">
-          <span
-            className={[
-              styles.strengthBadge,
-              passwordFeedback.level === 'weak' ? styles.weak : '',
-              passwordFeedback.level === 'medium' ? styles.medium : '',
-              passwordFeedback.level === 'strong' ? styles.strong : '',
-            ].join(' ')}
-          >
-            {passwordFeedback.level === 'weak' && 'Débil'}
-            {passwordFeedback.level === 'medium' && 'Media'}
-            {passwordFeedback.level === 'strong' && 'Fuerte'}
-          </span>
-          {passwordFeedback.unmet.length > 0 && (
-            <ul className={styles.requirements}>
-              {passwordFeedback.unmet.map((req) => (
-                <li key={req}>{req}</li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {password && <PasswordStrengthIndicator password={password} />}
 
         <Input
           id="confirmPassword"

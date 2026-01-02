@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import styles from './LoginForm.module.scss';
 import { Input } from '../../atoms/Input/Input';
 import { Button } from '../../atoms/Button/Button';
+import { AlertCircle } from 'lucide-react';
 
 type Props = {
   onSubmit?: (data: { email: string; password: string }) => Promise<void> | void;
   loading?: boolean;
+  isAccountLocked?: boolean;
 };
 
-export const LoginForm: React.FC<Props> = ({ onSubmit, loading = false }) => {
+export const LoginForm: React.FC<Props> = ({ onSubmit, loading = false, isAccountLocked = false }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -35,6 +37,13 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, loading = false }) => {
         <p className={styles.subtitle}>Accede con tu correo y contraseña</p>
       </div>
 
+      {isAccountLocked && (
+        <div className={styles.alert}>
+          <AlertCircle size={20} />
+          <span>Cuenta bloqueada por 15 minutos</span>
+        </div>
+      )}
+
       <div className={styles.fields}>
         <Input
           id="email"
@@ -59,7 +68,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, loading = false }) => {
         />
       </div>
 
-      <Button type="submit" variant="primary" fullWidth disabled={loading}>
+      <Button type="submit" variant="primary" fullWidth disabled={loading || isAccountLocked}>
         {loading ? 'Ingresando...' : 'Ingresar'}
       </Button>
     </form>

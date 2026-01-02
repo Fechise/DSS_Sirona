@@ -5,6 +5,8 @@ import { LoginPage } from './design-system/pages/Login/LoginPage';
 import { RegisterPage } from './design-system/pages/Register/RegisterPage';
 import { MedicalRecordPage } from './design-system/pages/MedicalRecord/MedicalRecordPage';
 import { PaginaInicio } from './design-system/pages/Home/HomePage';
+import { ChangePasswordPage } from './design-system/pages/ChangePassword/ChangePasswordPage';
+import { UserManagementPage } from './design-system/pages/UserManagement/UserManagementPage';
 
 const RutaInicial: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -31,6 +33,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <MedicalRecordPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cambiar-contrasena"
+            element={
+              <ProtectedRoute>
+                <ChangePasswordPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/usuarios"
+            element={
+              <ProtectedRoute requiredRole="Administrador">
+                <UserManagementPage />
               </ProtectedRoute>
             }
           />

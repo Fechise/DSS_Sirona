@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styles from './LoginPage.module.scss';
 import { LoginForm } from '../../molecules/LoginForm/LoginForm';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Button } from '../../atoms/Button/Button';
@@ -15,15 +15,19 @@ export const LoginPage: React.FC = () => {
   const [otp, setOtp] = useState('');
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [pendingRole, setPendingRole] = useState<string>('user');
+  const [accountLocked, setAccountLocked] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handlePasswordSubmit = async (data: { email: string; password: string }) => {
     setLoading(true);
+    setAccountLocked(false);
     try {
       // TODO: integrar con FastAPI (ej. POST /auth/login)
       // const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(data) });
-      // const { token, role } = await res.json();
+      // const response = await res.json();
+      // if (response.account_locked) { setAccountLocked(true); return; }
+      // const { token, role } = response;
       await new Promise((r) => setTimeout(r, 600)); // simulación
       
       // Mock: responder que se requiere MFA (por ejemplo, administradores o riesgo alto)
@@ -48,8 +52,12 @@ export const LoginPage: React.FC = () => {
   const handleFaceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setAccountLocked(false);
     try {
       // TODO: integrar con FastAPI (POST /auth/login/face) incluyendo prueba de vida y template biométrico
+      // const res = await fetch('/api/auth/login/face', { method: 'POST', body: formData });
+      // const response = await res.json();
+      // if (response.account_locked) { setAccountLocked(true); return; }
       await new Promise((r) => setTimeout(r, 600)); // simulación
 
       // Mock: éxito facial + liveness OK
@@ -134,13 +142,20 @@ export const LoginPage: React.FC = () => {
 
             {modo === 'password' && (
               <div className={styles.panel}>
-                <LoginForm onSubmit={handlePasswordSubmit} loading={loading} />
+                <LoginForm onSubmit={handlePasswordSubmit} loading={loading} isAccountLocked={accountLocked} />
               </div>
             )}
 
             {modo === 'face' && (
               <div className={styles.panel}>
                 <form className={styles.faceForm} onSubmit={handleFaceSubmit}>
+                  {accountLocked && (
+                    <div className={styles.alertLocked}>
+                      <AlertCircle size={20} />
+                      <span>Cuenta bloqueada por 15 minutos</span>
+                    </div>
+                  )}
+
                   <div className={styles.fieldGroup}>
                     <label htmlFor="face-email">Correo</label>
                     <input
@@ -167,7 +182,7 @@ export const LoginPage: React.FC = () => {
                     <p className={styles.hint}>{livenessTip}</p>
                   </div>
 
-                  <Button type="submit" variant="primary" fullWidth disabled={loading || !faceCapture}>
+                  <Button type="submit" variant="primary" fullWidth disabled={loading || !faceCapture || accountLocked}>
                     {loading ? 'Verificando...' : 'Iniciar reconocimiento facial'}
                   </Button>
                 </form>
@@ -215,17 +230,30 @@ export const LoginPage: React.FC = () => {
             >
               ¿No estás registrado? Regístrate aquí
             </button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                const mockToken = 'mock_jwt_token_demo';
-                login('demo@sirona.local', mockToken, 'demo');
-                navigate('/inicio');
-              }}
-            >
-              Entrar como demo
-            </Button>
+            <div className={styles.demoButtons}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  const mockToken = 'mock_jwt_token_demo';
+                  login('demo@sirona.local', mockToken, 'Paciente');
+                  navigate('/inicio');
+                }}
+              >
+                Demo Paciente
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  const mockToken = 'mock_jwt_token_admin';
+                  login('admin@sirona.local', mockToken, 'Administrador');
+                  navigate('/inicio');
+                }}
+              >
+                Demo Admin
+              </Button>
+            </div>
           </div>
         </div>
       </div>
