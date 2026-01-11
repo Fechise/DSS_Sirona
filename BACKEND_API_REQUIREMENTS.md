@@ -13,7 +13,64 @@ Documentación de endpoints necesarios para el backend de Sirona basado en las f
 
 ---
 
-## 🔐 Autenticación
+## � Historiales Clínicos
+
+### GET `/api/paciente/mi-historial`
+
+Obtener el historial clínico personal del paciente autenticado (solo lectura).
+
+**Headers:**
+```
+Authorization: Bearer <patient-token>
+```
+
+**Response Success (200):**
+```json
+{
+  "id": "hist_001",
+  "fecha": "2026-01-08",
+  "diagnostico": "Hipertensión arterial leve",
+  "sintomas": "Dolores de cabeza ocasionales, mareos leves",
+  "tratamiento": "Modificación del estilo de vida, medicación antihipertensiva",
+  "medicamentos": "Losartán 50mg una vez al día",
+  "notas": "Paciente responde bien al tratamiento. Se recomienda reducir consumo de sal y realizar ejercicio regular.",
+  "proximaCita": "2026-02-08",
+  "ultimaModificacion": "2026-01-08T14:30:00Z"
+}
+```
+
+**Response Unauthorized (401):**
+```json
+{
+  "error": "Unauthorized. Please login again."
+}
+```
+
+**Response Forbidden (403):**
+```json
+{
+  "error": "Access denied. This action is not permitted."
+}
+```
+
+**Response Not Found (404):**
+```json
+{
+  "error": "Medical history not found"
+}
+```
+
+**Lógica Requerida:**
+- Verificar autenticación (token válido)
+- Verificar que el usuario sea Paciente
+- Devolver solo el historial del usuario autenticado (no de otros)
+- Los datos deben ser de **solo lectura** (el paciente no puede editarlos)
+- Si el usuario no es Paciente, devolver 403
+- Si no hay historial, devolver 404
+
+---
+
+
 
 ### POST `/api/auth/login`
 
@@ -540,17 +597,18 @@ Registrar en logs de auditoría (BD WORM):
 1. ✅ POST `/api/auth/login` (con bloqueo de cuenta)
 2. ✅ POST `/api/auth/register` (con validación de contraseña)
 3. ✅ POST `/api/auth/change-password`
-4. ✅ Rate limiting en endpoints de auth
+4. ✅ GET `/api/paciente/mi-historial` (PBI-13: Historial de Paciente)
+5. ✅ Rate limiting en endpoints de auth
 
 ### Media Prioridad
-5. ✅ GET `/api/admin/users`
-6. ✅ PATCH `/api/admin/users/{userId}/role`
-7. ✅ POST `/api/auth/otp/verify`
+6. ✅ GET `/api/admin/users`
+7. ✅ PATCH `/api/admin/users/{userId}/role`
+8. ✅ POST `/api/auth/otp/verify`
 
 ### Baja Prioridad
-8. POST `/api/auth/login/face`
-9. Logs de auditoría detallados
-10. Notificaciones por email
+9. POST `/api/auth/login/face`
+10. Logs de auditoría detallados
+11. Notificaciones por email
 
 ---
 
@@ -567,6 +625,155 @@ Registrar en logs de auditoría (BD WORM):
 
 ---
 
+## � User Data Models - Mock Data
+
+Estructura de datos para usuarios según su rol. Estos ejemplos muestran cómo debe devolverse la información de usuarios en los endpoints de perfil y gestión.
+
+### Administrador
+
+```json
+{
+  "id": "admin-uuid-001",
+  "fullName": "Carlos Alberto Rodríguez",
+  "email": "carlos.rodriguez@sirona.local",
+  "role": "Administrador",
+  "status": "Activo",
+  "cedula": "1234567890",
+  "createdAt": "2025-01-15T08:00:00Z",
+  "lastLogin": "2026-01-09T14:30:00Z",
+  "memberSince": "Enero 2025",
+  "permissions": [
+    "manage_users",
+    "manage_roles",
+    "view_logs",
+    "manage_settings"
+  ]
+}
+```
+
+### Médico
+
+```json
+{
+  "id": "doctor-uuid-001",
+  "fullName": "Roberto García López",
+  "email": "roberto.garcia@sirona.local",
+  "role": "Médico",
+  "status": "Activo",
+  "cedula": "9876543210",
+  "especialidad": "Cardiología",
+  "numeroLicencia": "LIC-2024-45678",
+  "createdAt": "2024-06-20T10:15:00Z",
+  "lastLogin": "2026-01-09T11:45:00Z",
+  "memberSince": "Junio 2024",
+  "permissions": [
+    "view_patients",
+    "create_medical_records",
+    "edit_own_records",
+    "prescribe_medication"
+  ]
+}
+```
+
+### Paciente
+
+```json
+{
+  "id": "patient-uuid-001",
+  "fullName": "María José Martínez",
+  "email": "maria.martinez@email.com",
+  "role": "Paciente",
+  "status": "Activo",
+  "cedula": "5555666777",
+  "fechaNacimiento": "1985-03-15",
+  "telefonoContacto": "+34 612 345 678",
+  "createdAt": "2025-08-10T09:20:00Z",
+  "lastLogin": "2026-01-08T16:00:00Z",
+  "memberSince": "Agosto 2025",
+  "permissions": [
+    "view_own_records",
+    "view_appointments",
+    "message_doctor"
+  ]
+}
+```
+
+### Secretario
+
+```json
+{
+  "id": "secretary-uuid-001",
+  "fullName": "Ana Isabel Sánchez",
+  "email": "ana.sanchez@sirona.local",
+  "role": "Secretario",
+  "status": "Activo",
+  "cedula": "3333444555",
+  "departamento": "Admisión",
+  "createdAt": "2024-11-01T13:30:00Z",
+  "lastLogin": "2026-01-09T08:45:00Z",
+  "memberSince": "Noviembre 2024",
+  "permissions": [
+    "manage_appointments",
+    "view_patient_list",
+    "create_patient_records",
+    "generate_reports"
+  ]
+}
+```
+
+### Estructura de Respuesta para GET `/api/admin/users` (Completa)
+
+```json
+{
+  "users": [
+    {
+      "id": "admin-uuid-001",
+      "fullName": "Carlos Alberto Rodríguez",
+      "email": "carlos.rodriguez@sirona.local",
+      "role": "Administrador",
+      "status": "Activo",
+      "createdAt": "2025-01-15T08:00:00Z",
+      "lastLogin": "2026-01-09T14:30:00Z"
+    },
+    {
+      "id": "doctor-uuid-001",
+      "fullName": "Roberto García López",
+      "email": "roberto.garcia@sirona.local",
+      "role": "Médico",
+      "status": "Activo",
+      "createdAt": "2024-06-20T10:15:00Z",
+      "lastLogin": "2026-01-09T11:45:00Z"
+    },
+    {
+      "id": "secretary-uuid-001",
+      "fullName": "Ana Isabel Sánchez",
+      "email": "ana.sanchez@sirona.local",
+      "role": "Secretario",
+      "status": "Activo",
+      "createdAt": "2024-11-01T13:30:00Z",
+      "lastLogin": "2026-01-09T08:45:00Z"
+    },
+    {
+      "id": "patient-uuid-001",
+      "fullName": "María José Martínez",
+      "email": "maria.martinez@email.com",
+      "role": "Paciente",
+      "status": "Activo",
+      "createdAt": "2025-08-10T09:20:00Z",
+      "lastLogin": "2026-01-08T16:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total": 4,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
 ## 🔗 Frontend Integrado
 
 El frontend ya está listo para consumir estos endpoints. Los archivos clave son:
@@ -575,6 +782,28 @@ El frontend ya está listo para consumir estos endpoints. Los archivos clave son
 - `RegisterForm.tsx` - Registro con validación
 - `ChangePasswordForm.tsx` - Cambio de contraseña
 - `UserManagementPage.tsx` - Gestión de usuarios (admin)
+- `PatientHistoryPage.tsx` - Historial clínico solo lectura para pacientes (PBI-13)
 - `authErrors.ts` - Utilidades para manejar errores
+- `ProfilePage.tsx` - Perfil de usuario con secciones General y Seguridad
+- `GeneralSection.tsx` - Mostración de datos del usuario
+- `SecuritySection.tsx` - Cambio de contraseña
 
 Simplemente descomenta las líneas `// TODO: integrar con FastAPI` en cada componente y reemplaza con las llamadas reales a la API.
+
+### PatientHistoryPage - Manejo de Errores
+
+El componente `PatientHistoryPage.tsx` implementa el siguiente manejo de errores:
+
+**Código 401 (Unauthorized):**
+- Muestra: "Sesión Expirada"
+- Acción: Redirige automáticamente a `/login` después de 2 segundos
+
+**Código 403 (Forbidden):**
+- Muestra: "Acceso Denegado - No tienes permisos para acceder a esta información"
+- Acción: Permite volver al inicio manualmente
+
+**Otros errores (500, etc.):**
+- Muestra: El mensaje de error genérico
+- Acción: Permite volver al inicio manualmente
+
+

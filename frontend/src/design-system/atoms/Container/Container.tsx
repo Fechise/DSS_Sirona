@@ -8,8 +8,10 @@ type ContainerProps = {
 
 export const Container: React.FC<ContainerProps> = ({ children, className = '' }) => {
   return (
-    <div className={`${styles.container} ${className}`.trim()}>
-      {children}
+    <div className={styles.container}>
+      <div className={`${styles.content} ${className}`.trim()}>
+        {children}
+      </div>
     </div>
   );
 };

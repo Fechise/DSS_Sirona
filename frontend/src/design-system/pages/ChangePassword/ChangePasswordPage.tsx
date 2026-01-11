@@ -4,7 +4,6 @@ import { ChangePasswordForm } from '../../molecules/ChangePasswordForm/ChangePas
 import { ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from '../../atoms/Container/Container';
-import { Header } from '../../organisms/Header/Header';
 
 export const ChangePasswordPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -37,7 +36,6 @@ export const ChangePasswordPage: React.FC = () => {
 
   return (
     <Container>
-      <Header />
       <div className={styles.content}>
         <div className={styles.card}>
           <div className={styles.brand}>

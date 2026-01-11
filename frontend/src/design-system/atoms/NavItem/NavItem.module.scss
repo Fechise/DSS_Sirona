@@ -1,0 +1,133 @@
+@use '../../../styles/tokens/_index' as *;
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: $radius-medium;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.label {
+  display: inline-block;
+}
+
+// Primary (Médico - violet)
+.navItem.primary {
+  color: $text-color;
+  
+  &:hover {
+    background-color: rgba($primary-color, 0.05);
+    color: $primary-color;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+  }
+  
+  &.active {
+    background-color: $primary-color;
+    color: white;
+    
+    &:hover {
+      background-color: $primary-color-hover;
+    }
+  }
+}
+
+// Secondary (Paciente - teal)
+.navItem.secondary {
+  color: $text-color;
+  
+  &:hover {
+    background-color: rgba($secondary-color, 0.05);
+    color: $secondary-color;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($secondary-color, 0.2);
+  }
+  
+  &.active {
+    background-color: $secondary-color;
+    color: white;
+    
+    &:hover {
+      background-color: $secondary-color-hover;
+    }
+  }
+}
+
+// Tertiary (Secretario - coral)
+.navItem.tertiary {
+  color: $text-color;
+  
+  &:hover {
+    background-color: rgba($tertiary-color, 0.05);
+    color: $tertiary-color;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($tertiary-color, 0.2);
+  }
+  
+  &.active {
+    background-color: $tertiary-color;
+    color: white;
+    
+    &:hover {
+      background-color: $tertiary-color-hover;
+    }
+  }
+}
+
+// Quaternary (Administrador - brown)
+.navItem.quaternary {
+  color: $text-color;
+  
+  &:hover {
+    background-color: rgba($quaternary-color, 0.05);
+    color: $quaternary-color;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($quaternary-color, 0.2);
+  }
+  
+  &.active {
+    background-color: $quaternary-color;
+    color: white;
+    
+    &:hover {
+      background-color: $quaternary-color-hover;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .navItem {
+    padding: 8px 12px;
+  }
+  
+  .label {
+    display: none;
+  }
+}

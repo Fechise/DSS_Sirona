@@ -25,7 +25,7 @@ export const MedicalRecordPage: React.FC = () => {
         </div>
         <div className={styles.userInfo}>
           <span className={styles.email}>{user?.email}</span>
-          <Button variant="secondary" onClick={handleLogout}>
+          <Button variant="filled" color="secondary" onClick={handleLogout}>
             <LogOut size={16} />
             <span>Cerrar sesión</span>
           </Button>

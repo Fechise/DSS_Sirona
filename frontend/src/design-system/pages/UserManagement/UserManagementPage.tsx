@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './UserManagementPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
-import { Header } from '../../organisms/Header/Header';
 import { Users, RefreshCw } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import type { User, UserRole } from '../../../types/user';
@@ -72,7 +71,6 @@ export const UserManagementPage: React.FC = () => {
 
   return (
     <Container>
-      <Header />
       <main className={styles.main}>
         <div className={styles.header}>
           <div className={styles.titleRow}>
@@ -81,7 +79,8 @@ export const UserManagementPage: React.FC = () => {
               <h1>Gestión de Usuarios</h1>
             </div>
             <Button
-              variant="secondary"
+              variant="filled"
+              color="secondary"
               onClick={loadUsers}
               disabled={loading}
               startIcon={<RefreshCw size={16} />}

@@ -1,6 +1,14 @@
+@use '../../../styles/tokens/_index' as *;
+
 .container {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: color-mix(in srgb, var(--primary-color) 6%, white);
+}
+
+.content {
+  width: 100%;
+  max-width: $content-max-width;
+  margin: 0 auto;
 }

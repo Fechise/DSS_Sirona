@@ -1,0 +1,70 @@
+.avatar {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.withContent {
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.initials {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.icon {
+  color: white;
+}
+
+/* Tamaños */
+.small {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 0.75rem;
+  
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.medium {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 0.875rem;
+  
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.large {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+  font-size: 1.5rem;
+  
+  .icon {
+    width: 36px;
+    height: 36px;
+  }
+}

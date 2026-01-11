@@ -172,7 +172,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit, loading = false }) => 
         </div>
       </div>
 
-      <Button type="submit" variant="primary" fullWidth disabled={loading}>
+      <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading}>
         {loading ? 'Registrando…' : 'Registrarse'}
       </Button>
     </form>

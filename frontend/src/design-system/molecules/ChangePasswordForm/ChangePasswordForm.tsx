@@ -93,7 +93,7 @@ export const ChangePasswordForm: React.FC<Props> = ({ onSubmit, loading = false 
         />
       </div>
 
-      <Button type="submit" variant="primary" fullWidth disabled={loading || !passwordValidation.valid}>
+      <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || !passwordValidation.valid}>
         {loading ? 'Cambiando contraseña...' : 'Cambiar contraseña'}
       </Button>
     </form>

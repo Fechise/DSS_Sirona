@@ -68,7 +68,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, loading = false, isAccoun
         />
       </div>
 
-      <Button type="submit" variant="primary" fullWidth disabled={loading || isAccountLocked}>
+      <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || isAccountLocked}>
         {loading ? 'Ingresando...' : 'Ingresar'}
       </Button>
     </form>

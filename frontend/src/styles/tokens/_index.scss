@@ -1,5 +1,5 @@
-@use './_colors';
-@use './_spacing';
-@use './_typography';
-@use './_shadows';
-@use './_radius';
+@forward './_colors';
+@forward './_spacing';
+@forward './_typography';
+@forward './_shadows';
+@forward './_radius';

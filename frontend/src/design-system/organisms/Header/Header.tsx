@@ -1,18 +1,119 @@
 import React from 'react';
 import styles from './Header.module.scss';
-import { ShieldCheck, LogOut, KeyRound, Users } from 'lucide-react';
-import { Button } from '../../atoms/Button/Button';
+import { ShieldCheck, LogOut, User, Users, Clipboard, ChevronDown, Home, FileText } from 'lucide-react';
+import { Avatar } from '../../atoms/Avatar/Avatar';
+import { NavItem } from '../../atoms/NavItem/NavItem';
+import { DropdownMenu, type DropdownMenuItem } from '../../atoms/DropdownMenu/DropdownMenu';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  const handleProfile = () => {
+    navigate('/perfil');
+  };
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const getRoleColor = (): 'primary' | 'secondary' | 'tertiary' | 'quaternary' => {
+    switch (user?.role) {
+      case 'Médico':
+        return 'primary';
+      case 'Paciente':
+        return 'secondary';
+      case 'Secretario':
+        return 'tertiary';
+      case 'Administrador':
+        return 'quaternary';
+      default:
+        return 'primary';
+    }
+  };
+
+  const getNavItems = () => {
+    const items = [
+      {
+        id: 'home',
+        icon: <Home size={18} />,
+        label: 'Inicio',
+        path: '/inicio',
+      },
+    ];
+
+    switch (user?.role) {
+      case 'Médico':
+        items.push({
+          id: 'patients',
+          icon: <Clipboard size={18} />,
+          label: 'Mis Pacientes',
+          path: '/medico/pacientes',
+        });
+        break;
+      case 'Administrador':
+        items.push({
+          id: 'users',
+          icon: <Users size={18} />,
+          label: 'Gestión de Usuarios',
+          path: '/admin/usuarios',
+        });
+        break;
+      case 'Paciente':
+        items.push({
+          id: 'history',
+          icon: <FileText size={18} />,
+          label: 'Mi Historial',
+          path: '/paciente/mi-historial',
+        });
+        break;
+      case 'Secretario':
+        items.push({
+          id: 'records',
+          icon: <FileText size={18} />,
+          label: 'Historiales',
+          path: '/historiales',
+        });
+        break;
+    }
+
+    return items;
+  };
+
+  const navItems = getNavItems();
+  const roleColor = getRoleColor();
+
+  const menuItems: DropdownMenuItem[] = [
+    {
+      id: 'profile',
+      icon: <User size={18} />,
+      label: 'Ver Perfil',
+      onClick: handleProfile,
+    },
+    {
+      id: 'logout',
+      icon: <LogOut size={18} />,
+      label: 'Cerrar Sesión',
+      onClick: handleLogout,
+      variant: 'danger',
+    },
+  ];
+
+  const triggerContent = (
+    <button className={styles.profileButton}>
+      <div className={styles.avatarWrapper}>
+        <Avatar size="medium" />
+      </div>
+      <span className={styles.userName}>{user?.email}</span>
+      <ChevronDown size={16} className={styles.chevron} />
+    </button>
+  );
 
   return (
     <header className={styles.header}>
@@ -22,33 +123,27 @@ export const Header: React.FC = () => {
         </span>
         <span className={styles.brandText}>Sirona</span>
       </div>
+
+      <nav className={styles.nav}>
+        {navItems.map((item) => (
+          <NavItem
+            key={item.id}
+            icon={item.icon}
+            label={item.label}
+            isActive={isActive(item.path)}
+            onClick={() => navigate(item.path)}
+            color={roleColor}
+          />
+        ))}
+      </nav>
+
       <div className={styles.userInfo}>
-        <span className={styles.email}>{user?.email}</span>
-        <div className={styles.actions}>
-          {user?.role === 'Administrador' && (
-            <Button
-              variant="secondary"
-              onClick={() => navigate('/admin/usuarios')}
-              startIcon={<Users size={16} />}
-            >
-              Gestión de usuarios
-            </Button>
-          )}
-          <Button
-            variant="secondary"
-            onClick={() => navigate('/cambiar-contrasena')}
-            startIcon={<KeyRound size={16} />}
-          >
-            Cambiar contraseña
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleLogout}
-            startIcon={<LogOut size={16} />}
-          >
-            Cerrar sesión
-          </Button>
-        </div>
+        <DropdownMenu
+          trigger={triggerContent}
+          items={menuItems}
+          position="right"
+          showDividers={true}
+        />
       </div>
     </header>
   );

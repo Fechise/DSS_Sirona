@@ -1,12 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AppLayout } from './design-system/layouts/AppLayout';
 import { LoginPage } from './design-system/pages/Login/LoginPage';
 import { RegisterPage } from './design-system/pages/Register/RegisterPage';
 import { MedicalRecordPage } from './design-system/pages/MedicalRecord/MedicalRecordPage';
 import { PaginaInicio } from './design-system/pages/Home/HomePage';
-import { ChangePasswordPage } from './design-system/pages/ChangePassword/ChangePasswordPage';
 import { UserManagementPage } from './design-system/pages/UserManagement/UserManagementPage';
+import { DoctorPatientsPage } from './design-system/pages/DoctorPatients/DoctorPatientsPage';
+import { PatientRecordPage } from './design-system/pages/PatientRecord/PatientRecordPage';
+import { PatientHistoryPage } from './design-system/pages/PatientHistory/PatientHistoryPage';
+import { ProfilePage } from './design-system/pages/Profile/ProfilePage';
 
 const RutaInicial: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -24,7 +28,9 @@ function App() {
             path="/inicio"
             element={
               <ProtectedRoute>
-                <PaginaInicio />
+                <AppLayout>
+                  <PaginaInicio />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -32,15 +38,19 @@ function App() {
             path="/historiales"
             element={
               <ProtectedRoute>
-                <MedicalRecordPage />
+                <AppLayout>
+                  <MedicalRecordPage />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
           <Route
-            path="/cambiar-contrasena"
+            path="/perfil"
             element={
               <ProtectedRoute>
-                <ChangePasswordPage />
+                <AppLayout>
+                  <ProfilePage />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -48,7 +58,39 @@ function App() {
             path="/admin/usuarios"
             element={
               <ProtectedRoute requiredRole="Administrador">
-                <UserManagementPage />
+                <AppLayout>
+                  <UserManagementPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medico/pacientes"
+            element={
+              <ProtectedRoute requiredRole="Médico">
+                <AppLayout>
+                  <DoctorPatientsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medico/pacientes/:patientId/historial"
+            element={
+              <ProtectedRoute requiredRole="Médico">
+                <AppLayout>
+                  <PatientRecordPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/paciente/mi-historial"
+            element={
+              <ProtectedRoute requiredRole="Paciente">
+                <AppLayout>
+                  <PatientHistoryPage />
+                </AppLayout>
               </ProtectedRoute>
             }
           />

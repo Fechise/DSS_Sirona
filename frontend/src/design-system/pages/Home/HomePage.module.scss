@@ -1,7 +1,9 @@
+@use '../../../styles/tokens/_index' as *;
+
 .main {
   flex: 1;
   padding: 2rem;
-  max-width: 1200px;
+  max-width: $content-max-width;
   width: 100%;
   margin: 0 auto;
   display: grid;

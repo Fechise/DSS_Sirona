@@ -27,13 +27,14 @@ export const LoginPage: React.FC = () => {
       // const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(data) });
       // const response = await res.json();
       // if (response.account_locked) { setAccountLocked(true); return; }
-      // const { token, role } = response;
+      // const { token, role, name } = response;
       await new Promise((r) => setTimeout(r, 600)); // simulación
       
       // Mock: responder que se requiere MFA (por ejemplo, administradores o riesgo alto)
       const requiresMfa = true;
       const mockToken = 'mock_jwt_token_' + Date.now();
       const role = 'user';
+      const name = data.email.split('@')[0]; // usar parte del email como nombre por defecto
 
       if (requiresMfa) {
         setMfaRequired(true);
@@ -41,7 +42,7 @@ export const LoginPage: React.FC = () => {
         setPendingRole(role);
         // el token definitivo se obtendría tras validar el OTP; aquí sólo simulamos el flujo
       } else {
-        login(data.email, mockToken, role);
+        login(data.email, mockToken, role, name);
         navigate('/inicio');
       }
     } finally {
@@ -64,6 +65,7 @@ export const LoginPage: React.FC = () => {
       const requiresMfa = true;
       const role = 'user';
       const email = faceEmail || 'face@sirona.local';
+      const name = faceEmail.split('@')[0] || 'usuario';
 
       if (requiresMfa) {
         setMfaRequired(true);
@@ -71,7 +73,7 @@ export const LoginPage: React.FC = () => {
         setPendingRole(role);
       } else {
         const mockToken = 'mock_face_token_' + Date.now();
-        login(email, mockToken, role);
+        login(email, mockToken, role, name);
         navigate('/inicio');
       }
     } finally {
@@ -89,7 +91,8 @@ export const LoginPage: React.FC = () => {
       // Mock: OTP correcto
       const mockToken = 'mock_otp_token_' + Date.now();
       const email = pendingEmail || 'user@sirona.local';
-      login(email, mockToken, pendingRole);
+      const name = pendingEmail?.split('@')[0] || 'usuario';
+      login(email, mockToken, pendingRole, name);
       setMfaRequired(false);
       setOtp('');
       navigate('/inicio');
@@ -113,6 +116,7 @@ export const LoginPage: React.FC = () => {
           </span>
           <span className={styles.brandText}>Sirona</span>
         </div>
+
         {!mfaRequired && (
           <>
             <div className={styles.modes}>
@@ -182,7 +186,7 @@ export const LoginPage: React.FC = () => {
                     <p className={styles.hint}>{livenessTip}</p>
                   </div>
 
-                  <Button type="submit" variant="primary" fullWidth disabled={loading || !faceCapture || accountLocked}>
+                  <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || !faceCapture || accountLocked}>
                     {loading ? 'Verificando...' : 'Iniciar reconocimiento facial'}
                   </Button>
                 </form>
@@ -212,7 +216,7 @@ export const LoginPage: React.FC = () => {
                   required
                 />
               </div>
-              <Button type="submit" variant="primary" fullWidth disabled={loading || otp.length < 6}>
+              <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || otp.length < 6}>
                 {loading ? 'Validando...' : 'Validar OTP'}
               </Button>
               <p className={styles.hint}>
@@ -233,10 +237,11 @@ export const LoginPage: React.FC = () => {
             <div className={styles.demoButtons}>
               <Button
                 type="button"
-                variant="secondary"
+                variant="filled"
+                color="secondary"
                 onClick={() => {
                   const mockToken = 'mock_jwt_token_demo';
-                  login('demo@sirona.local', mockToken, 'Paciente');
+                  login('demo@sirona.local', mockToken, 'Paciente', 'Demo Paciente');
                   navigate('/inicio');
                 }}
               >
@@ -244,10 +249,23 @@ export const LoginPage: React.FC = () => {
               </Button>
               <Button
                 type="button"
-                variant="secondary"
+                variant="filled"
+                color="primary"
+                onClick={() => {
+                  const mockToken = 'mock_jwt_token_doctor';
+                  login('doctor@sirona.local', mockToken, 'Médico', 'Dr. Demo');
+                  navigate('/inicio');
+                }}
+              >
+                Demo Médico
+              </Button>
+              <Button
+                type="button"
+                variant="filled"
+                color="quaternary"
                 onClick={() => {
                   const mockToken = 'mock_jwt_token_admin';
-                  login('admin@sirona.local', mockToken, 'Administrador');
+                  login('admin@sirona.local', mockToken, 'Administrador', 'Admin');
                   navigate('/inicio');
                 }}
               >

@@ -1,0 +1,129 @@
+@use '../../../styles/tokens/_index' as *;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: 0;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #8b8b8b;
+  margin: 0;
+}
+
+.successAlert {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background-color: #ecf7ee;
+  border-left: 4px solid #4caf50;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-size: 14px;
+  font-weight: 500;
+
+  svg {
+    color: #4caf50;
+    flex-shrink: 0;
+  }
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  box-shadow: $shadow-medium;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-lg;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.cardTitleGroup {
+  display: flex;
+  gap: $spacing-md;
+  flex: 1;
+
+  svg {
+    color: $primary-color;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+}
+
+.cardSubtitle {
+  font-size: 14px;
+  color: #8b8b8b;
+  margin: $spacing-xs 0 0 0;
+}
+
+.securityInfo {
+  background: #fafafa;
+  border-left: 4px solid $primary-color;
+  padding: $spacing-lg $spacing-xl;
+  border-radius: 8px;
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0 0 $spacing-sm 0;
+  }
+
+  ul {
+    list-style: disc;
+    margin: 0;
+    padding-left: $spacing-lg;
+    font-size: 13px;
+    color: #8b8b8b;
+    line-height: 1.6;
+
+    li {
+      margin-bottom: $spacing-sm;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

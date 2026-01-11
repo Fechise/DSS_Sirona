@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  user: { email: string; role: string } | null;
+  user: { email: string; role: string; name: string } | null;
   token: string | null;
-  login: (email: string, token: string, role?: string) => void;
+  login: (email: string, token: string, role?: string, name?: string) => void;
   logout: () => void;
 };
 
@@ -12,7 +12,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ email: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; role: string; name: string } | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
   // Al cargar, revisar si hay sesión guardada (localStorage)
@@ -26,8 +26,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (email: string, tokenValue: string, role = 'user') => {
-    const userData = { email, role };
+  const login = (email: string, tokenValue: string, role = 'user', name = '') => {
+    const userData = { email, role, name };
     setToken(tokenValue);
     setUser(userData);
     setIsAuthenticated(true);
