@@ -17,6 +17,24 @@ import { EvaluationSection } from './sections/EvaluationSection';
 import { FollowUpSection } from './sections/FollowUpSection';
 import styles from './PatientRecordPage.module.scss';
 
+/**
+ * PBI-14 Security Policy: Clinical Data Storage
+ * 
+ * CRITICAL: This component does NOT store any patient clinical data in:
+ * - localStorage
+ * - sessionStorage
+ * - browser cache
+ * - cookies
+ * 
+ * All clinical data is:
+ * 1. Fetched fresh from API on every navigation
+ * 2. Stored only in React component state (memory)
+ * 3. Cleared immediately when patientId changes
+ * 4. Destroyed on component unmount
+ * 
+ * Only authentication tokens are persisted (managed by AuthContext).
+ */
+
 type ClinicalRecord = {
   id: string;
   patientId: string;
@@ -162,16 +180,46 @@ export const PatientRecordPage: React.FC = () => {
   const [evalForm, setEvalForm] = useState<EvalForm>({ diagnostico: '', tratamiento: '', observaciones: '' });
 
   useEffect(() => {
-    let active = true;
-    const fetchRecord = async () => {
-      setLoading(true);
+    // PBI-14: Race condition protection - only the latest request should update state
+    let isCurrent = true;
+    const abortController = new AbortController();
+
+    // PBI-14: Clear all previous patient data immediately when patientId changes
+    const clearAllPatientData = () => {
+      setRecord(null);
+      setInfoForm({ motivoConsulta: '', historiaEnfermedadActual: '' });
+      setAntecedentesForm({ personales: '', quirurgicos: '' });
+      setMedsForm({ medicamentos: '', alergias: '' });
+      setSocialForm({ tabaquismo: '', alcohol: '', ocupacion: '', actividadFisica: '' });
+      setEvalForm({ diagnostico: '', tratamiento: '', observaciones: '' });
+      setEditInfo(false);
+      setEditAntecedentes(false);
+      setEditMeds(false);
+      setEditSocial(false);
+      setEditEval(false);
       setError(null);
       setAuthError(null);
+    };
+
+    const fetchRecord = async () => {
+      // PBI-14: Clear previous patient data IMMEDIATELY before fetching new data
+      // This ensures no data from Patient A is visible while loading Patient B
+      clearAllPatientData();
+      setLoading(true);
+
       try {
+        // Simulate API call: GET /api/doctor/patients/:patientId/clinical-record
+        // In production, pass abortController.signal to fetch options
         await new Promise((resolve) => setTimeout(resolve, 400));
-        if (!active) return;
+        
+        // PBI-14: Ignore response if this request is no longer current (race condition)
+        if (!isCurrent || abortController.signal.aborted) return;
 
         const data = buildMockRecord(patientId);
+        
+        // PBI-14: Double-check isCurrent before updating state
+        if (!isCurrent) return;
+
         setRecord(data);
         setInfoForm({ motivoConsulta: data.motivoConsulta, historiaEnfermedadActual: data.historiaEnfermedadActual });
         setAntecedentesForm({ personales: data.antecedentesPersonales.join('\n'), quirurgicos: data.antecedentesQuirurgicos.join('\n') });
@@ -179,15 +227,23 @@ export const PatientRecordPage: React.FC = () => {
         setSocialForm({ ...data.historiaSocial });
         setEvalForm({ diagnostico: data.diagnostico, tratamiento: data.tratamiento, observaciones: data.observaciones });
       } catch (err) {
-        if (!active) return;
+        // PBI-14: Ignore errors from aborted/stale requests
+        if (!isCurrent || abortController.signal.aborted) return;
         setError('Error al cargar el historial médico');
       } finally {
-        if (active) setLoading(false);
+        // PBI-14: Only update loading state if this is still the current request
+        if (isCurrent) setLoading(false);
       }
     };
+
     fetchRecord();
+
     return () => {
-      active = false;
+      // PBI-14: Mark this request as stale and abort any ongoing fetch
+      isCurrent = false;
+      abortController.abort();
+      // PBI-14: Cleanup on unmount to prevent memory leaks and data exposure
+      clearAllPatientData();
     };
   }, [patientId]);
 
@@ -240,6 +296,8 @@ export const PatientRecordPage: React.FC = () => {
   };
 
   if (loading) {
+    // PBI-14: During loading, NO patient data is rendered
+    // This prevents Patient A's data from being visible while Patient B loads
     return (
       <Container>
         <div className={styles.loading}>
@@ -251,6 +309,7 @@ export const PatientRecordPage: React.FC = () => {
   }
 
   if (authError) {
+    // PBI-14: Authorization error - no patient data is exposed
     return (
       <Container>
         <div className={styles.errorContainer}>
@@ -265,6 +324,7 @@ export const PatientRecordPage: React.FC = () => {
   }
 
   if (!record) {
+    // PBI-14: No record loaded - show error without exposing any patient data
     return (
       <Container>
         <div className={styles.errorContainer}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './Header.module.scss';
-import { ShieldCheck, LogOut, User, Users, Clipboard, ChevronDown, Home, FileText } from 'lucide-react';
+import { ShieldCheck, LogOut, User, Users, Clipboard, ChevronDown, Home, FileText, Calendar } from 'lucide-react';
 import { Avatar } from '../../atoms/Avatar/Avatar';
 import { NavItem } from '../../atoms/NavItem/NavItem';
 import { DropdownMenu, type DropdownMenuItem } from '../../atoms/DropdownMenu/DropdownMenu';
@@ -75,10 +75,10 @@ export const Header: React.FC = () => {
         break;
       case 'Secretario':
         items.push({
-          id: 'records',
-          icon: <FileText size={18} />,
-          label: 'Historiales',
-          path: '/historiales',
+          id: 'appointments',
+          icon: <Calendar size={18} />,
+          label: 'Agendamiento',
+          path: '/secretario/citas',
         });
         break;
     }

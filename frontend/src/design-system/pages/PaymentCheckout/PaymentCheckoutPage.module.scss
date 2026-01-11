@@ -1,0 +1,97 @@
+@use 'sass:color';
+@use '../../../styles/tokens/_index' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: $text-color;
+  }
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba($secondary-color, 0.12);
+  color: $secondary-color;
+}
+
+.subtitle {
+  margin: 4px 0 0 0;
+  color: rgba($text-color, 0.7);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  h2 {
+    margin: 0;
+    color: $text-color;
+  }
+}
+
+.text {
+  margin: 0;
+  color: rgba($text-color, 0.85);
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.helper {
+  margin: 0;
+  color: rgba($text-color, 0.6);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  border-radius: 10px;
+  border: 1px solid rgba($error-color, 0.4);
+  background: rgba($error-color, 0.08);
+  color: color.adjust($error-color, $lightness: -10%);
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  border-radius: 10px;
+  border: 1px solid rgba($secondary-color, 0.3);
+  background: rgba($secondary-color, 0.08);
+  color: rgba($text-color, 0.85);
+}

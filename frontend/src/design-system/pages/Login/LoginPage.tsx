@@ -271,6 +271,18 @@ export const LoginPage: React.FC = () => {
               >
                 Demo Admin
               </Button>
+              <Button
+                type="button"
+                variant="filled"
+                color="tertiary"
+                onClick={() => {
+                  const mockToken = 'mock_jwt_token_secretary';
+                  login('secretario@sirona.local', mockToken, 'Secretario', 'Secretario Demo');
+                  navigate('/inicio');
+                }}
+              >
+                Demo Secretario
+              </Button>
             </div>
           </div>
         </div>
