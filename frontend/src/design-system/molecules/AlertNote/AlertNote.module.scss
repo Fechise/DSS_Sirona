@@ -1,0 +1,114 @@
+@use '../../../styles/tokens/_index' as *;
+
+.alertNote {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  border-left: 4px solid;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  flex: 1;
+
+  strong {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+// Color variants
+.primary {
+  background-color: rgba($primary-color, 0.1);
+  border-left-color: $primary-color;
+
+  .iconWrapper svg {
+    color: $primary-color;
+  }
+
+  strong {
+    color: $text-color;
+  }
+
+  p {
+    color: rgba($text-color, 0.85);
+  }
+}
+
+.secondary {
+  background-color: rgba($secondary-color, 0.1);
+  border-left-color: $secondary-color;
+
+  .iconWrapper svg {
+    color: $secondary-color;
+  }
+
+  strong {
+    color: $text-color;
+  }
+
+  p {
+    color: rgba($text-color, 0.85);
+  }
+}
+
+.tertiary {
+  background-color: rgba($tertiary-color, 0.1);
+  border-left-color: $tertiary-color;
+
+  .iconWrapper svg {
+    color: $tertiary-color;
+  }
+
+  strong {
+    color: $text-color;
+  }
+
+  p {
+    color: rgba($text-color, 0.85);
+  }
+}
+
+.quaternary {
+  background-color: rgba($quaternary-color, 0.1);
+  border-left-color: $quaternary-color;
+
+  .iconWrapper svg {
+    color: $quaternary-color;
+  }
+
+  strong {
+    color: $text-color;
+  }
+
+  p {
+    color: rgba($text-color, 0.85);
+  }
+}

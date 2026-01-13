@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Plus, Edit2, Trash2, AlertCircle } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Container } from '../../atoms/Container/Container';
+import { PageHeader } from '../../molecules/PageHeader/PageHeader';
+import { AlertNote } from '../../molecules/AlertNote/AlertNote';
+import { Table } from '../../molecules/Table/Table';
 import styles from './AppointmentSchedulingPage.module.scss';
 
 type Patient = {
@@ -129,14 +132,14 @@ export const AppointmentSchedulingPage: React.FC = () => {
         appointments.map((apt) =>
           apt.id === editingId
             ? {
-                ...apt,
-                patientId: formData.patientId,
-                patientName: patient.name,
-                doctorId: formData.doctorId,
-                doctorName: doctor.name,
-                date: formData.date,
-                time: formData.time,
-              }
+              ...apt,
+              patientId: formData.patientId,
+              patientName: patient.name,
+              doctorId: formData.doctorId,
+              doctorName: doctor.name,
+              date: formData.date,
+              time: formData.time,
+            }
             : apt
         )
       );
@@ -197,14 +200,14 @@ export const AppointmentSchedulingPage: React.FC = () => {
   return (
     <Container>
       <div className={styles.page}>
-        
-
         {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.titleSection}>
-            <Calendar size={32} />
-            <h1>Agendamiento de Citas</h1>
-          </div>
+        <PageHeader
+          title="Agendamiento de Citas"
+          icon={<Calendar size={32} />}
+        />
+
+        {/* New Appointment Button */}
+        <div className={styles.buttonSection}>
           <Button
             variant="filled"
             color="primary"
@@ -215,14 +218,11 @@ export const AppointmentSchedulingPage: React.FC = () => {
           </Button>
         </div>
 
-{/* Security Note */}
-        <div className={styles.securityNote}>
-          <AlertCircle size={16} />
-          <p>
-            <strong>Nota de Seguridad (PBI-16):</strong> Solo tienes acceso a datos demográficos de pacientes (nombre, teléfono).
-            Los historiales clínicos no son accesibles desde esta sección.
-          </p>
-        </div>
+        {/* Security Note */}
+        <AlertNote title="Nota de Seguridad (PBI-16):">
+          Solo tienes acceso a datos demográficos de pacientes (nombre, teléfono).
+          Los historiales clínicos no son accesibles desde esta sección.
+        </AlertNote>
 
         {/* Error Alert */}
         {error && (
@@ -312,64 +312,81 @@ export const AppointmentSchedulingPage: React.FC = () => {
         {/* Appointments Table */}
         <div className={styles.tableSection}>
           <h2>Citas Agendadas</h2>
-          {appointments.length === 0 ? (
-            <p className={styles.emptyMessage}>No hay citas agendadas</p>
-          ) : (
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Paciente</th>
-                    <th>Cédula</th>
-                    <th>Médico</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {appointments.map((apt) => {
-                    const patient = patients.find((p) => p.id === apt.patientId);
-                    return (
-                      <tr key={apt.id}>
-                        <td>{apt.patientName}</td>
-                        <td>{patient?.cedula}</td>
-                        <td>{apt.doctorName}</td>
-                        <td>{new Date(apt.date).toLocaleDateString('es-ES')}</td>
-                        <td>{apt.time}</td>
-                        <td>
-                          <span className={`${styles.status} ${styles[apt.status]}`}>
-                            {apt.status === 'scheduled' ? 'Agendada' : apt.status === 'completed' ? 'Completada' : 'Cancelada'}
-                          </span>
-                        </td>
-                        <td className={styles.actions}>
-                          <Button
-                            variant="filled"
-                            color="secondary"
-                            onClick={() => handleEditAppointment(apt)}
-                            startIcon={<Edit2 size={16} />}
-                          >
-                            Editar
-                          </Button>
-                          <Button
-                            variant="filled"
-                            color="tertiary"
-                            onClick={() => handleDeleteAppointment(apt.id)}
-                            startIcon={<Trash2 size={16} />}
-                          >
-                            Eliminar
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <Table<Appointment>
+            columns={[
+              {
+                key: 'patientName' as keyof Appointment,
+                label: 'Paciente',
+              },
+              {
+                key: 'patientId' as keyof Appointment,
+                label: 'Cédula',
+                render: (value) => {
+                  const patient = patients.find((p) => p.id === value);
+                  return patient?.cedula;
+                },
+              },
+              {
+                key: 'doctorName' as keyof Appointment,
+                label: 'Médico',
+              },
+              {
+                key: 'date' as keyof Appointment,
+                label: 'Fecha',
+                render: (value) => new Date(value as string).toLocaleDateString('es-ES'),
+              },
+              {
+                key: 'time' as keyof Appointment,
+                label: 'Hora',
+              },
+              {
+                key: 'status' as keyof Appointment,
+                label: 'Estado',
+                render: (value) => {
+                  const statusText =
+                    value === 'scheduled'
+                      ? 'Agendada'
+                      : value === 'completed'
+                        ? 'Completada'
+                        : 'Cancelada';
+                  return (
+                    <span className={`${styles.status} ${styles[value]}`}>
+                      {statusText}
+                    </span>
+                  );
+                },
+              },
+              {
+                key: 'id' as keyof Appointment,
+                label: 'Acciones',
+                align: 'right',
+                render: (_, row) => (
+                  <div className={styles.actions}>
+                    <Button
+                      variant="filled"
+                      color="secondary"
+                      onClick={() => handleEditAppointment(row)}
+                      startIcon={<Edit2 size={16} />}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="filled"
+                      color="tertiary"
+                      onClick={() => handleDeleteAppointment(row.id)}
+                      startIcon={<Trash2 size={16} />}
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+            data={appointments}
+            rowKey="id"
+            emptyMessage="No hay citas agendadas"
+          />
         </div>
-
       </div>
     </Container>
   );

@@ -1,0 +1,66 @@
+@use '../../../styles/tokens/_index' as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  padding-bottom: $spacing-md;
+  border-bottom: 2px solid $border-color;
+  margin-bottom: $spacing-lg;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  width: 100%;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text-color;
+  margin: 0;
+}
+
+// Color variants for icon
+.primary {
+  .iconWrapper svg {
+    color: $primary-color;
+  }
+}
+
+.secondary {
+  .iconWrapper svg {
+    color: $secondary-color;
+  }
+}
+
+.tertiary {
+  .iconWrapper svg {
+    color: $tertiary-color;
+  }
+}
+
+.quaternary {
+  .iconWrapper svg {
+    color: $quaternary-color;
+  }
+}

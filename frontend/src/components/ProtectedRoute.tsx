@@ -9,8 +9,17 @@ type ProtectedRouteProps = {
 };
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
+
+  // PBI-7, PBI-14: Mostrar loading mientras se decodifica JWT desde localStorage
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div>Cargando sesión...</div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     // Redirigir a login si no está autenticado

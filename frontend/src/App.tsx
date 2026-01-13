@@ -13,6 +13,7 @@ import { PatientHistoryPage } from './design-system/pages/PatientHistory/Patient
 import { ProfilePage } from './design-system/pages/Profile/ProfilePage';
 import { AppointmentSchedulingPage } from './design-system/pages/AppointmentScheduling/AppointmentSchedulingPage';
 import { PaymentCheckoutPage } from './design-system/pages/PaymentCheckout/PaymentCheckoutPage';
+import { PatientListPage } from './design-system/pages/PatientList/PatientListPage';
 
 const RutaInicial: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -112,6 +113,16 @@ function App() {
               <ProtectedRoute requiredRole="Secretario">
                 <AppLayout>
                   <AppointmentSchedulingPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pacientes"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <PatientListPage />
                 </AppLayout>
               </ProtectedRoute>
             }

@@ -3,6 +3,8 @@ import styles from './UserManagementPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
 import { Users, RefreshCw } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
+import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import type { User, UserRole } from '../../../types/user';
 import { ALL_ROLES } from '../../../types/user';
 
@@ -69,28 +71,75 @@ export const UserManagementPage: React.FC = () => {
     }
   };
 
+  // Definir columnas de la tabla
+  const columns: TableColumn<User>[] = [
+    {
+      key: 'fullName',
+      label: 'Nombre',
+    },
+    {
+      key: 'email',
+      label: 'Correo',
+    },
+    {
+      key: 'role',
+      label: 'Rol Actual',
+      render: (value: UserRole) => (
+        <span className={[styles.roleBadge, styles[`role${value}`]].join(' ')}>
+          {value}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      render: (value: string) => (
+        <span className={[styles.statusBadge, styles[`status${value}`]].join(' ')}>
+          {value}
+        </span>
+      ),
+    },
+    {
+      key: 'id',
+      label: 'Acciones',
+      render: (_value: string, user: User) => (
+        <select
+          className={styles.roleSelect}
+          value={user.role}
+          onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
+          disabled={updating === user.id}
+        >
+          {ALL_ROLES.map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
+          ))}
+        </select>
+      ),
+    },
+  ];
+
   return (
     <Container>
       <main className={styles.main}>
-        <div className={styles.header}>
-          <div className={styles.titleRow}>
-            <div className={styles.titleGroup}>
-              <Users size={28} />
-              <h1>Gestión de Usuarios</h1>
-            </div>
-            <Button
-              variant="filled"
-              color="secondary"
-              onClick={loadUsers}
-              disabled={loading}
-              startIcon={<RefreshCw size={16} />}
-            >
-              Actualizar
-            </Button>
-          </div>
+        <PageHeader
+          title="Gestión de Usuarios"
+          icon={<Users size={32} />}
+        />
+
+        <div className={styles.headerActions}>
           <p className={styles.subtitle}>
             Administra los roles y permisos de los usuarios del sistema
           </p>
+          <Button
+            variant="filled"
+            color="secondary"
+            onClick={loadUsers}
+            disabled={loading}
+            startIcon={<RefreshCw size={16} />}
+          >
+            Actualizar
+          </Button>
         </div>
 
         {loading ? (
@@ -100,58 +149,11 @@ export const UserManagementPage: React.FC = () => {
           </div>
         ) : (
           <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Correo</th>
-                  <th>Rol Actual</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.fullName}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span className={[styles.roleBadge, styles[`role${user.role}`]].join(' ')}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={[styles.statusBadge, styles[`status${user.status}`]].join(' ')}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td>
-                      <select
-                        className={styles.roleSelect}
-                        value={user.role}
-                        onChange={(e) =>
-                          handleRoleChange(user.id, e.target.value as UserRole)
-                        }
-                        disabled={updating === user.id}
-                      >
-                        {ALL_ROLES.map((role) => (
-                          <option key={role} value={role}>
-                            {role}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {!loading && users.length === 0 && (
-          <div className={styles.emptyState}>
-            <Users size={48} />
-            <p>No se encontraron usuarios</p>
+            <Table<User>
+              columns={columns}
+              data={users}
+              emptyMessage="No se encontraron usuarios"
+            />
           </div>
         )}
       </main>

@@ -1,8 +1,8 @@
 // Role-based color themes
-$primary-color: #8b7bd0; // Médico - morado pastel
+$primary-color: #7B69C9; // Médico - morado pastel
 $secondary-color: #2a9d8f; // Paciente - teal profundo
-$tertiary-color: #E08D79; // Secretario - salmón/coral
-$quaternary-color: #4B4237; // Administrador - marrón oscuro
+$tertiary-color: #D8735A; // Secretario - salmón/coral
+$quaternary-color: #4D85A8; // Administrador - azul oscuro
 
 // Other theme colors
 $accent-color: #e74c3c;
@@ -19,6 +19,12 @@ $on-primary-color: #ffffff;
 $on-secondary-color: #ffffff;
 $on-tertiary-color: #ffffff;
 $on-quaternary-color: #ffffff;
+
+// Background colors for role-based pages (6% mix with white)
+$background-primary: color-mix(in srgb, $primary-color 6%, white);     // Médico
+$background-secondary: color-mix(in srgb, $secondary-color 6%, white); // Paciente
+$background-tertiary: color-mix(in srgb, $tertiary-color 6%, white);   // Secretario
+$background-quaternary: color-mix(in srgb, $quaternary-color 6%, white); // Administrador
 
 @use 'sass:color';
 
@@ -48,6 +54,10 @@ $quaternary-color-active: color.mix($quaternary-color, #000, 8%);
   --on-secondary-color: #{$on-secondary-color};
   --on-tertiary-color: #{$on-tertiary-color};
   --on-quaternary-color: #{$on-quaternary-color};
+  --background-primary: #{$background-primary};
+  --background-secondary: #{$background-secondary};
+  --background-tertiary: #{$background-tertiary};
+  --background-quaternary: #{$background-quaternary};
   --primary-color-hover: #{$primary-color-hover};
   --primary-color-active: #{$primary-color-active};
   --secondary-color-hover: #{$secondary-color-hover};

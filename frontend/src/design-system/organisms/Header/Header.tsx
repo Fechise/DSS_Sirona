@@ -80,6 +80,12 @@ export const Header: React.FC = () => {
           label: 'Agendamiento',
           path: '/secretario/citas',
         });
+        items.push({
+          id: 'patients-list',
+          icon: <Users size={18} />,
+          label: 'Listado de Pacientes',
+          path: '/pacientes',
+        });
         break;
     }
 

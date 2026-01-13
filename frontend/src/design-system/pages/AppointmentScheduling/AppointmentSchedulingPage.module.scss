@@ -8,35 +8,13 @@
   padding: $spacing-lg;
 }
 
-.header {
+.buttonSection {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: $spacing-md;
   margin-bottom: $spacing-lg;
-  padding-bottom: $spacing-md;
-  border-bottom: 1px solid $border-color;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: $spacing-md;
-    align-items: flex-start;
-  }
-}
-
-.titleSection {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: $text-color;
-    margin: 0;
-  }
-
-  svg {
-    color: $secondary-color;
   }
 }
 
@@ -142,56 +120,6 @@
   }
 }
 
-.emptyMessage {
-  text-align: center;
-  color: rgba($text-color, 0.5);
-  padding: $spacing-lg;
-  font-style: italic;
-}
-
-.tableWrapper {
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-
-  thead {
-    background-color: #fafafa;
-    border-bottom: 2px solid $border-color;
-  }
-
-  th {
-    padding: $spacing-md;
-    text-align: left;
-    font-weight: 600;
-    color: rgba($text-color, 0.85);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  td {
-    padding: $spacing-md;
-    border-bottom: 1px solid $border-color;
-    color: rgba($text-color, 0.85);
-    font-size: 0.95rem;
-
-    &:last-child {
-      text-align: right;
-    }
-  }
-
-  tbody tr {
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: rgba($secondary-color, 0.05);
-    }
-  }
-}
-
 .status {
   display: inline-block;
   padding: $spacing-xs $spacing-sm;
@@ -223,31 +151,6 @@
 
   @media (max-width: 768px) {
     flex-direction: column;
-  }
-}
-
-.securityNote {
-  display: flex;
-  gap: $spacing-sm;
-  padding: $spacing-md;
-  background-color: rgba($secondary-color, 0.1);
-  border-left: 4px solid $secondary-color;
-  border-radius: 8px;
-
-  svg {
-    color: $secondary-color;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  p {
-    margin: 0;
-    color: rgba($text-color, 0.85);
-    font-size: 0.9rem;
-
-    strong {
-      color: $text-color;
-    }
   }
 }
 

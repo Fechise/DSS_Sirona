@@ -5,6 +5,7 @@ import { ShieldCheck, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Button } from '../../atoms/Button/Button';
+import { AuthApiService } from '../../../services/api';
 
 export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -16,34 +17,36 @@ export const LoginPage: React.FC = () => {
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [pendingRole, setPendingRole] = useState<string>('user');
   const [accountLocked, setAccountLocked] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handlePasswordSubmit = async (data: { email: string; password: string }) => {
     setLoading(true);
     setAccountLocked(false);
+    setErrorMessage(null);
+    
     try {
-      // TODO: integrar con FastAPI (ej. POST /auth/login)
-      // const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(data) });
-      // const response = await res.json();
-      // if (response.account_locked) { setAccountLocked(true); return; }
-      // const { token, role, name } = response;
-      await new Promise((r) => setTimeout(r, 600)); // simulación
+      const response = await AuthApiService.login(data);
       
-      // Mock: responder que se requiere MFA (por ejemplo, administradores o riesgo alto)
-      const requiresMfa = true;
-      const mockToken = 'mock_jwt_token_' + Date.now();
-      const role = 'user';
-      const name = data.email.split('@')[0]; // usar parte del email como nombre por defecto
-
-      if (requiresMfa) {
+      console.log('Login response:', response); // Debug
+    
+      if (response.requires_mfa) {
         setMfaRequired(true);
         setPendingEmail(data.email);
-        setPendingRole(role);
-        // el token definitivo se obtendría tras validar el OTP; aquí sólo simulamos el flujo
+        setPendingRole(response.role);
       } else {
-        login(data.email, mockToken, role, name);
+        // Usar el email del formulario y el token de la respuesta
+        login(data.email, response.token, response.role, data.email.split('@')[0]);
         navigate('/inicio');
+      }
+    } catch (error: any) {
+      console.error('Login failed:', error); // Debug
+      if (error.account_locked) {
+        setAccountLocked(true);
+        setErrorMessage(`Cuenta bloqueada hasta ${error.locked_until || '15 minutos'}`);
+      } else {
+        setErrorMessage(error.detail || 'Error al iniciar sesión. Verifica tus credenciales.');
       }
     } finally {
       setLoading(false);
@@ -54,27 +57,30 @@ export const LoginPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setAccountLocked(false);
+    setErrorMessage(null);
+    
     try {
-      // TODO: integrar con FastAPI (POST /auth/login/face) incluyendo prueba de vida y template biométrico
-      // const res = await fetch('/api/auth/login/face', { method: 'POST', body: formData });
-      // const response = await res.json();
-      // if (response.account_locked) { setAccountLocked(true); return; }
-      await new Promise((r) => setTimeout(r, 600)); // simulación
+      if (!faceCapture) {
+        setErrorMessage('Debes capturar tu rostro para continuar');
+        return;
+      }
 
-      // Mock: éxito facial + liveness OK
-      const requiresMfa = true;
-      const role = 'user';
-      const email = faceEmail || 'face@sirona.local';
-      const name = faceEmail.split('@')[0] || 'usuario';
-
-      if (requiresMfa) {
+      const response = await AuthApiService.loginWithFace(faceEmail, faceCapture);
+      
+      if (response.requires_mfa) {
         setMfaRequired(true);
-        setPendingEmail(email);
-        setPendingRole(role);
+        setPendingEmail(faceEmail);
+        setPendingRole(response.role);
       } else {
-        const mockToken = 'mock_face_token_' + Date.now();
-        login(email, mockToken, role, name);
+        login(faceEmail, response.token, response.role, faceEmail.split('@')[0]);
         navigate('/inicio');
+      }
+    } catch (error: any) {
+      if (error.account_locked) {
+        setAccountLocked(true);
+        setErrorMessage(`Cuenta bloqueada hasta ${error.locked_until || '15 minutos'}`);
+      } else {
+        setErrorMessage(error.detail || 'Error en reconocimiento facial. Intenta nuevamente.');
       }
     } finally {
       setLoading(false);
@@ -84,18 +90,17 @@ export const LoginPage: React.FC = () => {
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
+    
     try {
-      // TODO: validar OTP contra backend (ej. POST /auth/otp/verify)
-      await new Promise((r) => setTimeout(r, 500));
-
-      // Mock: OTP correcto
-      const mockToken = 'mock_otp_token_' + Date.now();
-      const email = pendingEmail || 'user@sirona.local';
-      const name = pendingEmail?.split('@')[0] || 'usuario';
-      login(email, mockToken, pendingRole, name);
+      const response = await AuthApiService.verifyOtp(pendingEmail!, otp);
+      
+      login(pendingEmail!, response.token, response.role, pendingEmail!.split('@')[0]);
       setMfaRequired(false);
       setOtp('');
       navigate('/inicio');
+    } catch (error: any) {
+      setErrorMessage(error.detail || 'Código OTP inválido. Intenta nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -116,6 +121,13 @@ export const LoginPage: React.FC = () => {
           </span>
           <span className={styles.brandText}>Sirona</span>
         </div>
+
+        {errorMessage && (
+          <div className={styles.alertError}>
+            <AlertCircle size={20} />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         {!mfaRequired && (
           <>
@@ -225,6 +237,7 @@ export const LoginPage: React.FC = () => {
             </form>
           </div>
         )}
+        
         <div className={styles.foot}>
           <div className={styles.links}>
             <button

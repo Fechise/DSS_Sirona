@@ -1,0 +1,110 @@
+@use '../../../styles/tokens/_index' as *;
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    border-bottom: 2px solid $border-color;
+
+    th {
+      padding: $spacing-md;
+      text-align: left;
+      font-weight: 600;
+      color: $on-primary-color;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      // Responsive
+      @media (max-width: 768px) {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba($primary-color, 0.02);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: $spacing-md;
+        color: $text-color;
+        font-size: 0.95rem;
+
+        @media (max-width: 768px) {
+          padding: 0.75rem;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// Color variants for header background
+.primary {
+  thead {
+    background-color: $primary-color;
+
+    th {
+      color: $on-primary-color;
+    }
+  }
+}
+
+.secondary {
+  thead {
+    background-color: $secondary-color;
+
+    th {
+      color: $on-secondary-color;
+    }
+  }
+}
+
+.tertiary {
+  thead {
+    background-color: $tertiary-color;
+
+    th {
+      color: $on-tertiary-color;
+    }
+  }
+}
+
+.quaternary {
+  thead {
+    background-color: $quaternary-color;
+
+    th {
+      color: $on-quaternary-color;
+    }
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-lg;
+  color: rgba($text-color, 0.5);
+  font-style: italic;
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}

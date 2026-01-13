@@ -4,11 +4,27 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: color-mix(in srgb, var(--primary-color) 6%, white);
 }
 
 .content {
   width: 100%;
   max-width: $content-max-width;
   margin: 0 auto;
+}
+
+// Color variants por rol (sin var(), usando $ directamente)
+.primary {
+  background: $background-primary; // Médico - violeta 6%
+}
+
+.secondary {
+  background: $background-secondary; // Paciente - teal 6%
+}
+
+.tertiary {
+  background: $background-tertiary; // Secretario - salmón 6%
+}
+
+.quaternary {
+  background: $background-quaternary; // Administrador - azul 6%
 }
