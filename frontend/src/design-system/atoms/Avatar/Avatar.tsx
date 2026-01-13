@@ -4,6 +4,8 @@ import { User } from 'lucide-react';
 
 export type AvatarSize = 'small' | 'medium' | 'large';
 
+export type AvatarColor = 'primary' | 'secondary' | 'tertiary' | 'quaternary';
+
 export type AvatarProps = {
   /**
    * URL de la imagen del avatar (opcional)
@@ -21,7 +23,12 @@ export type AvatarProps = {
   size?: AvatarSize;
   
   /**
-   * Color personalizado para el gradiente (opcional)
+   * Color del avatar basado en rol
+   */
+  color?: AvatarColor;
+  
+  /**
+   * Color personalizado para el gradiente (opcional, sobrescribe color)
    */
   customColor?: string;
   
@@ -45,12 +52,14 @@ export const Avatar: React.FC<AvatarProps> = ({
   src,
   initials,
   size = 'medium',
+  color = 'primary',
   customColor,
   showIcon = true,
   className = '',
   alt = 'Avatar',
 }) => {
   const sizeClass = styles[size];
+  const colorClass = styles[color];
   const customStyle = customColor ? { background: customColor } : undefined;
 
   // Si hay imagen, mostrarla
@@ -66,7 +75,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   if (initials) {
     return (
       <div 
-        className={`${styles.avatar} ${sizeClass} ${styles.withContent} ${className}`}
+        className={`${styles.avatar} ${sizeClass} ${styles.withContent} ${colorClass} ${className}`}
         style={customStyle}
       >
         <span className={styles.initials}>{initials}</span>
@@ -78,7 +87,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   if (showIcon) {
     return (
       <div 
-        className={`${styles.avatar} ${sizeClass} ${styles.withContent} ${className}`}
+        className={`${styles.avatar} ${sizeClass} ${styles.withContent} ${colorClass} ${className}`}
         style={customStyle}
       >
         <User className={styles.icon} />
@@ -89,7 +98,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   // Fallback: avatar vacío
   return (
     <div 
-      className={`${styles.avatar} ${sizeClass} ${styles.withContent} ${className}`}
+      className={`${styles.avatar} ${sizeClass} ${styles.withContent} ${colorClass} ${className}`}
       style={customStyle}
     />
   );

@@ -1,13 +1,13 @@
-@use '../../../styles/tokens/_index' as tokens;
+@use '../../../styles/tokens/_index' as *;
 
 .profileContainer {
   display: flex;
-  gap: tokens.$spacing-xl;
-  margin: tokens.$spacing-lg;
+  gap: $spacing-xl;
+  margin: $spacing-lg;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: tokens.$spacing-lg;
+    gap: $spacing-lg;
   }
 }
 
@@ -16,8 +16,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: tokens.$spacing-lg;
-  padding: tokens.$spacing-xl;
+  gap: $spacing-lg;
+  padding: $spacing-xl;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -26,16 +26,16 @@
 .sectionContainer {
   display: flex;
   flex-direction: column;
-  gap: tokens.$spacing-lg;
-  margin: tokens.$spacing-lg;
+  gap: $spacing-lg;
+  margin: $spacing-lg;
 }
 
 .errorAlert {
   display: flex;
   align-items: center;
-  padding: tokens.$spacing-md tokens.$spacing-lg;
+  padding: $spacing-md $spacing-lg;
   background-color: #ffebee;
-  border-left: 4px solid var(--accent-color);
+  border-left: 4px solid $accent-color;
   border-radius: 8px;
   color: #c62828;
   font-size: 14px;

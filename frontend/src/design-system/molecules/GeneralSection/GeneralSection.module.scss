@@ -66,24 +66,45 @@
   width: fit-content;
 }
 
-.roleAdmin {
-  background: #fee;
-  color: #c33;
+// Variantes de badge por rol
+.primary {
+  .roleBadge {
+    background: color-mix(in srgb, $primary-color 15%, white);
+    color: $primary-color;
+  }
+  .infoLabel svg {
+    color: $primary-color;
+  }
 }
 
-.roleDoctor {
-  background: #e8f4fd;
-  color: #0969da;
+.secondary {
+  .roleBadge {
+    background: color-mix(in srgb, $secondary-color 15%, white);
+    color: $secondary-color;
+  }
+  .infoLabel svg {
+    color: $secondary-color;
+  }
 }
 
-.rolePatient {
-  background: #f0f8ff;
-  color: #0550ae;
+.tertiary {
+  .roleBadge {
+    background: color-mix(in srgb, $tertiary-color 15%, white);
+    color: $tertiary-color;
+  }
+  .infoLabel svg {
+    color: $tertiary-color;
+  }
 }
 
-.roleSecretary {
-  background: #f6f8fa;
-  color: #57606a;
+.quaternary {
+  .roleBadge {
+    background: color-mix(in srgb, $quaternary-color 15%, white);
+    color: $quaternary-color;
+  }
+  .infoLabel svg {
+    color: $quaternary-color;
+  }
 }
 
 .divider {
@@ -110,10 +131,6 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: #8b8b8b;
-
-  svg {
-    color: $primary-color;
-  }
 }
 
 .infoValue {

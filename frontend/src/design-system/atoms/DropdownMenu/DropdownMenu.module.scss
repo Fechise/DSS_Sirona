@@ -1,3 +1,5 @@
+@use '../../../styles/tokens/_index' as *;
+
 .dropdownContainer {
   position: relative;
 }
@@ -10,7 +12,7 @@
   position: absolute;
   top: calc(100% + 0.5rem);
   background: #ffffff;
-  border: 1px solid var(--border-color);
+  border: 1px solid $border-color;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   min-width: 220px;
@@ -50,7 +52,7 @@
   cursor: pointer;
   font-family: inherit;
   font-size: 0.9375rem;
-  color: var(--text-color);
+  color: $text-color;
   transition: all 0.15s ease;
   text-align: left;
 
@@ -59,7 +61,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: var(--text-color);
+    color: $text-color;
   }
 
   .label {
@@ -68,17 +70,11 @@
 
   &:hover:not(.danger) {
     background: #f0f0f0;
-    color: var(--primary-color);
-
-    .icon {
-      color: var(--primary-color);
-    }
   }
 
   &:focus {
     outline: none;
     background: #f0f0f0;
-    box-shadow: 0 0 0 2px rgba(139, 123, 208, 0.2);
   }
 
   &.danger {
@@ -101,7 +97,7 @@
 
 .divider {
   height: 1px;
-  background: var(--border-color);
+  background: $border-color;
   margin: 0.5rem 0;
 }
 
@@ -109,5 +105,46 @@
   .menu {
     min-width: 200px;
     right: 0;
+  }
+}
+
+/* Variantes de color por rol */
+.primary {
+  .item:hover:not(.danger) {
+    color: $primary-color;
+    .icon { color: $primary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $primary-color 20%, white);
+  }
+}
+
+.secondary {
+  .item:hover:not(.danger) {
+    color: $secondary-color;
+    .icon { color: $secondary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $secondary-color 20%, white);
+  }
+}
+
+.tertiary {
+  .item:hover:not(.danger) {
+    color: $tertiary-color;
+    .icon { color: $tertiary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $tertiary-color 20%, white);
+  }
+}
+
+.quaternary {
+  .item:hover:not(.danger) {
+    color: $quaternary-color;
+    .icon { color: $quaternary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $quaternary-color 20%, white);
   }
 }

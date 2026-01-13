@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
 import styles from './SecuritySection.module.scss';
 import { Button } from '../../atoms/Button/Button';
 import { KeyRound, CheckCircle } from 'lucide-react';
@@ -14,8 +15,26 @@ type SecuritySectionProps = {
 export const SecuritySection: React.FC<SecuritySectionProps> = ({
   onPasswordChange,
 }) => {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [passwordChanged, setPasswordChanged] = useState(false);
+
+  const getColorByRole = (): 'primary' | 'secondary' | 'tertiary' | 'quaternary' => {
+    switch (user?.role) {
+      case 'Médico':
+        return 'primary';
+      case 'Paciente':
+        return 'secondary';
+      case 'Secretario':
+        return 'tertiary';
+      case 'Administrador':
+        return 'quaternary';
+      default:
+        return 'secondary';
+    }
+  };
+
+  const roleColor = getColorByRole();
 
   const handlePasswordChange = async (data: {
     currentPassword: string;
@@ -31,7 +50,7 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
   };
 
   return (
-    <div className={styles.section}>
+    <div className={`${styles.section} ${styles[roleColor]}`}>
       <div className={styles.header}>
         <h2>Seguridad</h2>
         <p className={styles.subtitle}>

@@ -1,7 +1,9 @@
+@use '../../../styles/tokens/_index' as *;
+
 .sidebar {
   width: 280px;
   background: #ffffff;
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid $border-color;
   border-radius: 12px;
   padding: 1.5rem 0;
   height: fit-content;
@@ -27,7 +29,7 @@
   font-family: inherit;
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--text-color);
+  color: $text-color;
   transition: all 0.2s ease;
   text-align: left;
   margin: 0 0.75rem;
@@ -47,27 +49,15 @@
 
   &:hover {
     background: #f5f5f5;
-    color: var(--primary-color);
 
     .icon {
-      color: var(--primary-color);
+      color: inherit;
     }
   }
 
   &:focus {
     outline: none;
     background: #f5f5f5;
-    box-shadow: inset 0 0 0 2px var(--primary-color);
-  }
-
-  &.active {
-    background: var(--primary-color);
-    color: white;
-    font-weight: 600;
-
-    .icon {
-      color: white;
-    }
   }
 }
 
@@ -85,7 +75,7 @@
     position: relative;
     top: auto;
     border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid $border-color;
   }
 
   .nav {
@@ -103,7 +93,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: var(--border-subtle);
+      background: $border-color;
       border-radius: 2px;
     }
   }
@@ -112,5 +102,78 @@
     flex-shrink: 0;
     white-space: nowrap;
     margin: 0 0.25rem;
+  }
+}
+
+// Variantes por rol
+.primary {
+  .navItem {
+    &:hover {
+      color: $primary-color;
+      .icon { color: $primary-color; }
+    }
+    &:focus {
+      box-shadow: inset 0 0 0 2px $primary-color;
+    }
+    &.active {
+      background: $primary-color;
+      color: $on-primary-color;
+      font-weight: 600;
+      .icon { color: $on-primary-color; }
+    }
+  }
+}
+
+.secondary {
+  .navItem {
+    &:hover {
+      color: $secondary-color;
+      .icon { color: $secondary-color; }
+    }
+    &:focus {
+      box-shadow: inset 0 0 0 2px $secondary-color;
+    }
+    &.active {
+      background: $secondary-color;
+      color: $on-secondary-color;
+      font-weight: 600;
+      .icon { color: $on-secondary-color; }
+    }
+  }
+}
+
+.tertiary {
+  .navItem {
+    &:hover {
+      color: $tertiary-color;
+      .icon { color: $tertiary-color; }
+    }
+    &:focus {
+      box-shadow: inset 0 0 0 2px $tertiary-color;
+    }
+    &.active {
+      background: $tertiary-color;
+      color: $on-tertiary-color;
+      font-weight: 600;
+      .icon { color: $on-tertiary-color; }
+    }
+  }
+}
+
+.quaternary {
+  .navItem {
+    &:hover {
+      color: $quaternary-color;
+      .icon { color: $quaternary-color; }
+    }
+    &:focus {
+      box-shadow: inset 0 0 0 2px $quaternary-color;
+    }
+    &.active {
+      background: $quaternary-color;
+      color: $on-quaternary-color;
+      font-weight: 600;
+      .icon { color: $on-quaternary-color; }
+    }
   }
 }

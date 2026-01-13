@@ -114,7 +114,7 @@ export const Header: React.FC = () => {
   const triggerContent = (
     <button className={styles.profileButton}>
       <div className={styles.avatarWrapper}>
-        <Avatar size="medium" />
+        <Avatar size="medium" color={roleColor} />
       </div>
       <span className={styles.userName}>{user?.email}</span>
       <ChevronDown size={16} className={styles.chevron} />
@@ -147,6 +147,7 @@ export const Header: React.FC = () => {
         <DropdownMenu
           trigger={triggerContent}
           items={menuItems}
+          color={roleColor}
           position="right"
           showDividers={true}
         />

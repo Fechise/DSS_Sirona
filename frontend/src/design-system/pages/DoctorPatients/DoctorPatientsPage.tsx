@@ -4,6 +4,8 @@ import { Container } from '../../atoms/Container/Container';
 import { Users, RefreshCw, FileText, Calendar } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { useNavigate } from 'react-router-dom';
+import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 
 type PacienteAsignado = {
   id: string;
@@ -19,6 +21,66 @@ export const DoctorPatientsPage: React.FC = () => {
   const [pacientes, setPacientes] = useState<PacienteAsignado[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const columns: TableColumn<PacienteAsignado>[] = [
+    {
+      key: 'fullName',
+      label: 'Nombre',
+      render: (_, row) => (
+        <div className={styles.patientName}>
+          <strong>{row.fullName}</strong>
+          <span className={styles.email}>{row.email}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'cedula',
+      label: 'Cédula',
+    },
+    {
+      key: 'fechaNacimiento',
+      label: 'Edad',
+      render: (_, row) => `${calcularEdad(row.fechaNacimiento)} años`,
+    },
+    {
+      key: 'ultimaConsulta',
+      label: 'Última Consulta',
+      render: (value) => {
+        if (value) {
+          return (
+            <div className={styles.consultaInfo}>
+              <Calendar size={14} />
+              <span>{new Date(value).toLocaleDateString('es-ES')}</span>
+            </div>
+          );
+        }
+        return <span className={styles.noConsulta}>Sin consultas</span>;
+      },
+    },
+    {
+      key: 'diagnosticos',
+      label: 'Diagnósticos',
+      render: (value) => (
+        <span className={styles.badge}>
+          {value} registro{value !== 1 ? 's' : ''}
+        </span>
+      ),
+    },
+    {
+      key: 'id',
+      label: 'Acciones',
+      render: (_, row) => (
+        <Button
+          variant="filled"
+          color="primary"
+          onClick={() => handleVerHistorial(row.id)}
+          startIcon={<FileText size={16} />}
+        >
+          Ver Historial
+        </Button>
+      ),
+    },
+  ];
 
   // Cargar pacientes asignados (mock por ahora, luego integrar con backend)
   const loadPacientes = async () => {
@@ -91,25 +153,20 @@ export const DoctorPatientsPage: React.FC = () => {
   return (
     <Container>
       <main className={styles.main}>
-        <div className={styles.header}>
-          <div className={styles.titleRow}>
-            <div className={styles.titleGroup}>
-              <Users size={28} />
-              <h1>Mis Pacientes Asignados</h1>
-            </div>
-            <Button
-              variant="filled"
-              color="secondary"
-              onClick={loadPacientes}
-              disabled={loading}
-              startIcon={<RefreshCw size={16} />}
-            >
-              Actualizar
-            </Button>
-          </div>
+        <div className={styles.headerWrapper}>
+          <PageHeader title="Mis Pacientes Asignados" icon={<Users size={28} />} />
           <p className={styles.subtitle}>
             Lista de pacientes bajo tu cuidado médico
           </p>
+          <Button
+            variant="filled"
+            color="secondary"
+            onClick={loadPacientes}
+            disabled={loading}
+            startIcon={<RefreshCw size={16} />}
+          >
+            Actualizar
+          </Button>
         </div>
 
         {loading ? (
@@ -117,69 +174,22 @@ export const DoctorPatientsPage: React.FC = () => {
             <RefreshCw size={32} className={styles.spinner} />
             <p>Cargando pacientes...</p>
           </div>
-        ) : (
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Cédula</th>
-                  <th>Edad</th>
-                  <th>Última Consulta</th>
-                  <th>Diagnósticos</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pacientes.map((paciente) => (
-                  <tr key={paciente.id}>
-                    <td>
-                      <div className={styles.patientName}>
-                        <strong>{paciente.fullName}</strong>
-                        <span className={styles.email}>{paciente.email}</span>
-                      </div>
-                    </td>
-                    <td>{paciente.cedula}</td>
-                    <td>{calcularEdad(paciente.fechaNacimiento)} años</td>
-                    <td>
-                      {paciente.ultimaConsulta ? (
-                        <div className={styles.consultaInfo}>
-                          <Calendar size={14} />
-                          <span>{new Date(paciente.ultimaConsulta).toLocaleDateString('es-ES')}</span>
-                        </div>
-                      ) : (
-                        <span className={styles.noConsulta}>Sin consultas</span>
-                      )}
-                    </td>
-                    <td>
-                      <span className={styles.badge}>
-                        {paciente.diagnosticos} registro{paciente.diagnosticos !== 1 ? 's' : ''}
-                      </span>
-                    </td>
-                    <td>
-                      <Button
-                        variant="filled"
-                        color="primary"
-                        onClick={() => handleVerHistorial(paciente.id)}
-                        startIcon={<FileText size={16} />}
-                      >
-                        Ver Historial
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {!loading && pacientes.length === 0 && (
+        ) : pacientes.length === 0 ? (
           <div className={styles.emptyState}>
             <Users size={48} />
             <p>No tienes pacientes asignados</p>
             <span className={styles.hint}>
               Contacta con el administrador para que te asigne pacientes
             </span>
+          </div>
+        ) : (
+          <div className={styles.tableContainer}>
+            <Table
+              columns={columns}
+              data={pacientes}
+              emptyMessage="No hay pacientes para mostrar"
+              rowKey="id"
+            />
           </div>
         )}
       </main>

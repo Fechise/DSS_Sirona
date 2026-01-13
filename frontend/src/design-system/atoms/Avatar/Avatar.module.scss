@@ -1,3 +1,5 @@
+@use '../../../styles/tokens/_index' as *;
+
 .avatar {
   border-radius: 50%;
   display: flex;
@@ -9,7 +11,6 @@
 }
 
 .withContent {
-  background: var(--primary-color);
   color: white;
   font-weight: 600;
 }
@@ -67,4 +68,21 @@
     width: 36px;
     height: 36px;
   }
+}
+
+/* Variantes de color por rol */
+.primary {
+  background: $primary-color;
+}
+
+.secondary {
+  background: $secondary-color;
+}
+
+.tertiary {
+  background: $tertiary-color;
+}
+
+.quaternary {
+  background: $quaternary-color;
 }

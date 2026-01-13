@@ -78,7 +78,6 @@
   flex: 1;
 
   svg {
-    color: $primary-color;
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -99,7 +98,6 @@
 
 .securityInfo {
   background: #fafafa;
-  border-left: 4px solid $primary-color;
   padding: $spacing-lg $spacing-xl;
   border-radius: 8px;
 
@@ -126,4 +124,25 @@
       }
     }
   }
+}
+
+// Variantes por rol
+.primary {
+  .cardTitleGroup svg { color: $primary-color; }
+  .securityInfo { border-left: 4px solid $primary-color; }
+}
+
+.secondary {
+  .cardTitleGroup svg { color: $secondary-color; }
+  .securityInfo { border-left: 4px solid $secondary-color; }
+}
+
+.tertiary {
+  .cardTitleGroup svg { color: $tertiary-color; }
+  .securityInfo { border-left: 4px solid $tertiary-color; }
+}
+
+.quaternary {
+  .cardTitleGroup svg { color: $quaternary-color; }
+  .securityInfo { border-left: 4px solid $quaternary-color; }
 }

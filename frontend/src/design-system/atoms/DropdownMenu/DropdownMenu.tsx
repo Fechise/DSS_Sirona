@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './DropdownMenu.module.scss';
 
+export type DropdownMenuColor = 'primary' | 'secondary' | 'tertiary' | 'quaternary';
+
 export type DropdownMenuItem = {
   /**
    * Identificador único
@@ -40,6 +42,11 @@ export type DropdownMenuProps = {
   items: DropdownMenuItem[];
 
   /**
+   * Color del tema basado en rol
+   */
+  color?: DropdownMenuColor;
+
+  /**
    * Callback cuando se abre/cierra
    */
   onOpenChange?: (isOpen: boolean) => void;
@@ -58,6 +65,7 @@ export type DropdownMenuProps = {
 export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   trigger,
   items,
+  color = 'primary',
   onOpenChange,
   position = 'right',
   showDividers = false,
@@ -117,7 +125,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       </div>
 
       {isOpen && (
-        <div className={`${styles.menu} ${styles[position]}`}>
+        <div className={`${styles.menu} ${styles[position]} ${styles[color]}`}>
           {items.map((item, index) => (
             <React.Fragment key={item.id}>
               <button

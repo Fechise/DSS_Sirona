@@ -1,37 +1,56 @@
 import React from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
 import styles from './GeneralSection.module.scss';
 import { Avatar } from '../../atoms/Avatar/Avatar';
 import { User, Mail, Shield, Calendar } from 'lucide-react';
 
 export const GeneralSection: React.FC = () => {
-  // Mock data - en el futuro vendrá del contexto/API
-  const mockUser = {
-    id: 'user-123',
-    name: 'Roberto García',
-    email: 'roberto.garcia@sirona.com',
-    role: 'Médico',
-    status: 'Activo',
-    memberSince: 'Enero 2024',
-    avatar: undefined, // Avatar mostrará las iniciales
+  const { user } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
+  // Formatear fecha de creación si está disponible
+  const getMemberSince = () => {
+    // Por ahora mockeado, en el futuro vendrá del campo createdAt
+    return 'Enero 2024';
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'Administrador':
-        return styles.roleAdmin;
-      case 'Médico':
-        return styles.roleDoctor;
-      case 'Paciente':
-        return styles.rolePatient;
-      case 'Secretario':
-        return styles.roleSecretary;
+  const getStatusLabel = (status?: string) => {
+    switch (status?.toUpperCase()) {
+      case 'ACTIVO':
+        return 'Activo';
+      case 'INACTIVO':
+        return 'Inactivo';
+      case 'BLOQUEADO':
+        return 'Bloqueado';
+      case 'PENDIENTE_VERIFICACION':
+        return 'Pendiente Verificación';
       default:
-        return '';
+        return 'Activo';
     }
   };
 
+  const getColorByRole = (): 'primary' | 'secondary' | 'tertiary' | 'quaternary' => {
+    switch (user?.role) {
+      case 'Médico':
+        return 'primary';
+      case 'Paciente':
+        return 'secondary';
+      case 'Secretario':
+        return 'tertiary';
+      case 'Administrador':
+        return 'quaternary';
+      default:
+        return 'secondary';
+    }
+  };
+
+  const roleColor = getColorByRole();
+
   return (
-    <div className={styles.section}>
+    <div className={`${styles.section} ${styles[roleColor]}`}>
       <div className={styles.header}>
         <h2>Información General</h2>
         <p className={styles.subtitle}>
@@ -41,14 +60,12 @@ export const GeneralSection: React.FC = () => {
 
       <div className={styles.card}>
         <div className={styles.avatarSection}>
-          <Avatar size="large" />
+          <Avatar size="large" color={roleColor} />
           <div className={styles.userInfo}>
-            <h3>{mockUser.name}</h3>
-            <div
-              className={`${styles.roleBadge} ${getRoleBadgeColor(mockUser.role || '')}`}
-            >
+            <h3>{user.fullName}</h3>
+            <div className={styles.roleBadge}>
               <Shield size={14} />
-              <span>{mockUser.role}</span>
+              <span>{user.role}</span>
             </div>
           </div>
         </div>
@@ -61,7 +78,7 @@ export const GeneralSection: React.FC = () => {
               <Mail size={18} />
               <span>Correo electrónico</span>
             </div>
-            <div className={styles.infoValue}>{mockUser.email}</div>
+            <div className={styles.infoValue}>{user.email}</div>
           </div>
 
           <div className={styles.infoItem}>
@@ -69,7 +86,7 @@ export const GeneralSection: React.FC = () => {
               <Shield size={18} />
               <span>Rol</span>
             </div>
-            <div className={styles.infoValue}>{mockUser.role}</div>
+            <div className={styles.infoValue}>{user.role}</div>
           </div>
 
           <div className={styles.infoItem}>
@@ -78,7 +95,7 @@ export const GeneralSection: React.FC = () => {
               <span>Estado</span>
             </div>
             <div className={styles.infoValue}>
-              <span className={styles.statusBadge}>{mockUser.status}</span>
+              <span className={styles.statusBadge}>{getStatusLabel(user.status)}</span>
             </div>
           </div>
 
@@ -87,7 +104,7 @@ export const GeneralSection: React.FC = () => {
               <Calendar size={18} />
               <span>Miembro desde</span>
             </div>
-            <div className={styles.infoValue}>{mockUser.memberSince}</div>
+            <div className={styles.infoValue}>{getMemberSince()}</div>
           </div>
         </div>
       </div>
