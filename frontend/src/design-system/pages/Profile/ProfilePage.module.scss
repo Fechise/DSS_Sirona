@@ -3,7 +3,7 @@
 .profileContainer {
   display: flex;
   gap: $spacing-xl;
-  margin: $spacing-lg;
+  padding: $spacing-lg; // Evitar colapso de márgenes con el contenedor y el scroll innecesario
 
   @media (max-width: 768px) {
     flex-direction: column;

@@ -5,12 +5,14 @@ import styles from './PageHeader.module.scss';
 type PageHeaderProps = {
   title: string;
   icon: ReactNode;
+  subtitle?: ReactNode;
   color?: 'primary' | 'secondary' | 'tertiary' | 'quaternary';
 };
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   icon,
+  subtitle,
   color,
 }) => {
   const { user } = useAuth();
@@ -39,7 +41,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         <div className={styles.iconWrapper}>
           {icon}
         </div>
-        <h1>{title}</h1>
+        <div className={styles.titleContent}>
+          <h1>{title}</h1>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        </div>
       </div>
     </div>
   );

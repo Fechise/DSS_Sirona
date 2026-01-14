@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft, FileText } from 'lucide-react';
 
 import { Button } from '../../atoms/Button/Button';
 import { Container } from '../../atoms/Container/Container';
+import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { ConsultationInfoSection } from './sections/ConsultationInfoSection';
 import { MedicalHistorySection } from './sections/MedicalHistorySection';
 import { MedicationsSection } from './sections/MedicationsSection';
@@ -340,10 +341,12 @@ export const PatientRecordPage: React.FC = () => {
   return (
     <Container>
       <div className={styles.page}>
-        <div className={styles.pageHeader}>
-          <Button variant="filled" color="secondary" onClick={() => navigate('/medico/pacientes')} startIcon={<ArrowLeft size={16} />}>Volver</Button>
-          <h1 className={styles.title}><FileText size={28} />Historial Médico</h1>
+        <div className={styles.backButton}>
+          <Button variant="filled" color="secondary" onClick={() => navigate('/medico/pacientes')} startIcon={<ArrowLeft size={16} />}>
+            Volver
+          </Button>
         </div>
+        <PageHeader title="Historial Médico" icon={<FileText size={32} />} />
 
         {error && (
           <div className={styles.alert}>

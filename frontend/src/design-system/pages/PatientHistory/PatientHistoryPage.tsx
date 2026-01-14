@@ -11,6 +11,16 @@ import {
   User
 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
+import {
+  PersonalInfoSection,
+  ContactInfoSection,
+  ConsultasSection,
+  VacunasSection,
+  AntecedentesSection,
+  ProximaCitaSection,
+} from '../../organisms/SectionsPatientHistory';
+import { AlertNote } from '../../molecules/AlertNote/AlertNote';
+import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 
 type MedicalRecord = {
   id: string;
@@ -191,7 +201,7 @@ export const PatientHistoryPage: React.FC = () => {
           <div className={styles.pageHeader}>
             <div className={styles.backButton}>
               <Button
-                variant="outlined"
+                variant="filled"
                 color="secondary"
                 onClick={() => navigate('/inicio')}
                 startIcon={<ArrowLeft size={16} />}
@@ -199,13 +209,11 @@ export const PatientHistoryPage: React.FC = () => {
                 Volver
               </Button>
             </div>
-            <div className={styles.titleSection}>
-              <FileText size={32} className={styles.titleIcon} />
-              <div>
-                <h1 className={styles.title}>Mi Historial Clínico</h1>
-                <p className={styles.subtitle}>Información médica personal y confidencial</p>
-              </div>
-            </div>
+            <PageHeader
+              title="Mi Historial Clínico"
+              icon={<FileText size={32} />}
+              subtitle="Información médica personal y confidencial"
+            />
           </div>
 
           {loading && (
@@ -262,16 +270,9 @@ export const PatientHistoryPage: React.FC = () => {
           {!loading && !error && record && (
             <div className={styles.recordContainer}>
               {/* Aviso de Seguridad */}
-              <div className={styles.securityNotice}>
-                <AlertCircle size={20} />
-                <div>
-                  <h3>Este es tu historial clínico personal</h3>
-                  <p>
-                    Estos datos son confidenciales y están protegidos. Solo tú puedes acceder a tu historial clínico.
-                    Si necesitas actualizaciones, contacta a tu médico de cabecera.
-                  </p>
-                </div>
-              </div>
+              <AlertNote title="Este es tu historial clínico personal">
+                Estos datos son confidenciales y están protegidos. Solo tú puedes acceder a tu historial clínico. Si necesitas actualizaciones, contacta a tu médico de cabecera.
+              </AlertNote>
 
               {/* Información del Paciente */}
               <div className={styles.recordCard}>
@@ -315,225 +316,31 @@ export const PatientHistoryPage: React.FC = () => {
               </div>
 
               {/* Información Médica */}
-              <div className={styles.recordCard}>
-                <div className={styles.cardHeader}>
-                  <h2>Información Médica</h2>
-                </div>
+              <PersonalInfoSection
+                tipoSangre={record.tipoSangre}
+                alergias={record.alergias}
+                condicionesCronicas={record.condicionesCronicas}
+                medicamentosActuales={record.medicamentosActuales}
+              />
 
-                <div className={styles.fieldSection}>
-                  <label>Alergias</label>
-                  {record.alergias.length > 0 ? (
-                    <div className={styles.tagList}>
-                      {record.alergias.map((alergia, idx) => (
-                        <span key={idx} className={styles.allergyTag}>{alergia}</span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className={styles.readOnlyField}>Sin alergias registradas</p>
-                  )}
-                </div>
+              <ContactInfoSection
+                medicoAsignado={record.medicoAsignado}
+                contactoEmergencia={record.contactoEmergencia}
+              />
 
-                <div className={styles.fieldSection}>
-                  <label>Condiciones Crónicas</label>
-                  {record.condicionesCronicas.length > 0 ? (
-                    <div className={styles.tagList}>
-                      {record.condicionesCronicas.map((condicion, idx) => (
-                        <span key={idx} className={styles.conditionTag}>{condicion}</span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className={styles.readOnlyField}>Sin condiciones crónicas</p>
-                  )}
-                </div>
+              <ConsultasSection consultas={record.consultas} />
 
-                <div className={styles.fieldSection}>
-                  <label>Medicamentos Actuales</label>
-                  {record.medicamentosActuales.length > 0 ? (
-                    <ul className={styles.medicationList}>
-                      {record.medicamentosActuales.map((med, idx) => (
-                        <li key={idx}>{med}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className={styles.readOnlyField}>Sin medicamentos actuales</p>
-                  )}
-                </div>
-              </div>
+              <VacunasSection vacunas={record.vacunas} />
 
-              {/* Médico Asignado */}
-              <div className={styles.recordCard}>
-                <div className={styles.cardHeader}>
-                  <h2>Médico Asignado</h2>
-                </div>
+              <AntecedentesSection antecedentesFamiliares={record.antecedentesFamiliares} />
 
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoField}>
-                    <label>Nombre</label>
-                    <div className={styles.fieldValue}>
-                      <span>{record.medicoAsignado.nombre}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.infoField}>
-                    <label>Especialidad</label>
-                    <div className={styles.fieldValue}>
-                      <span>{record.medicoAsignado.especialidad}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.infoField}>
-                    <label>Teléfono</label>
-                    <div className={styles.fieldValue}>
-                      <span>{record.medicoAsignado.telefono}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contacto de Emergencia */}
-              <div className={styles.recordCard}>
-                <div className={styles.cardHeader}>
-                  <h2>Contacto de Emergencia</h2>
-                </div>
-
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoField}>
-                    <label>Nombre</label>
-                    <div className={styles.fieldValue}>
-                      <span>{record.contactoEmergencia.nombre}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.infoField}>
-                    <label>Relación</label>
-                    <div className={styles.fieldValue}>
-                      <span>{record.contactoEmergencia.relacion}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.infoField}>
-                    <label>Teléfono</label>
-                    <div className={styles.fieldValue}>
-                      <span>{record.contactoEmergencia.telefono}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Historial de Consultas */}
-              <div className={styles.recordCard}>
-                <div className={styles.cardHeader}>
-                  <h2>Historial de Consultas</h2>
-                </div>
-
-                {record.consultas.map((consulta, idx) => (
-                  <div key={consulta.id} className={styles.consultaItem}>
-                    <div className={styles.consultaHeader}>
-                      <span className={styles.consultaFecha}>
-                        {new Date(consulta.fecha).toLocaleDateString('es-ES', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </span>
-                      <span className={styles.consultaMotivo}>{consulta.motivo}</span>
-                    </div>
-                    
-                    <div className={styles.consultaDetails}>
-                      <div className={styles.consultaField}>
-                        <strong>Diagnóstico:</strong> {consulta.diagnostico}
-                      </div>
-                      <div className={styles.consultaField}>
-                        <strong>Tratamiento:</strong> {consulta.tratamiento}
-                      </div>
-                      <div className={styles.consultaField}>
-                        <strong>Notas del Médico:</strong> {consulta.notasMedico}
-                      </div>
-                    </div>
-                    
-                    {idx < record.consultas.length - 1 && <div className={styles.divider} />}
-                  </div>
-                ))}
-              </div>
-
-              {/* Vacunas */}
-              <div className={styles.recordCard}>
-                <div className={styles.cardHeader}>
-                  <h2>Vacunas</h2>
-                </div>
-
-                <div className={styles.vaccineList}>
-                  {record.vacunas.map((vacuna, idx) => (
-                    <div key={idx} className={styles.vaccineItem}>
-                      <div className={styles.vaccineName}>{vacuna.nombre}</div>
-                      <div className={styles.vaccineDate}>
-                        Aplicada: {new Date(vacuna.fecha).toLocaleDateString('es-ES', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </div>
-                      {vacuna.proximaDosis && (
-                        <div className={styles.vaccineNext}>
-                          Próxima dosis: {new Date(vacuna.proximaDosis).toLocaleDateString('es-ES', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Antecedentes Familiares */}
-              <div className={styles.recordCard}>
-                <div className={styles.cardHeader}>
-                  <h2>Antecedentes Familiares</h2>
-                </div>
-
-                <ul className={styles.antecedentesList}>
-                  {record.antecedentesFamiliares.map((antecedente, idx) => (
-                    <li key={idx}>{antecedente}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Próxima Cita */}
-              {record.proximaCita && (
-                <div className={styles.recordCard}>
-                  <div className={styles.cardHeader}>
-                    <h2>Próxima Cita</h2>
-                  </div>
-
-                  <div className={styles.appointmentCard}>
-                    <div className={styles.appointmentDate}>
-                      <Calendar size={24} />
-                      <div>
-                        <div className={styles.appointmentDay}>
-                          {new Date(record.proximaCita.fecha).toLocaleDateString('es-ES', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
-                        </div>
-                        <div className={styles.appointmentTime}>
-                          {new Date(record.proximaCita.fecha).toLocaleTimeString('es-ES', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                    <div className={styles.appointmentInfo}>
-                      <div><strong>Motivo:</strong> {record.proximaCita.motivo}</div>
-                      <div><strong>Médico:</strong> {record.proximaCita.medico}</div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <ProximaCitaSection
+                proximaCita={record.proximaCita ? {
+                  fecha: record.proximaCita.fecha,
+                  motivo: record.proximaCita.motivo,
+                  doctor: record.proximaCita.medico,
+                } : null}
+              />
             </div>
           )}
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './LoginForm.module.scss';
 import { Input } from '../../atoms/Input/Input';
 import { Button } from '../../atoms/Button/Button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Mail, Lock } from 'lucide-react';
 
 type Props = {
   onSubmit?: (data: { email: string; password: string }) => Promise<void> | void;
@@ -54,6 +54,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, loading = false, isAccoun
           onChange={setEmail}
           error={errors.email}
           autoComplete="email"
+          icon={<Mail size={16} />}
         />
 
         <Input
@@ -65,6 +66,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, loading = false, isAccoun
           onChange={setPassword}
           error={errors.password}
           autoComplete="current-password"
+          icon={<Lock size={16} />}
         />
       </div>
 

@@ -1,11 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styles from './LoginPage.module.scss';
 import { LoginForm } from '../../molecules/LoginForm/LoginForm';
-import { ShieldCheck, AlertCircle } from 'lucide-react';
+import { ShieldCheck, AlertCircle, Mail, Hash } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Button } from '../../atoms/Button/Button';
+import { Input } from '../../atoms/Input/Input';
+import { FaceCameraCapture } from '../../atoms/FaceCameraCapture/FaceCameraCapture';
+import { Link } from '../../atoms/Link/Link';
 import { AuthApiService } from '../../../services/api';
+import { BackgroundBlobs } from './BackgroundBlobs';
 
 export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -25,12 +29,12 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
     setAccountLocked(false);
     setErrorMessage(null);
-    
+
     try {
       const response = await AuthApiService.login(data);
-      
+
       console.log('Login response:', response); // Debug
-    
+
       if (response.requires_mfa) {
         setMfaRequired(true);
         setPendingEmail(data.email);
@@ -58,7 +62,7 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
     setAccountLocked(false);
     setErrorMessage(null);
-    
+
     try {
       if (!faceCapture) {
         setErrorMessage('Debes capturar tu rostro para continuar');
@@ -66,7 +70,7 @@ export const LoginPage: React.FC = () => {
       }
 
       const response = await AuthApiService.loginWithFace(faceEmail, faceCapture);
-      
+
       if (response.requires_mfa) {
         setMfaRequired(true);
         setPendingEmail(faceEmail);
@@ -91,10 +95,10 @@ export const LoginPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage(null);
-    
+
     try {
       const response = await AuthApiService.verifyOtp(pendingEmail!, otp);
-      
+
       login(pendingEmail!, response.token, response.role, pendingEmail!.split('@')[0]);
       setMfaRequired(false);
       setOtp('');
@@ -106,14 +110,9 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const livenessTip = useMemo(
-    () =>
-      'Se requiere prueba de vida (movimiento/cierre de ojos) y coincidencia con la plantilla biométrica almacenada.',
-    []
-  );
-
   return (
     <div className={styles.container}>
+      <BackgroundBlobs />
       <div className={styles.card}>
         <div className={styles.brand}>
           <span className={styles.brandIcon} aria-hidden>
@@ -134,10 +133,7 @@ export const LoginPage: React.FC = () => {
             <div className={styles.modes}>
               <button
                 type="button"
-                className={[
-                  styles.modeButton,
-                  modo === 'password' ? styles.active : '',
-                ].join(' ')}
+                className={[styles.modeButton, modo === 'password' ? styles.active : ''].join(' ')}
                 onClick={() => setModo('password')}
                 disabled={loading}
               >
@@ -145,10 +141,7 @@ export const LoginPage: React.FC = () => {
               </button>
               <button
                 type="button"
-                className={[
-                  styles.modeButton,
-                  modo === 'face' ? styles.active : '',
-                ].join(' ')}
+                className={[styles.modeButton, modo === 'face' ? styles.active : ''].join(' ')}
                 onClick={() => setModo('face')}
                 disabled={loading}
               >
@@ -172,30 +165,23 @@ export const LoginPage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className={styles.fieldGroup}>
-                    <label htmlFor="face-email">Correo</label>
-                    <input
-                      id="face-email"
-                      type="email"
-                      value={faceEmail}
-                      onChange={(e) => setFaceEmail(e.target.value)}
-                      placeholder="tu@correo.com"
-                      required
-                      autoComplete="email"
-                    />
-                  </div>
+                  <Input
+                    id="face-email"
+                    label="Correo"
+                    type="email"
+                    value={faceEmail}
+                    onChange={setFaceEmail}
+                    placeholder="tu@correo.com"
+                    autoComplete="email"
+                    icon={<Mail size={16} />}
+                  />
 
-                  <div className={styles.fieldGroup}>
-                    <label htmlFor="face-capture">Captura en vivo (prueba de vida)</label>
-                    <input
-                      id="face-capture"
-                      type="file"
-                      accept="image/*"
-                      capture="user"
-                      onChange={(e) => setFaceCapture(e.target.files?.[0] || null)}
-                      required
+                  <div className={styles.captureSection}>
+                    <FaceCameraCapture
+                      onCapture={setFaceCapture}
+                      onClear={() => setFaceCapture(null)}
+                      disabled={loading || accountLocked}
                     />
-                    <p className={styles.hint}>{livenessTip}</p>
                   </div>
 
                   <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || !faceCapture || accountLocked}>
@@ -214,20 +200,15 @@ export const LoginPage: React.FC = () => {
               <p>Ingresa el código OTP enviado a tu segundo factor.</p>
             </div>
             <form className={styles.otpForm} onSubmit={handleOtpSubmit}>
-              <div className={styles.fieldGroup}>
-                <label htmlFor="otp-code">Código OTP</label>
-                <input
-                  id="otp-code"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="123456"
-                  required
-                />
-              </div>
+              <Input
+                id="otp-code"
+                label="Código OTP"
+                type="text"
+                value={otp}
+                onChange={setOtp}
+                placeholder="123456"
+                icon={<Hash size={16} />}
+              />
               <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || otp.length < 6}>
                 {loading ? 'Validando...' : 'Validar OTP'}
               </Button>
@@ -237,16 +218,12 @@ export const LoginPage: React.FC = () => {
             </form>
           </div>
         )}
-        
+
         <div className={styles.foot}>
           <div className={styles.links}>
-            <button
-              type="button"
-              className={styles.ctaLink}
-              onClick={() => navigate('/register')}
-            >
+            <Link onClick={() => navigate('/register')}>
               ¿No estás registrado? Regístrate aquí
-            </button>
+            </Link>
             <div className={styles.demoButtons}>
               <Button
                 type="button"

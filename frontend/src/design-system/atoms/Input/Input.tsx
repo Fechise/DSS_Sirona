@@ -10,6 +10,7 @@ type InputProps = {
   onChange: (value: string) => void;
   error?: string;
   autoComplete?: string;
+  icon?: React.ReactNode;
 };
 
 export const Input: React.FC<InputProps> = ({
@@ -21,11 +22,13 @@ export const Input: React.FC<InputProps> = ({
   onChange,
   error,
   autoComplete,
+  icon,
 }) => {
   return (
     <div className={styles.field}>
       {label && (
         <label htmlFor={id} className={styles.label}>
+          {icon && <span className={styles.labelIcon}>{icon}</span>}
           {label}
         </label>
       )}

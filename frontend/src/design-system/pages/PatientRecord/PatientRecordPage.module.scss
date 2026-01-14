@@ -1,254 +1,97 @@
-@use '../../../styles/tokens/_index' as tokens;
+@use '../../../styles/tokens/_index' as *;
 
 .page {
   display: flex;
   flex-direction: column;
-  gap: tokens.$spacing-lg;
-  color: tokens.$text-color;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
 }
 
-.pageHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: tokens.$spacing-md;
+.backButton {
+  margin-bottom: $spacing-md;
 }
 
 .title {
   display: flex;
   align-items: center;
-  gap: tokens.$spacing-sm;
-  font-size: 24px;
-  color: tokens.$text-color;
-}
-
-.patientInfo {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: tokens.$spacing-md;
-}
-
-.infoRow {
-  display: flex;
-  align-items: center;
-  gap: tokens.$spacing-sm;
-  padding: tokens.$spacing-md;
-  background: #fff;
-  border: 1px solid tokens.$border-color;
-  border-radius: tokens.$radius-medium;
-}
-
-.label {
-  display: inline-block;
-  font-weight: 600;
-  margin-right: tokens.$spacing-sm;
-}
-
-.value {
-  color: tokens.$text-color;
-}
-
-.recordCard {
-  background: #fff;
-  border: 1px solid tokens.$border-color;
-  border-radius: tokens.$radius-medium;
-  padding: tokens.$spacing-lg;
-  box-shadow: tokens.$shadow-small;
-}
-
-.cardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: tokens.$spacing-md;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: tokens.$spacing-xs;
-  margin-bottom: tokens.$spacing-md;
-}
-
-.fieldValue {
-  white-space: pre-line;
-  padding: tokens.$spacing-md;
-  background: #fafafa;
-  border: 1px solid tokens.$border-color;
-  border-radius: tokens.$radius-small;
-}
-
-.textarea {
-  width: 100%;
-  padding: tokens.$spacing-md;
-  border: 1px solid tokens.$border-color;
-  border-radius: tokens.$radius-small;
-  resize: vertical;
-  min-height: 100px;
-}
-
-.metadata {
-  font-size: 12px;
-  color: #666;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: tokens.$spacing-sm;
-}
-
-.alert {
-  display: flex;
-  align-items: center;
-  gap: tokens.$spacing-sm;
-  padding: tokens.$spacing-md;
-  border: 1px solid tokens.$warning-color;
-  background: rgba(tokens.$warning-color, 0.08);
-  color: tokens.$text-color;
-  border-radius: tokens.$radius-small;
-}
-
-.errorContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: tokens.$spacing-md;
-  padding: tokens.$spacing-xl;
-}
-
-.errorIcon {
-  color: tokens.$error-color;
-}
-
-.errorMessage {
-  font-weight: 600;
-}
-
-.errorDetail {
-  color: #666;
-}
-
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: tokens.$spacing-md;
-  padding: tokens.$spacing-xl;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 3px solid tokens.$border-color;
-  border-top-color: tokens.$primary-color;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-  .patientInfo {
-    grid-template-columns: 1fr;
-  }
-}
-.page {
-  padding: 2rem 0;
-}
-
-.pageHeader {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  gap: $spacing-sm;
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-color;
   margin: 0;
 }
 
 .patientInfo {
-  background: var(--surface-primary);
+  background: #fff;
   border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.25rem;
-  border: 1px solid var(--border-subtle);
+  gap: $spacing-lg;
+  border: 1px solid $border-color;
 }
 
 .infoRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: var(--text-secondary);
+  gap: $spacing-sm;
   
   svg {
     flex-shrink: 0;
-    color: var(--accent-primary);
+    color: $primary-color;
   }
   
   > div {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: $spacing-xs;
   }
 }
 
 .label {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: rgba($text-color, 0.75);
   font-weight: 500;
 }
 
 .value {
   font-size: 1rem;
-  color: var(--text-primary);
+  color: $text-color;
   font-weight: 600;
 }
 
 .recordCard {
-  background: var(--surface-primary);
+  background: #fff;
   border-radius: 12px;
-  padding: 2rem;
-  border: 1px solid var(--border-subtle);
+  padding: $spacing-xl;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-small;
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-color;
   
   h2 {
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: $text-color;
     margin: 0;
   }
 }
 
 .actions {
   display: flex;
-  gap: 0.75rem;
+  gap: $spacing-sm;
 }
 
 .field {
-  margin-bottom: 1.5rem;
+  margin-bottom: $spacing-lg;
   
   &:last-child {
     margin-bottom: 0;
@@ -258,19 +101,19 @@
     display: block;
     font-size: 0.9375rem;
     font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    color: $text-color;
+    margin-bottom: $spacing-xs;
   }
 }
 
 .fieldValue {
   font-size: 1rem;
-  color: var(--text-primary);
+  color: $text-color;
   line-height: 1.6;
-  padding: 0.875rem;
-  background: var(--surface-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border-subtle);
+  padding: $spacing-md;
+  background: #fafafa;
+  border-radius: $radius-small;
+  border: 1px solid $border-color;
   white-space: pre-wrap;
 }
 
@@ -278,18 +121,19 @@
   width: 100%;
   font-family: inherit;
   font-size: 1rem;
-  color: var(--text-primary);
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 0.875rem;
+  color: $text-color;
+  background: #fafafa;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  padding: $spacing-md;
   resize: vertical;
+  min-height: 100px;
   transition: all 0.2s ease;
   
   &:focus {
     outline: none;
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px var(--accent-primary-alpha);
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
   }
   
   &:disabled {
@@ -299,27 +143,28 @@
 }
 
 .metadata {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-subtle);
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: rgba($text-color, 0.75);
   font-style: italic;
 }
 
 .alert {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: var(--error-background);
-  border: 1px solid var(--error-border);
-  border-radius: 8px;
-  color: var(--error-text);
-  margin-bottom: 1.5rem;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background: rgba($warning-color, 0.08);
+  border: 1px solid $warning-color;
+  border-radius: $radius-small;
+  color: $text-color;
+  margin-bottom: $spacing-lg;
   
   svg {
     flex-shrink: 0;
+    color: $warning-color;
   }
 }
 
@@ -328,12 +173,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
-  gap: 1.5rem;
+  padding: $spacing-xl * 2;
+  gap: $spacing-lg;
   
   p {
     font-size: 1.125rem;
-    color: var(--text-secondary);
+    color: rgba($text-color, 0.75);
     margin: 0;
   }
 }
@@ -341,8 +186,8 @@
 .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid var(--border-subtle);
-  border-top-color: var(--accent-primary);
+  border: 4px solid $border-color;
+  border-top-color: $primary-color;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -358,31 +203,32 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  padding: $spacing-xl * 2;
   text-align: center;
-  gap: 1.5rem;
+  gap: $spacing-lg;
   
   h2 {
     font-size: 1.75rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: $text-color;
     margin: 0;
   }
 }
 
 .errorIcon {
-  color: var(--error-text);
+  color: $error-color;
 }
 
 .errorMessage {
   font-size: 1.125rem;
-  color: var(--text-secondary);
+  color: rgba($text-color, 0.75);
   margin: 0;
+  font-weight: 600;
 }
 
 .errorDetail {
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: rgba($text-color, 0.75);
   max-width: 500px;
   margin: 0;
   line-height: 1.6;
@@ -390,13 +236,13 @@
 
 @media (max-width: 768px) {
   .page {
-    padding: 1rem 0;
+    padding: $spacing-md;
   }
   
   .pageHeader {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: $spacing-md;
   }
   
   .title {
@@ -405,17 +251,17 @@
   
   .patientInfo {
     grid-template-columns: 1fr;
-    padding: 1.25rem;
+    padding: $spacing-md;
   }
   
   .recordCard {
-    padding: 1.5rem;
+    padding: $spacing-lg;
   }
   
   .cardHeader {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: $spacing-md;
   }
   
   .actions {

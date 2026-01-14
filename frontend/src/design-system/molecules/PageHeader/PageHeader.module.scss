@@ -5,7 +5,6 @@
   align-items: center;
   padding-bottom: $spacing-md;
   border-bottom: 2px solid $border-color;
-  margin-bottom: $spacing-lg;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -19,6 +18,11 @@
   align-items: center;
   gap: $spacing-md;
   width: 100%;
+}
+
+.titleContent {
+  display: flex;
+  flex-direction: column;
 }
 
 .iconWrapper {
@@ -38,6 +42,13 @@ h1 {
   font-weight: 700;
   color: $text-color;
   margin: 0;
+}
+
+.subtitle {
+  margin: 0;
+  margin-top: $spacing-xs;
+  font-size: $font-size-sm;
+  color: rgba($text-color, 0.75);
 }
 
 // Color variants for icon
