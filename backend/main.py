@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
 
@@ -7,6 +6,7 @@ import uvicorn
 from services.db import init_db, close_db
 from routers import auth, appointments, patients
 from middleware.rate_limiter import RateLimitMiddleware
+from middleware.cors_handler import CustomCORSMiddleware
 from uvicorn import *
 
 
@@ -40,16 +40,8 @@ for origin in prod_origins:
     if origin not in allowed_origins:
         allowed_origins.append(origin)
 
-# Configurar CORS - Zero Trust: solo orígenes explícitos
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
-    expose_headers=["*"],
-    max_age=3600,
-)
+# Configurar CORS personalizado - Evita conflictos con headers del hosting
+app.add_middleware(CustomCORSMiddleware, allowed_origins=allowed_origins)
 
 # Configurar Rate Limiting (10 req/min)
 app.add_middleware(RateLimitMiddleware, max_requests=10, window_seconds=60)
