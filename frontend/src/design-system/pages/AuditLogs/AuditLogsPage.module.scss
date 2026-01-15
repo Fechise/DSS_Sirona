@@ -1,0 +1,331 @@
+@use '../../../styles/tokens/_index' as *;
+@use 'sass:color';
+
+.main {
+  flex: 1;
+  padding: $spacing-xl;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.description {
+  margin-bottom: $spacing-lg;
+  
+  p {
+    color: rgba($text-color, 0.7);
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+}
+
+.filtersSection {
+  background: #fff;
+  border-radius: $radius-medium;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-small;
+}
+
+.filtersRow {
+  display: flex;
+  align-items: flex-end;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  min-width: 200px;
+  flex: 1;
+  
+  label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: $text-color;
+  }
+}
+
+.select {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  background: #fff;
+  color: $text-color;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+
+  &:hover {
+    border-color: $primary-color;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+  }
+}
+
+.textInput {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  background: #fff;
+  color: $text-color;
+  font-size: 0.9375rem;
+  width: 100%;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+
+  &::placeholder {
+    color: rgba($text-color, 0.5);
+  }
+
+  &:hover {
+    border-color: $primary-color;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+  }
+}
+
+.filterActions {
+  display: flex;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.statsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  background: rgba($background-color, 0.5);
+  border-radius: $radius-small;
+  margin-bottom: $spacing-md;
+  font-size: 0.875rem;
+  color: rgba($text-color, 0.7);
+  
+  strong {
+    color: $text-color;
+  }
+}
+
+.logsContainer {
+  background: #fff;
+  border-radius: $radius-medium;
+  overflow: hidden;
+  box-shadow: $shadow-small;
+}
+
+.logsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  
+  th, td {
+    padding: $spacing-sm $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid rgba($border-color, 0.5);
+  }
+  
+  th {
+    background: rgba($background-color, 0.5);
+    font-weight: 600;
+    color: $text-color;
+    position: sticky;
+    top: 0;
+  }
+  
+  tbody tr {
+    transition: background-color 160ms ease;
+    
+    &:hover {
+      background: rgba($background-color, 0.3);
+    }
+  }
+}
+
+.dateCell {
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 0.8125rem;
+  color: rgba($text-color, 0.8);
+}
+
+.emailCell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ipCell {
+  font-family: monospace;
+  font-size: 0.8125rem;
+}
+
+.detailsCell {
+  max-width: 300px;
+}
+
+.detailsExpander {
+  cursor: pointer;
+  
+  summary {
+    color: $primary-color;
+    font-size: 0.8125rem;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  pre {
+    margin-top: $spacing-sm;
+    padding: $spacing-sm;
+    background: rgba($background-color, 0.8);
+    border-radius: $radius-small;
+    font-size: 0.75rem;
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
+.eventBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: $radius-small;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: monospace;
+}
+
+.eventDanger {
+  background: rgba($error-color, 0.15);
+  color: $error-color;
+  border: 1px solid rgba($error-color, 0.3);
+}
+
+.eventSuccess {
+  background: rgba($success-color, 0.15);
+  color: color.adjust($success-color, $lightness: -10%);
+  border: 1px solid rgba($success-color, 0.3);
+}
+
+.eventWarning {
+  background: rgba($warning-color, 0.15);
+  color: color.adjust($warning-color, $lightness: -15%);
+  border: 1px solid rgba($warning-color, 0.3);
+}
+
+.eventNeutral {
+  background: rgba($border-color, 0.3);
+  color: $text-color;
+  border: 1px solid $border-color;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xxl;
+  color: rgba($text-color, 0.5);
+  
+  p {
+    margin: $spacing-md 0 0;
+  }
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xxl $spacing-lg;
+  color: rgba($text-color, 0.6);
+
+  p {
+    margin: $spacing-md 0 0;
+    font-size: 0.9375rem;
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+  padding: $spacing-md 0;
+}
+
+.pageNumbers {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.pageButton {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  background: #fff;
+  color: $text-color;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 160ms ease;
+  
+  &:hover:not(:disabled) {
+    border-color: $primary-color;
+    color: $primary-color;
+  }
+  
+  &.active {
+    background: $primary-color;
+    border-color: $primary-color;
+    color: #fff;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: rgba($error-color, 0.1);
+  border: 1px solid rgba($error-color, 0.3);
+  border-radius: $radius-small;
+  color: $error-color;
+  margin-bottom: $spacing-md;
+  font-size: 0.9375rem;
+}
