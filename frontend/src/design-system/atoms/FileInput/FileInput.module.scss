@@ -1,0 +1,98 @@
+@use '../../../styles/tokens/_index' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  min-width: 0;
+  width: 100%;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: 0.875rem;
+  color: $text-color;
+  font-weight: 600;
+}
+
+.labelIcon {
+  display: inline-flex;
+  align-items: center;
+  color: $primary-color;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.selectButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm calc($spacing-md - 2px);
+  border: 1px dashed $border-color;
+  border-radius: $radius-medium;
+  background: rgba($primary-color, 0.04);
+  color: $primary-color;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 160ms ease;
+
+  &:hover {
+    border-color: $primary-color;
+    background: rgba($primary-color, 0.08);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.fileName {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm calc($spacing-sm + $spacing-xs);
+  background: rgba($success-color, 0.08);
+  border: 1px solid rgba($success-color, 0.3);
+  border-radius: $radius-small;
+  color: $text-color;
+  font-size: 0.875rem;
+  margin-top: $spacing-xs;
+}
+
+.fileIcon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.fileText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  padding: $spacing-sm calc($spacing-sm + $spacing-xs);
+  color: color-mix(in srgb, $text-color 50%, transparent);
+  font-size: 0.875rem;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, $text-color 70%, white);
+  line-height: 1.4;
+}

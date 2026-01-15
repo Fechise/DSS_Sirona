@@ -1,0 +1,42 @@
+@use '../../../styles/tokens/_index' as *;
+
+.link {
+  background: transparent;
+  border: none;
+  color: $primary-color;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-small + 2px;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+  text-decoration: none;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, $primary-color 12%, white);
+    color: $primary-color-hover;
+  }
+
+  &:active:not(:disabled) {
+    background-color: color-mix(in srgb, $primary-color 18%, white);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.default {
+  // Estilo por defecto ya definido arriba
+}
+
+.subtle {
+  color: color-mix(in srgb, $text-color 75%, white);
+  font-weight: 500;
+  
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, $text-color 8%, white);
+    color: $text-color;
+  }
+}

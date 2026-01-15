@@ -1,0 +1,150 @@
+@use '../../../styles/tokens/_index' as *;
+
+.dropdownContainer {
+  position: relative;
+}
+
+.trigger {
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  background: #ffffff;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 220px;
+  padding: 0.5rem;
+  z-index: 1000;
+  animation: slideDown 0.2s ease;
+
+  &.left {
+    left: 0;
+  }
+
+  &.right {
+    right: 0;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: $text-color;
+  transition: all 0.15s ease;
+  text-align: left;
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: $text-color;
+  }
+
+  .label {
+    flex: 1;
+  }
+
+  &:hover:not(.danger) {
+    background: #f0f0f0;
+  }
+
+  &:focus {
+    outline: none;
+    background: #f0f0f0;
+  }
+
+  &.danger {
+    color: #e74c3c;
+
+    .icon {
+      color: #e74c3c;
+    }
+
+    &:hover {
+      background: rgba(231, 76, 60, 0.1);
+      color: #c0392b;
+
+      .icon {
+        color: #c0392b;
+      }
+    }
+  }
+}
+
+.divider {
+  height: 1px;
+  background: $border-color;
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .menu {
+    min-width: 200px;
+    right: 0;
+  }
+}
+
+/* Variantes de color por rol */
+.primary {
+  .item:hover:not(.danger) {
+    color: $primary-color;
+    .icon { color: $primary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $primary-color 20%, white);
+  }
+}
+
+.secondary {
+  .item:hover:not(.danger) {
+    color: $secondary-color;
+    .icon { color: $secondary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $secondary-color 20%, white);
+  }
+}
+
+.tertiary {
+  .item:hover:not(.danger) {
+    color: $tertiary-color;
+    .icon { color: $tertiary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $tertiary-color 20%, white);
+  }
+}
+
+.quaternary {
+  .item:hover:not(.danger) {
+    color: $quaternary-color;
+    .icon { color: $quaternary-color; }
+  }
+  .item:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $quaternary-color 20%, white);
+  }
+}

@@ -1,0 +1,11 @@
+@use '../../../styles/tokens/_index' as *;
+
+.container {
+  width: 100%;
+}
+
+.content {
+  width: 100%;
+  max-width: $content-max-width;
+  margin: 0 auto;
+}

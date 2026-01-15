@@ -1,0 +1,158 @@
+@use '../../../styles/tokens/_index' as *;
+
+.sectionCard {
+  background-color: #ffffff;
+  border: 1px solid $border-color;
+  border-radius: $radius-medium;
+  padding: $spacing-lg;
+  box-shadow: $shadow-small;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 2px solid $border-color;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: $text-color;
+}
+
+.badge {
+  display: inline-block;
+  background-color: $primary-color;
+  color: $on-primary-color;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-medium;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+}
+
+.infoField {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.infoLabel {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba($text-color, 0.6);
+  font-weight: 600;
+}
+
+.infoValue {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: 0.9375rem;
+  color: $text-color;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tag {
+  display: inline-block;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-medium;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tagDanger {
+  background-color: rgba(#dc3545, 0.1);
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.tagWarning {
+  background-color: rgba(#ffc107, 0.1);
+  color: #e69500;
+  border: 1px solid #ffc107;
+}
+
+.bloodType {
+  display: inline-block;
+  background-color: #dc3545;
+  color: white;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-medium;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.consultaItem {
+  margin-bottom: $spacing-lg;
+}
+
+.consultaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 2px solid $border-color;
+}
+
+.consultaFecha {
+  font-size: 14px;
+  font-weight: 700;
+  color: $primary-color;
+}
+
+.consultaMotivo {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-color;
+  background-color: rgba($primary-color, 0.1);
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-medium;
+}
+
+.consultaDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.vaccineGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spacing-md;
+}
+
+.vaccineItem {
+  background-color: #f8f9fa;
+  border: 1px solid $border-color;
+  border-left: 3px solid $success-color;
+  padding: $spacing-md;
+  border-radius: $radius-medium;
+}
+
+.appointmentCard {
+  background-color: rgba($secondary-color, 0.05);
+  border: 2px solid $secondary-color;
+  border-radius: $radius-medium;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}

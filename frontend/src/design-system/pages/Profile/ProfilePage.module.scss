@@ -1,0 +1,85 @@
+@use '../../../styles/tokens/_index' as *;
+
+.profileContainer {
+  display: flex;
+  gap: $spacing-xl;
+  padding: $spacing-lg; // Evitar colapso de márgenes con el contenedor y el scroll innecesario
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-xl;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  margin: $spacing-lg;
+}
+
+.errorAlert {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  background-color: #ffebee;
+  border-left: 4px solid $accent-color;
+  border-radius: 8px;
+  color: #c62828;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem 0;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .profileCard,
+  .securityCard {
+    padding: 1.5rem;
+  }
+  
+  .avatarSection {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  
+  .userInfo {
+    align-items: center;
+    
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cardHeader {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .changePasswordButton {
+    width: 100%;
+  }
+}

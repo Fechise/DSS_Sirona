@@ -1,0 +1,69 @@
+// Role-based color themes
+$primary-color: #7B69C9; // Médico - morado pastel
+$secondary-color: #2a9d8f; // Paciente - teal profundo
+$tertiary-color: #D8735A; // Secretario - salmón/coral
+$quaternary-color: #4D85A8; // Administrador - azul oscuro
+
+// Other theme colors
+$accent-color: #e74c3c;
+$background-color: #ecf0f1;
+$text-color: #2c3e50;
+$border-color: #bdc3c7;
+
+$success-color: #2ecc71;
+$warning-color: #f39c12;
+$error-color: #e74c3c;
+
+// Text colors on theme backgrounds
+$on-primary-color: #ffffff;
+$on-secondary-color: #ffffff;
+$on-tertiary-color: #ffffff;
+$on-quaternary-color: #ffffff;
+
+// Background colors for role-based pages (6% mix with white)
+$background-primary: color-mix(in srgb, $primary-color 6%, white);     // Médico
+$background-secondary: color-mix(in srgb, $secondary-color 6%, white); // Paciente
+$background-tertiary: color-mix(in srgb, $tertiary-color 6%, white);   // Secretario
+$background-quaternary: color-mix(in srgb, $quaternary-color 6%, white); // Administrador
+
+@use 'sass:color';
+
+// Estados: hover con opacidad para mejor visibilidad
+$primary-color-hover: rgba($primary-color, 0.9);
+$primary-color-active: color.mix($primary-color, #000, 8%);
+$secondary-color-hover: rgba($secondary-color, 0.9);
+$secondary-color-active: color.mix($secondary-color, #000, 8%);
+$tertiary-color-hover: rgba($tertiary-color, 0.9);
+$tertiary-color-active: color.mix($tertiary-color, #000, 8%);
+$quaternary-color-hover: rgba($quaternary-color, 0.9);
+$quaternary-color-active: color.mix($quaternary-color, #000, 8%);
+
+:root {
+  --primary-color: #{$primary-color};
+  --secondary-color: #{$secondary-color};
+  --tertiary-color: #{$tertiary-color};
+  --quaternary-color: #{$quaternary-color};
+  --accent-color: #{$accent-color};
+  --background-color: #{$background-color};
+  --text-color: #{$text-color};
+  --border-color: #{$border-color};
+  --success-color: #{$success-color};
+  --warning-color: #{$warning-color};
+  --error-color: #{$error-color};
+  --on-primary-color: #{$on-primary-color};
+  --on-secondary-color: #{$on-secondary-color};
+  --on-tertiary-color: #{$on-tertiary-color};
+  --on-quaternary-color: #{$on-quaternary-color};
+  --background-primary: #{$background-primary};
+  --background-secondary: #{$background-secondary};
+  --background-tertiary: #{$background-tertiary};
+  --background-quaternary: #{$background-quaternary};
+  --primary-color-hover: #{$primary-color-hover};
+  --primary-color-active: #{$primary-color-active};
+  --secondary-color-hover: #{$secondary-color-hover};
+  --secondary-color-active: #{$secondary-color-active};
+  --tertiary-color-hover: #{$tertiary-color-hover};
+  --tertiary-color-active: #{$tertiary-color-active};
+  --quaternary-color-hover: #{$quaternary-color-hover};
+  --quaternary-color-active: #{$quaternary-color-active};
+}

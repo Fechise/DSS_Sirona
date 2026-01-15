@@ -1,0 +1,181 @@
+@use '../../../styles/tokens/_index' as *;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  color: #8b8b8b;
+  margin: 0;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: $spacing-xl;
+  border: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  box-shadow: $shadow-medium;
+}
+
+.avatarSection {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+// Variantes de badge por rol
+.primary {
+  .roleBadge {
+    background: color-mix(in srgb, $primary-color 15%, white);
+    color: $primary-color;
+  }
+  .infoLabel svg {
+    color: $primary-color;
+  }
+}
+
+.secondary {
+  .roleBadge {
+    background: color-mix(in srgb, $secondary-color 15%, white);
+    color: $secondary-color;
+  }
+  .infoLabel svg {
+    color: $secondary-color;
+  }
+}
+
+.tertiary {
+  .roleBadge {
+    background: color-mix(in srgb, $tertiary-color 15%, white);
+    color: $tertiary-color;
+  }
+  .infoLabel svg {
+    color: $tertiary-color;
+  }
+}
+
+.quaternary {
+  .roleBadge {
+    background: color-mix(in srgb, $quaternary-color 15%, white);
+    color: $quaternary-color;
+  }
+  .infoLabel svg {
+    color: $quaternary-color;
+  }
+}
+
+.divider {
+  height: 1px;
+  background: $border-color;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.infoLabel {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #8b8b8b;
+}
+
+.infoValue {
+  font-size: 1rem;
+  font-weight: 500;
+  color: $text-color;
+  padding-left: 1.75rem;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #ecf7ee;
+  color: #2e7d32;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .header {
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .card {
+    padding: $spacing-lg;
+  }
+
+  .avatarSection {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .userInfo {
+    align-items: center;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .infoValue {
+    padding-left: 0;
+  }
+}

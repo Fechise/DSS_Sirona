@@ -1,0 +1,274 @@
+@use '../../../styles/tokens/_index' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+}
+
+.backButton {
+  margin-bottom: $spacing-md;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: $text-color;
+  margin: 0;
+}
+
+.patientInfo {
+  background: #fff;
+  border-radius: 12px;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+  border: 1px solid $border-color;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  
+  svg {
+    flex-shrink: 0;
+    color: $primary-color;
+  }
+  
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+}
+
+.label {
+  font-size: 0.875rem;
+  color: rgba($text-color, 0.75);
+  font-weight: 500;
+}
+
+.value {
+  font-size: 1rem;
+  color: $text-color;
+  font-weight: 600;
+}
+
+.recordCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: $spacing-xl;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-small;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-color;
+  
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.field {
+  margin-bottom: $spacing-lg;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  label {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $text-color;
+    margin-bottom: $spacing-xs;
+  }
+}
+
+.fieldValue {
+  font-size: 1rem;
+  color: $text-color;
+  line-height: 1.6;
+  padding: $spacing-md;
+  background: #fafafa;
+  border-radius: $radius-small;
+  border: 1px solid $border-color;
+  white-space: pre-wrap;
+}
+
+.textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  color: $text-color;
+  background: #fafafa;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  padding: $spacing-md;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.metadata {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+  font-size: 0.875rem;
+  color: rgba($text-color, 0.75);
+  font-style: italic;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background: rgba($warning-color, 0.08);
+  border: 1px solid $warning-color;
+  border-radius: $radius-small;
+  color: $text-color;
+  margin-bottom: $spacing-lg;
+  
+  svg {
+    flex-shrink: 0;
+    color: $warning-color;
+  }
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl * 2;
+  gap: $spacing-lg;
+  
+  p {
+    font-size: 1.125rem;
+    color: rgba($text-color, 0.75);
+    margin: 0;
+  }
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid $border-color;
+  border-top-color: $primary-color;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl * 2;
+  text-align: center;
+  gap: $spacing-lg;
+  
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+}
+
+.errorIcon {
+  color: $error-color;
+}
+
+.errorMessage {
+  font-size: 1.125rem;
+  color: rgba($text-color, 0.75);
+  margin: 0;
+  font-weight: 600;
+}
+
+.errorDetail {
+  font-size: 1rem;
+  color: rgba($text-color, 0.75);
+  max-width: 500px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: $spacing-md;
+  }
+  
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .patientInfo {
+    grid-template-columns: 1fr;
+    padding: $spacing-md;
+  }
+  
+  .recordCard {
+    padding: $spacing-lg;
+  }
+  
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+  
+  .actions {
+    width: 100%;
+    
+    button {
+      flex: 1;
+    }
+  }
+}

@@ -1,0 +1,106 @@
+@use '../../styles/tokens/_index' as *;
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden; // Evita que el scroll salga en el contenedor principal
+
+  @supports not (height: 100svh) {
+    height: 100vh;
+  }
+}
+
+// Role-based backgrounds at layout level
+.primary {
+  background: $background-primary;
+}
+.secondary {
+  background: $background-secondary;
+}
+.tertiary {
+  background: $background-tertiary;
+}
+.quaternary {
+  background: $background-quaternary;
+}
+
+.mainContent {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+
+  // WebKit scrollbar styling (Chrome, Safari, Edge)
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba($text-color, 0.05);
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba($text-color, 0.3);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba($text-color, 0.5);
+    background-clip: padding-box;
+  }
+
+  // Firefox
+  scrollbar-width: thin;
+  scrollbar-color: rgba($text-color, 0.3) rgba($text-color, 0.05);
+}
+
+// Scrollbar coloreado por rol
+.primary .mainContent {
+  &::-webkit-scrollbar-thumb {
+    background: rgba($primary-color, 0.4);
+    background-clip: padding-box;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba($primary-color, 0.6);
+    background-clip: padding-box;
+  }
+  scrollbar-color: rgba($primary-color, 0.4) rgba($text-color, 0.05);
+}
+
+.secondary .mainContent {
+  &::-webkit-scrollbar-thumb {
+    background: rgba($secondary-color, 0.4);
+    background-clip: padding-box;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba($secondary-color, 0.6);
+    background-clip: padding-box;
+  }
+  scrollbar-color: rgba($secondary-color, 0.4) rgba($text-color, 0.05);
+}
+
+.tertiary .mainContent {
+  &::-webkit-scrollbar-thumb {
+    background: rgba($tertiary-color, 0.4);
+    background-clip: padding-box;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba($tertiary-color, 0.6);
+    background-clip: padding-box;
+  }
+  scrollbar-color: rgba($tertiary-color, 0.4) rgba($text-color, 0.05);
+}
+
+.quaternary .mainContent {
+  &::-webkit-scrollbar-thumb {
+    background: rgba($quaternary-color, 0.4);
+    background-clip: padding-box;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba($quaternary-color, 0.6);
+    background-clip: padding-box;
+  }
+  scrollbar-color: rgba($quaternary-color, 0.4) rgba($text-color, 0.05);
+}

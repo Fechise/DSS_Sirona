@@ -1,0 +1,63 @@
+.container {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-color) 12%, white),
+    color-mix(in srgb, var(--secondary-color) 10%, white)
+  );
+  padding: 1rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.brandIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+.brandText {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.foot {
+  display: flex;
+  justify-content: center;
+}
+
+.ctaLink {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 12%, white);
+  }
+}

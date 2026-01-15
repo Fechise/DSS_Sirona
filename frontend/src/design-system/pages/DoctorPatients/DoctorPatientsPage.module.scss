@@ -1,0 +1,138 @@
+.main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.headerWrapper {
+  margin-bottom: 2rem;
+}
+
+.subtitle {
+  margin: 1rem 0 1.5rem 0;
+  color: color-mix(in srgb, var(--text-color) 70%, white);
+  font-size: 0.9375rem;
+}
+
+.tableContainer {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: color-mix(in srgb, var(--primary-color) 8%, white);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.875rem;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 160ms ease;
+}
+
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--primary-color) 4%, white);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 1rem;
+  color: var(--text-color);
+  font-size: 0.9375rem;
+}
+
+.patientName {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.patientName strong {
+  color: var(--text-color);
+}
+
+.email {
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--text-color) 60%, white);
+}
+
+.consultaInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+}
+
+.noConsulta {
+  color: color-mix(in srgb, var(--text-color) 50%, white);
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--primary-color) 15%, white);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.loadingState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: color-mix(in srgb, var(--text-color) 60%, white);
+}
+
+.loadingState p,
+.emptyState p {
+  margin: 1rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.emptyState .hint {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--text-color) 50%, white);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
