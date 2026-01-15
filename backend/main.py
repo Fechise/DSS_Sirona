@@ -57,5 +57,4 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(appointments.router, prefix="/api", tags=["Appointments"])
 app.include_router(patients.router, prefix="/api/paciente", tags=["Patients"])
 
-uvicorn.run(app, host="localhost", port=8000)
-
+uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)
