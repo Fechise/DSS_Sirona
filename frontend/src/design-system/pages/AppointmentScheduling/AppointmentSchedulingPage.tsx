@@ -5,6 +5,7 @@ import { Container } from '../../atoms/Container/Container';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { Table } from '../../molecules/Table/Table';
+import { Modal } from '../../atoms/Modal/Modal';
 import styles from './AppointmentSchedulingPage.module.scss';
 
 type Patient = {
@@ -211,10 +212,10 @@ export const AppointmentSchedulingPage: React.FC = () => {
           <Button
             variant="filled"
             color="primary"
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => (showForm ? handleCancel() : setShowForm(true))}
             startIcon={<Plus size={16} />}
           >
-            {showForm ? 'Cancelar' : 'Nueva Cita'}
+            {showForm ? 'Cerrar' : 'Nueva Cita'}
           </Button>
         </div>
 
@@ -232,10 +233,13 @@ export const AppointmentSchedulingPage: React.FC = () => {
           </div>
         )}
 
-        {/* Form Section */}
-        {showForm && (
+        <Modal
+          isOpen={showForm}
+          onClose={handleCancel}
+          title={editingId ? 'Editar Cita' : 'Crear Nueva Cita'}
+          maxWidth="640px"
+        >
           <div className={styles.formSection}>
-            <h2>{editingId ? 'Editar Cita' : 'Crear Nueva Cita'}</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label htmlFor="patient">Paciente</label>
@@ -307,7 +311,7 @@ export const AppointmentSchedulingPage: React.FC = () => {
               </Button>
             </div>
           </div>
-        )}
+        </Modal>
 
         {/* Appointments Table */}
         <div className={styles.tableSection}>

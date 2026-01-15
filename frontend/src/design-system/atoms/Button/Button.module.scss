@@ -39,6 +39,7 @@
 
   &:hover:not(:disabled) {
     box-shadow: $shadow-medium;
+    transform: translateY(-1px);
   }
 }
 

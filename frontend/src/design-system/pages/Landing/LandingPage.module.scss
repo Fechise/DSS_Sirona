@@ -1,0 +1,279 @@
+@use '../../../styles/tokens/_index' as *;
+
+.landingPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* ========== Header ========== */
+.header {
+  background: white;
+  border-bottom: 1px solid #dee2e6;
+  padding: $spacing-md;
+  box-shadow: $shadow-small;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logoText {
+  font-size: $font-size-h1;
+  font-weight: $font-weight-bold;
+  color: $primary-color;
+  margin: 0;
+  letter-spacing: -0.5px;
+  
+  // Gradiente sutil en el texto
+  background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 15%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.headerActions {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: center;
+}
+
+/* ========== Hero Section ========== */
+.hero {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: $spacing-xxl;
+}
+
+.heroContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xl;
+  align-items: center;
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+    gap: $spacing-xxl;
+  }
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: $font-weight-bold;
+  color: $text-color;
+  margin: 0;
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.brandName {
+  color: $primary-color;
+  display: inline-block;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $primary-color 0%, darken($primary-color, 10%) 100%);
+    border-radius: $radius-full;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-h3;
+  font-weight: $font-weight-bold;
+  color: darken($text-color, 5%);
+  margin: 0;
+}
+
+.description {
+  font-size: $font-size-lg;
+  color: lighten($text-color, 15%);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-sm;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    width: 100%;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+/* ========== Roles Collage ========== */
+.rolesCollage {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.roleCard {
+  background: white;
+  border-radius: $radius-large;
+  padding: $spacing-lg;
+  box-shadow: $shadow-medium;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-xlarge;
+  }
+
+  // Colores específicos por rol según el design system
+  &[data-role="admin"] {
+    border-color: rgba($quaternary-color, 0.2);
+    
+    .roleIcon {
+      color: $quaternary-color;
+      background: rgba($quaternary-color, 0.1);
+    }
+    
+    &:hover {
+      border-color: $quaternary-color;
+      box-shadow: 0 8px 24px rgba($quaternary-color, 0.15);
+    }
+  }
+
+  &[data-role="medico"] {
+    border-color: rgba($primary-color, 0.2);
+    
+    .roleIcon {
+      color: $primary-color;
+      background: rgba($primary-color, 0.1);
+    }
+    
+    &:hover {
+      border-color: $primary-color;
+      box-shadow: 0 8px 24px rgba($primary-color, 0.15);
+    }
+  }
+
+  &[data-role="paciente"] {
+    border-color: rgba($secondary-color, 0.2);
+    
+    .roleIcon {
+      color: $secondary-color;
+      background: rgba($secondary-color, 0.1);
+    }
+    
+    &:hover {
+      border-color: $secondary-color;
+      box-shadow: 0 8px 24px rgba($secondary-color, 0.15);
+    }
+  }
+
+  &[data-role="secretario"] {
+    border-color: rgba($tertiary-color, 0.2);
+    
+    .roleIcon {
+      color: $tertiary-color;
+      background: rgba($tertiary-color, 0.1);
+    }
+    
+    &:hover {
+      border-color: $tertiary-color;
+      box-shadow: 0 8px 24px rgba($tertiary-color, 0.15);
+    }
+  }
+}
+
+.roleIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: $radius-large;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  
+  .roleCard:hover & {
+    transform: scale(1.1);
+  }
+}
+
+.roleTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-color;
+  margin: 0;
+}
+
+.roleDescription {
+  font-size: $font-size-sm;
+  color: lighten($text-color, 20%);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ========== Footer ========== */
+.footer {
+  background: white;
+  border-top: 1px solid #dee2e6;
+  padding: $spacing-lg 0;
+  margin-top: auto;
+}
+
+.footerText {
+  text-align: center;
+  color: lighten($text-color, 20%);
+  font-size: $font-size-sm;
+  margin: 0;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 968px) {
+  .heroContent {
+    text-align: center;
+  }
+
+  .ctaButtons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .rolesCollage {
+    grid-template-columns: 1fr;
+  }
+
+  .headerActions {
+    gap: $spacing-xs;
+  }
+}

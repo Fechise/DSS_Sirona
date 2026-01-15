@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './design-system/layouts/AppLayout';
+import { LandingPage } from './design-system/pages/Landing/LandingPage';
 import { LoginPage } from './design-system/pages/Login/LoginPage';
 import { RegisterPage } from './design-system/pages/Register/RegisterPage';
 import { MedicalRecordPage } from './design-system/pages/MedicalRecord/MedicalRecordPage';
@@ -15,9 +16,9 @@ import { AppointmentSchedulingPage } from './design-system/pages/AppointmentSche
 import { PaymentCheckoutPage } from './design-system/pages/PaymentCheckout/PaymentCheckoutPage';
 import { PatientListPage } from './design-system/pages/PatientList/PatientListPage';
 
-const RutaInicial: React.FC = () => {
+const RedireccionInicio: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  return <Navigate to={isAuthenticated ? '/inicio' : '/login'} replace />;
+  return <Navigate to={isAuthenticated ? '/inicio' : '/'} replace />;
 };
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route
@@ -127,8 +129,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/" element={<RutaInicial />} />
-          <Route path="*" element={<RutaInicial />} />
+          <Route path="*" element={<RedireccionInicio />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

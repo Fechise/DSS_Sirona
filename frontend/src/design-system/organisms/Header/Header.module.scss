@@ -4,11 +4,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   background: #fff;
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  gap: 2rem;
+  gap: 1.25rem;
 }
 
 .brand {
@@ -26,14 +26,14 @@
 
 .brandText {
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: var(--text-color);
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
+  gap: $spacing-xs;
   flex: 1;
   justify-content: center;
 }
@@ -51,7 +51,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.85rem;
   background: var(--surface-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: 50px;

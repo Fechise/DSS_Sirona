@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import styles from './RegisterForm.module.scss';
 import { Input } from '../../atoms/Input/Input';
 import { Button } from '../../atoms/Button/Button';
-import { Upload, Camera } from 'lucide-react';
+import { User, Mail, CreditCard, Lock, ShieldCheck } from 'lucide-react';
 import { PasswordStrengthIndicator, validatePasswordStrength } from '../PasswordStrengthIndicator/PasswordStrengthIndicator';
+import { CedulaUpload } from '../CedulaUpload/CedulaUpload';
 
 export type RegisterData = {
   fullName: string;
@@ -71,105 +72,86 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit, loading = false }) => 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
       <div className={styles.header}>
-        <h1 className={styles.title}>Crear cuenta</h1>
-        <p className={styles.subtitle}>Regístrate para acceder a Sirona</p>
+        <div className={styles.brand}>
+          <ShieldCheck size={32} />
+          <span className={styles.brandText}>Sirona</span>
+        </div>
+        <div className={styles.headerText}>
+          <h1 className={styles.title}>Crear cuenta</h1>
+          <p className={styles.subtitle}>Regístrate para acceder a Sirona</p>
+        </div>
       </div>
 
-      <div className={styles.fields}>
-        <Input
-          id="fullName"
-          label="Nombre completo"
-          value={fullName}
-          placeholder="Nombre y apellidos"
-          onChange={setFullName}
-          error={errors.fullName}
-          autoComplete="name"
-        />
+      <div className={styles.formGrid}>
+        {/* Columna izquierda: Campos del formulario */}
+        <div className={styles.fields}>
+          <Input
+            id="fullName"
+            label="Nombre completo"
+            value={fullName}
+            placeholder="Nombre y apellidos"
+            onChange={setFullName}
+            error={errors.fullName}
+            autoComplete="name"
+            icon={<User size={16} />}
+          />
 
-        <Input
-          id="email"
-          label="Correo"
-          type="email"
-          value={email}
-          placeholder="tu@correo.com"
-          onChange={setEmail}
-          error={errors.email}
-          autoComplete="email"
-        />
+          <Input
+            id="email"
+            label="Correo"
+            type="email"
+            value={email}
+            placeholder="tu@correo.com"
+            onChange={setEmail}
+            error={errors.email}
+            autoComplete="email"
+            icon={<Mail size={16} />}
+          />
 
-        <Input
-          id="cedula"
-          label="Cédula"
-          value={cedula}
-          placeholder="Número de cédula"
-          onChange={setCedula}
-          error={errors.cedula}
-          autoComplete="off"
-        />
+          <Input
+            id="cedula"
+            label="Cédula"
+            value={cedula}
+            placeholder="Número de cédula"
+            onChange={setCedula}
+            error={errors.cedula}
+            autoComplete="off"
+            icon={<CreditCard size={16} />}
+          />
 
-        <Input
-          id="password"
-          label="Contraseña"
-          type="password"
-          value={password}
-          placeholder="••••••••"
-          onChange={setPassword}
-          error={errors.password}
-          autoComplete="new-password"
-        />
-        {password && <PasswordStrengthIndicator password={password} />}
+          <Input
+            id="password"
+            label="Contraseña"
+            type="password"
+            value={password}
+            placeholder="••••••••"
+            onChange={setPassword}
+            error={errors.password}
+            autoComplete="new-password"
+            icon={<Lock size={16} />}
+          />
+          {password && <PasswordStrengthIndicator password={password} />}
 
-        <Input
-          id="confirmPassword"
-          label="Repite la contraseña"
-          type="password"
-          value={confirmPassword}
-          placeholder="••••••••"
-          onChange={setConfirmPassword}
-          error={errors.confirmPassword}
-          autoComplete="new-password"
-        />
-
-        <div className={styles.uploadRow}>
-          <label className={styles.uploadLabel} htmlFor="cedulaImage">
-            <span className={styles.uploadText}>Imagen de cédula</span>
-            <span className={styles.hint}>Sube o captura una foto</span>
-          </label>
-
-          <div className={styles.uploadControls}>
-            <label className={styles.uploadButton}>
-              <Upload size={18} />
-              <span>Subir imagen</span>
-              <input
-                id="cedulaImage"
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleFile(e.target.files?.[0])}
-                hidden
-              />
-            </label>
-            <label className={styles.captureButton}>
-              <Camera size={18} />
-              <span>Capturar</span>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={(e) => handleFile(e.target.files?.[0])}
-                hidden
-              />
-            </label>
-          </div>
-          {errors.cedulaImage && (
-            <div className={styles.error}>{errors.cedulaImage}</div>
-          )}
-
-          {previewUrl && (
-            <div className={styles.preview}>
-              <img src={previewUrl} alt="Previsualización de cédula" />
-            </div>
-          )}
+          <Input
+            id="confirmPassword"
+            label="Repite la contraseña"
+            type="password"
+            value={confirmPassword}
+            placeholder="••••••••"
+            onChange={setConfirmPassword}
+            error={errors.confirmPassword}
+            autoComplete="new-password"
+            icon={<Lock size={16} />}
+          />
         </div>
+
+        {/* Columna derecha: Imagen de cédula */}
+        <CedulaUpload
+          previewUrl={previewUrl}
+          onFileSelect={handleFile}
+          error={errors.cedulaImage}
+          disabled={loading}
+        />
       </div>
 
       <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading}>

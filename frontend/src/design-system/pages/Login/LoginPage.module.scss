@@ -8,6 +8,12 @@
   background: linear-gradient(135deg, #f8f9fa, #e9ecef);
   padding: $spacing-md;
   overflow: hidden;
+
+  @media (max-height: 800px) {
+    display: flex;
+    align-items: flex-start;
+    padding: 1.5rem 1rem;
+  }
 }
 
 .card {
@@ -27,12 +33,27 @@
   padding: calc($spacing-md + $spacing-xs);
   display: grid;
   gap: $spacing-md;
+
+  @media (max-height: 800px) {
+    padding: $spacing-md;
+    gap: $spacing-sm;
+    margin: auto;
+  }
+
+  @media (max-width: 480px) {
+    padding: $spacing-md;
+    gap: $spacing-sm;
+  }
 }
 
 .modes {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $spacing-sm;
+
+  @media (max-height: 800px) {
+    gap: $spacing-xs;
+  }
 }
 
 .modeButton {
@@ -45,6 +66,11 @@
   color: $text-color;
   cursor: pointer;
   transition: background-color 160ms ease, border-color 160ms ease;
+
+  @media (max-height: 800px) {
+    padding: $spacing-xs $spacing-sm;
+    font-size: 0.8125rem;
+  }
 
   &:hover:not(:disabled) {
     background-color: color-mix(in srgb, $primary-color 10%, white);
@@ -68,26 +94,49 @@
   border-radius: calc($radius-medium + $radius-small);
   padding: $spacing-md;
   background: #fff;
+
+  @media (max-height: 800px) {
+    padding: $spacing-sm;
+  }
 }
 
 .otpHeader h2 {
   margin: 0;
   color: $text-color;
+  font-size: 1.25rem;
+
+  @media (max-height: 800px) {
+    font-size: 1.125rem;
+  }
 }
 
 .otpHeader p {
   margin: $spacing-xs 0 0;
   color: color-mix(in srgb, $text-color 75%, white);
+  font-size: 0.9375rem;
+
+  @media (max-height: 800px) {
+    font-size: 0.875rem;
+    margin-top: $spacing-xs;
+  }
 }
 
 .otpForm {
   display: grid;
   gap: calc($spacing-sm + $spacing-xs);
+
+  @media (max-height: 800px) {
+    gap: $spacing-sm;
+  }
 }
 
 .faceForm {
   display: grid;
   gap: calc($spacing-sm + $spacing-xs);
+
+  @media (max-height: 800px) {
+    gap: $spacing-sm;
+  }
 }
 
 .captureSection {
@@ -95,25 +144,15 @@
   border: 2px dashed color-mix(in srgb, $primary-color 30%, white);
   border-radius: $radius-medium;
   background: color-mix(in srgb, $primary-color 3%, white);
+
+  @media (max-height: 800px) {
+    padding: $spacing-sm;
+  }
 }
 
 .fieldGroup {
   display: grid;
   gap: $spacing-xs;
-}
-
-.fieldGroup label {
-  font-size: 0.9rem;
-  color: $text-color;
-  font-weight: 600;
-}
-
-.fieldGroup input[type='file'] {
-  padding: 0.6rem calc($spacing-sm + $spacing-xs);
-  border: 1px solid $border-color;
-  border-radius: 10px;
-  background: #fff;
-  color: $text-color;
 }
 
 .alertLocked {
@@ -128,6 +167,12 @@
   font-size: 0.9375rem;
   font-weight: 500;
   margin-bottom: $spacing-sm;
+
+  @media (max-height: 800px) {
+    padding: $spacing-sm;
+    font-size: 0.875rem;
+    gap: $spacing-sm;
+  }
 }
 
 .alertError {
@@ -144,12 +189,23 @@
   svg {
     flex-shrink: 0;
   }
+
+  @media (max-height: 800px) {
+    padding: $spacing-sm;
+    font-size: 0.875rem;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-sm;
+  }
 }
 
 .hint {
   margin: 0;
   font-size: 0.85rem;
   color: color-mix(in srgb, $text-color 70%, white);
+
+  @media (max-height: 800px) {
+    font-size: 0.8125rem;
+  }
 }
 
 .brand {
@@ -158,6 +214,10 @@
   gap: $spacing-sm;
   justify-content: center;
   margin-bottom: $spacing-xs;
+
+  @media (max-height: 800px) {
+    margin-bottom: 0;
+  }
 }
 
 .brandIcon {
@@ -170,17 +230,31 @@
 .brandText {
   font-weight: 700;
   color: $text-color;
+  font-size: 1.125rem;
+
+  @media (max-height: 800px) {
+    font-size: 1rem;
+  }
 }
 
 .foot {
   display: flex;
   justify-content: center;
+  margin-top: -$spacing-xs;
+
+  @media (max-height: 800px) {
+    margin-top: 0;
+  }
 }
 
 .links {
   display: grid;
   gap: $spacing-sm;
   justify-items: center;
+
+  @media (max-height: 800px) {
+    gap: $spacing-xs;
+  }
 }
 
 .demoButtons {
@@ -188,4 +262,8 @@
   gap: $spacing-sm;
   flex-wrap: wrap;
   justify-content: center;
+
+  @media (max-height: 800px) {
+    gap: $spacing-xs;
+  }
 }

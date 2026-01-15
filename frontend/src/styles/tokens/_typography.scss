@@ -1,9 +1,9 @@
 // Typography tokens
 $font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 $font-family-heading: 'Source Sans 3', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-$font-size-base: 16px;
-$font-size-lg: 18px;
-$font-size-sm: 14px;
+$font-size-base: 14px;
+$font-size-lg: 16px;
+$font-size-sm: 13px;
 $line-height-base: 1.5;
 $font-weight-normal: 400;
 $font-weight-bold: 700;
@@ -15,10 +15,10 @@ $font-weight-bold: 700;
 }
 
 // Headings
-$font-size-h1: 2rem;
-$font-size-h2: 1.75rem;
-$font-size-h3: 1.5rem;
-$font-size-h4: 1.25rem;
+$font-size-h1: 1.5rem;
+$font-size-h2: 1.375rem;
+$font-size-h3: 1.25rem;
+$font-size-h4: 1.125rem;
 $font-size-h5: 1rem;
 $font-size-h6: 0.875rem;
 

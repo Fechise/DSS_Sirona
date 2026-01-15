@@ -13,6 +13,18 @@ The React Compiler is currently not compatible with SWC. See [this issue](https:
 
 ---
 
+## 🚀 Flujo de Usuario
+
+### Pantalla Inicial
+La aplicación comienza en la **Landing Page** (`/`) que presenta:
+- Logo y descripción de Sirona
+- Collage visual de los 4 roles del sistema
+- Botones de "Iniciar sesión" y "Registrarse"
+
+Los usuarios no autenticados son dirigidos a la Landing Page. Después del login exitoso, son redirigidos a `/inicio`.
+
+---
+
 ## 🎨 Design System - Role Based Color Themes
 
 Sirona utiliza un sistema de temas por rol de usuario. Cada rol tiene un color primario asociado que se usa en botones, badges, y elementos interactivos.
@@ -21,10 +33,10 @@ Sirona utiliza un sistema de temas por rol de usuario. Cada rol tiene un color p
 
 | Rol | Color | Código Hex | Descripción |
 |-----|-------|-----------|------------|
-| **Médico** | Violeta Pastel | `#8b7bd0` | Color primario principal. Representa profesionalismo y confianza. |
+| **Médico** | Violeta Pastel | `#7B69C9` | Color primario principal. Representa profesionalismo y confianza. |
 | **Paciente** | Teal Profundo | `#2a9d8f` | Accesible y amigable. Representa seguridad y bienestar. |
-| **Secretario** | Salmón/Coral | `#E08D79` | Cálido y acogedor. Representa organización y apoyo. |
-| **Administrador** | Marrón Oscuro | `#4B4237` | Serio y formal. Representa autoridad y control. |
+| **Secretario** | Salmón/Coral | `#D8735A` | Cálido y acogedor. Representa organización y apoyo. |
+| **Administrador** | Azul Oscuro | `#4D85A8` | Serio y formal. Representa autoridad y control. |
 
 ### Implementación
 
@@ -33,16 +45,16 @@ En futuras actualizaciones, los colores se asignarán dinámicamente basados en 
 ```tsx
 // Ejemplo (próxima implementación)
 const roleColorMap = {
-  'Médico': '#8b7bd0',
+  'Médico': '#7B69C9',
   'Paciente': '#2a9d8f',
-  'Secretario': '#E08D79',
-  'Administrador': '#4B4237'
+  'Secretario': '#D8735A',
+  'Administrador': '#4D85A8'
 };
 
 const userThemeColor = roleColorMap[user.role];
 ```
 
-Actualmente, el sistema usa `primary` (#8b7bd0) y `secondary` (#2a9d8f) definidos en `src/styles/tokens/_colors.scss`.
+Actualmente, el sistema usa `primary` (#7B69C9), `secondary` (#2a9d8f), `tertiary` (#D8735A) y `quaternary` (#4D85A8) definidos en `src/styles/tokens/_colors.scss`.
 
 ---
 

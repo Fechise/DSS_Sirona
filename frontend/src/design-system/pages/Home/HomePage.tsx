@@ -5,6 +5,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { FileText, UserCog, Users, Settings } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Container } from '../../atoms/Container/Container';
+import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 
 export const PaginaInicio: React.FC = () => {
   const navigate = useNavigate();
@@ -15,8 +16,11 @@ export const PaginaInicio: React.FC = () => {
       case 'Paciente':
         return (
           <>
-            <h1>Bienvenido, {user.fullName || user.name}</h1>
-            <p>Accede a tu historial clínico personal y gestiona tu salud.</p>
+            <PageHeader
+              title={`Bienvenido, ${user.fullName || user.name}`}
+              subtitle="Accede a tu historial clínico personal y gestiona tu salud."
+              icon={<FileText size={20} />}
+            />
             <div className={styles.actions}>
               <Button
                 variant="filled"
@@ -41,8 +45,11 @@ export const PaginaInicio: React.FC = () => {
       case 'Médico':
         return (
           <>
-            <h1>Panel del Médico</h1>
-            <p>Gestiona tus pacientes y accede a sus historiales clínicos.</p>
+            <PageHeader
+              title="Panel del Médico"
+              subtitle="Gestiona tus pacientes y accede a sus historiales clínicos."
+              icon={<Users size={20} />}
+            />
             <div className={styles.actions}>
               <Button
                 variant="filled"
@@ -67,8 +74,11 @@ export const PaginaInicio: React.FC = () => {
       case 'Secretario':
         return (
           <>
-            <h1>Panel del Secretario</h1>
-            <p>Gestiona pacientes y agenda citas médicas.</p>
+            <PageHeader
+              title="Panel del Secretario"
+              subtitle="Gestiona pacientes y agenda citas médicas."
+              icon={<FileText size={20} />}
+            />
             <div className={styles.actions}>
               <Button
                 variant="filled"
@@ -101,8 +111,11 @@ export const PaginaInicio: React.FC = () => {
       case 'Administrador':
         return (
           <>
-            <h1>Panel de Administración</h1>
-            <p>Gestiona usuarios, roles y configuración del sistema.</p>
+            <PageHeader
+              title="Panel de Administración"
+              subtitle="Gestiona usuarios, roles y configuración del sistema."
+              icon={<Settings size={20} />}
+            />
             <div className={styles.actions}>
               <Button
                 variant="filled"

@@ -125,7 +125,7 @@ export const Header: React.FC = () => {
     <header className={styles.header}>
       <div className={styles.brand}>
         <span className={styles.brandIcon} aria-hidden>
-          <ShieldCheck size={28} />
+          <ShieldCheck size={24} />
         </span>
         <span className={styles.brandText}>Sirona</span>
       </div>

@@ -4,6 +4,7 @@ import { RegisterForm } from '../../molecules/RegisterForm/RegisterForm';
 import type { RegisterData } from '../../molecules/RegisterForm/RegisterForm';
 import { ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from '../../atoms/Link/Link';
 
 export const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -34,21 +35,11 @@ export const RegisterPage: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <div className={styles.brand}>
-          <span className={styles.brandIcon} aria-hidden>
-            <ShieldCheck size={28} />
-          </span>
-          <span className={styles.brandText}>Sirona</span>
-        </div>
         <RegisterForm onSubmit={handleSubmit} loading={loading} />
         <div className={styles.foot}>
-          <button
-            type="button"
-            className={styles.ctaLink}
-            onClick={() => navigate('/login')}
-          >
+          <Link onClick={() => navigate('/login')}>
             ¿Ya tienes cuenta? Inicia sesión
-          </button>
+          </Link>
         </div>
       </div>
     </div>

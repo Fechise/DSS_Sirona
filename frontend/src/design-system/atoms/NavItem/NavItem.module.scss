@@ -3,14 +3,14 @@
 .navItem {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
-  padding: 10px 16px;
+  gap: $spacing-xs;
+  padding: 8px 12px;
   background: transparent;
   border: none;
   border-radius: $radius-medium;
   cursor: pointer;
   font-family: inherit;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 500;
   transition: all 0.2s ease;
   white-space: nowrap;

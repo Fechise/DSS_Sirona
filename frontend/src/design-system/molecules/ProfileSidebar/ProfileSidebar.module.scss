@@ -1,11 +1,11 @@
 @use '../../../styles/tokens/_index' as *;
 
 .sidebar {
-  width: 280px;
+  width: 248px;
   background: #ffffff;
   border-right: 1px solid $border-color;
-  border-radius: 12px;
-  padding: 1.5rem 0;
+  border-radius: 10px;
+  padding: 1rem 0;
   height: fit-content;
   position: sticky;
   top: 2rem;
@@ -21,13 +21,13 @@
 .navItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
   background: none;
   border: none;
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: $font-size-sm;
   font-weight: 500;
   color: $text-color;
   transition: all 0.2s ease;
