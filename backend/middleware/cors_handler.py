@@ -36,15 +36,18 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         # Procesar la request normalmente
         response = await call_next(request)
         
+        # CRÍTICO: Limpiar TODOS los headers CORS existentes (pueden venir del hosting)
+        # Usar lista de headers para evitar modificar dict durante iteración
+        headers_to_remove = []
+        for header_name in response.headers.keys():
+            if header_name.lower().startswith("access-control-"):
+                headers_to_remove.append(header_name)
+        
+        for header_name in headers_to_remove:
+            del response.headers[header_name]
+        
         # Añadir headers CORS solo si el origen está permitido
         if origin in self.allowed_origins:
-            # Limpiar cualquier header CORS existente
-            if "access-control-allow-origin" in response.headers:
-                del response.headers["access-control-allow-origin"]
-            if "access-control-allow-credentials" in response.headers:
-                del response.headers["access-control-allow-credentials"]
-            
-            # Añadir headers correctos
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
             response.headers["Access-Control-Expose-Headers"] = "*"
