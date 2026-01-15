@@ -1,0 +1,346 @@
+"""
+Router de Administración - Gestión de Integridad y Auditoría
+=============================================================
+Endpoints para administradores del sistema:
+- Validación de integridad de historiales (PBI-20)
+- Consulta de logs de auditoría (PBI-15)
+"""
+
+from fastapi import APIRouter, HTTPException, status, Depends, Request, BackgroundTasks
+from typing import List, Optional
+from datetime import datetime
+from pydantic import BaseModel
+
+from models.models import PatientHistory, User, UserRole, AuditLog
+from services.auth import get_admin_user
+from services.integrity import integrity_service
+from services.audit import audit_logger, AuditEventType
+
+router = APIRouter()
+
+
+# --- SCHEMAS ---
+class IntegrityCheckResult(BaseModel):
+    """Resultado de verificación de integridad de un historial."""
+    history_id: str
+    patient_id: str
+    is_valid: bool
+    expected_hash: Optional[str] = None
+    calculated_hash: Optional[str] = None
+    is_corrupted: bool = False
+    corruption_reason: Optional[str] = None
+
+
+class IntegrityReportResponse(BaseModel):
+    """Reporte completo de verificación de integridad."""
+    total_histories: int
+    valid_count: int
+    invalid_count: int
+    corrupted_count: int
+    missing_hash_count: int
+    results: List[IntegrityCheckResult]
+    checked_at: datetime
+
+
+class AuditLogResponse(BaseModel):
+    """Respuesta de log de auditoría."""
+    id: str
+    timestamp: datetime
+    event: str
+    user_email: Optional[str] = None
+    user_id: Optional[str] = None
+    ip_address: str
+    user_agent: str
+    details: dict
+
+
+class AuditLogsListResponse(BaseModel):
+    """Lista de logs de auditoría."""
+    total: int
+    logs: List[AuditLogResponse]
+
+
+# --- ENDPOINTS ---
+@router.get("/integrity/check-all", response_model=IntegrityReportResponse)
+async def check_all_histories_integrity(
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Verificar la integridad de TODOS los historiales médicos.
+    Solo administradores pueden ejecutar esta operación.
+    
+    Este endpoint implementa el "job nocturno" de validación (PBI-20).
+    Puede ejecutarse manualmente o programarse vía cron/scheduler.
+    
+    Returns:
+        Reporte con el estado de integridad de todos los historiales
+    """
+    # Obtener todos los historiales
+    all_histories = await PatientHistory.find_all().to_list()
+    
+    results = []
+    valid_count = 0
+    invalid_count = 0
+    corrupted_count = 0
+    missing_hash_count = 0
+    
+    for history in all_histories:
+        # Verificar integridad
+        is_valid, expected_hash, calculated_hash = await integrity_service.verify_integrity(
+            history=history,
+            ip_address=request.client.host,
+            user_agent="integrity_job"
+        )
+        
+        is_corrupted = getattr(history, 'is_corrupted', False)
+        corruption_reason = getattr(history, 'corruption_reason', None)
+        
+        result = IntegrityCheckResult(
+            history_id=str(history.id),
+            patient_id=history.patient_id,
+            is_valid=is_valid,
+            expected_hash=expected_hash[:16] + "..." if expected_hash else None,
+            calculated_hash=calculated_hash[:16] + "..." if calculated_hash else None,
+            is_corrupted=is_corrupted,
+            corruption_reason=corruption_reason
+        )
+        results.append(result)
+        
+        if not expected_hash:
+            missing_hash_count += 1
+        elif is_valid:
+            valid_count += 1
+        else:
+            invalid_count += 1
+            # Marcar como corrupto si no lo está ya
+            if not is_corrupted:
+                await integrity_service.mark_as_corrupted(
+                    history=history,
+                    reason="Hash mismatch detected during integrity job",
+                    ip_address=request.client.host
+                )
+                corrupted_count += 1
+        
+        if is_corrupted:
+            corrupted_count += 1
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.INTEGRIDAD_VERIFICADA,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "total_histories": len(all_histories),
+            "valid_count": valid_count,
+            "invalid_count": invalid_count,
+            "corrupted_count": corrupted_count,
+            "missing_hash_count": missing_hash_count
+        }
+    )
+    
+    return IntegrityReportResponse(
+        total_histories=len(all_histories),
+        valid_count=valid_count,
+        invalid_count=invalid_count,
+        corrupted_count=corrupted_count,
+        missing_hash_count=missing_hash_count,
+        results=results,
+        checked_at=datetime.utcnow()
+    )
+
+
+@router.post("/integrity/regenerate-hashes")
+async def regenerate_all_hashes(
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Regenerar los hashes de integridad para TODOS los historiales.
+    Solo administradores pueden ejecutar esta operación.
+    
+    ADVERTENCIA: Solo usar para inicialización o después de una migración.
+    Esto NO debe usarse para "arreglar" historiales corruptos.
+    """
+    all_histories = await PatientHistory.find_all().to_list()
+    
+    updated_count = 0
+    for history in all_histories:
+        # Solo regenerar si no está marcado como corrupto
+        is_corrupted = getattr(history, 'is_corrupted', False)
+        if not is_corrupted:
+            new_hash = integrity_service.calculate_hash(history)
+            history.integrity_hash = new_hash
+            await history.save()
+            updated_count += 1
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.INTEGRIDAD_VERIFICADA,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "action": "regenerate_all_hashes",
+            "total_histories": len(all_histories),
+            "updated_count": updated_count
+        }
+    )
+    
+    return {
+        "message": f"Regenerated hashes for {updated_count} histories",
+        "total": len(all_histories),
+        "updated": updated_count,
+        "skipped_corrupted": len(all_histories) - updated_count
+    }
+
+
+@router.get("/integrity/corrupted", response_model=List[IntegrityCheckResult])
+async def get_corrupted_histories(
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Obtener lista de historiales marcados como corruptos.
+    Solo administradores pueden ver esta información.
+    """
+    corrupted = await PatientHistory.find(
+        PatientHistory.is_corrupted == True
+    ).to_list()
+    
+    results = []
+    for history in corrupted:
+        results.append(IntegrityCheckResult(
+            history_id=str(history.id),
+            patient_id=history.patient_id,
+            is_valid=False,
+            expected_hash=history.integrity_hash[:16] + "..." if history.integrity_hash else None,
+            calculated_hash=None,  # No recalculamos aquí
+            is_corrupted=True,
+            corruption_reason=history.corruption_reason
+        ))
+    
+    return results
+
+
+@router.post("/integrity/clear-corruption/{history_id}")
+async def clear_corruption_flag(
+    history_id: str,
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Limpiar el flag de corrupción de un historial y regenerar su hash.
+    Solo administradores pueden ejecutar esta operación.
+    
+    ADVERTENCIA: Solo usar después de verificar manualmente que los datos son correctos.
+    """
+    history = await PatientHistory.get(history_id)
+    
+    if not history:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="History not found"
+        )
+    
+    # Limpiar flags de corrupción
+    history.is_corrupted = False
+    history.corruption_detected_at = None
+    history.corruption_reason = None
+    
+    # Regenerar hash
+    new_hash = integrity_service.calculate_hash(history)
+    history.integrity_hash = new_hash
+    
+    await history.save()
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.HISTORIAL_EDITADO,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        patient_id=history.patient_id,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "action": "clear_corruption_flag",
+            "history_id": history_id,
+            "new_hash": new_hash[:16] + "..."
+        }
+    )
+    
+    return {
+        "message": "Corruption flag cleared and hash regenerated",
+        "history_id": history_id,
+        "new_hash": new_hash[:16] + "..."
+    }
+
+
+@router.get("/audit/logs", response_model=AuditLogsListResponse)
+async def get_audit_logs(
+    request: Request,
+    event_type: Optional[str] = None,
+    user_email: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Obtener logs de auditoría.
+    Solo administradores pueden ver los logs.
+    
+    Parámetros:
+        event_type: Filtrar por tipo de evento
+        user_email: Filtrar por email de usuario
+        limit: Límite de resultados (default: 100)
+        offset: Offset para paginación
+    """
+    # Construir query
+    query = {}
+    if event_type:
+        query["event"] = event_type
+    if user_email:
+        query["user_email"] = user_email
+    
+    # Obtener total
+    total = await AuditLog.find(query).count()
+    
+    # Obtener logs con paginación
+    logs = await AuditLog.find(query).sort(
+        [("timestamp", -1)]
+    ).skip(offset).limit(limit).to_list()
+    
+    return AuditLogsListResponse(
+        total=total,
+        logs=[
+            AuditLogResponse(
+                id=str(log.id),
+                timestamp=log.timestamp,
+                event=log.event,
+                user_email=log.user_email,
+                user_id=log.user_id,
+                ip_address=log.ip_address,
+                user_agent=log.user_agent,
+                details=log.details
+            )
+            for log in logs
+        ]
+    )
+
+
+@router.get("/audit/events")
+async def get_audit_event_types(
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Obtener lista de tipos de eventos disponibles.
+    """
+    return {
+        "event_types": [e.value for e in AuditEventType]
+    }

@@ -130,11 +130,11 @@ export const DoctorAppointmentsPage: React.FC = () => {
         </div>
 
         <Button
-          variant="secondary"
+          variant="outlined"
           onClick={loadAppointments}
           disabled={loading}
-          icon={<RefreshCw size={16} />}
         >
+          <RefreshCw size={16} />
           Actualizar
         </Button>
       </div>

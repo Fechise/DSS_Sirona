@@ -27,9 +27,18 @@ export const AuditLogsPage: React.FC = () => {
   const loadEventTypes = useCallback(async () => {
     if (!token) return;
     try {
-      const response = await AdminApiService.getAuditEventTypes(token);
-      // El backend devuelve { event_types: [...] }
-      const types = (response as unknown as { event_types: string[] }).event_types || [];
+      // Hardcoded event types since backend doesn't have this endpoint yet
+      const types = [
+        'login_success',
+        'login_failed',
+        'login_blocked',
+        'doctor_registered',
+        'patient_registered',
+        'appointment_created',
+        'appointment_updated',
+        'appointment_deleted',
+        'doctor_availability_created'
+      ];
       setEventTypes(types);
     } catch (err) {
       console.error('Error loading event types:', err);
@@ -43,12 +52,7 @@ export const AuditLogsPage: React.FC = () => {
     setError(null);
     try {
       const skip = (currentPage - 1) * LOGS_PER_PAGE;
-      const data = await AdminApiService.getAuditLogs(token, {
-        event: eventFilter || undefined,
-        user_email: emailFilter || undefined,
-        limit: LOGS_PER_PAGE,
-        skip,
-      });
+      const data = await AdminApiService.getAuditLogs(token, skip, LOGS_PER_PAGE);
       setLogs(data.logs);
       setTotalLogs(data.total);
     } catch (err) {
