@@ -96,9 +96,9 @@ export const AppointmentSchedulingPage: React.FC = () => {
         setAppointments(appointmentsRes.map(apt => ({
           id: apt.id,
           patientId: apt.patient_id,
-          patientName: apt.patient_name,
+          patientName: apt.patientName,
           doctorId: apt.doctor_id,
-          doctorName: apt.doctor_name,
+          doctorName: apt.doctorName,
           date: apt.fecha.split('T')[0],
           time: apt.fecha.split('T')[1]?.substring(0, 5) || '',
           status: apt.estado.toLowerCase() as 'scheduled' | 'completed' | 'cancelled'
@@ -167,9 +167,9 @@ export const AppointmentSchedulingPage: React.FC = () => {
         const newAppointment: Appointment = {
           id: newApt.id,
           patientId: newApt.patient_id,
-          patientName: newApt.patient_name,
+          patientName: newApt.patientName,
           doctorId: newApt.doctor_id,
-          doctorName: newApt.doctor_name,
+          doctorName: newApt.doctorName,
           date: newApt.fecha.split('T')[0],
           time: newApt.fecha.split('T')[1]?.substring(0, 5) || '',
           status: 'scheduled',

@@ -9,7 +9,6 @@ import {
   FileText,
   Calendar,
   User,
-  Loader,
   Clock
 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
@@ -353,7 +352,7 @@ export const PatientHistoryPage: React.FC = () => {
                       })}</span>
                     </div>
                     <div className={styles.appointmentDetails}>
-                      <strong>{apt.doctor_name}</strong>
+                      <strong>{apt.doctorName}</strong>
                       <span>{apt.motivo}</span>
                     </div>
                     <span className={`${styles.statusBadge} ${styles[`status${apt.estado.replace(' ', '')}`]}`}>

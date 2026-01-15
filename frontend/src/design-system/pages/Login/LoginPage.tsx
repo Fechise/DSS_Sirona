@@ -19,7 +19,6 @@ export const LoginPage: React.FC = () => {
   const [mfaRequired, setMfaRequired] = useState(false);
   const [otp, setOtp] = useState('');
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  const [pendingRole, setPendingRole] = useState<string>('user');
   const [accountLocked, setAccountLocked] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -38,7 +37,6 @@ export const LoginPage: React.FC = () => {
       if (response.requires_mfa) {
         setMfaRequired(true);
         setPendingEmail(data.email);
-        setPendingRole(response.role);
       } else {
         // Usar el email del formulario y el token de la respuesta
         login(data.email, response.token, response.role, data.email.split('@')[0]);
@@ -74,7 +72,6 @@ export const LoginPage: React.FC = () => {
       if (response.requires_mfa) {
         setMfaRequired(true);
         setPendingEmail(faceEmail);
-        setPendingRole(response.role);
       } else {
         login(faceEmail, response.token, response.role, faceEmail.split('@')[0]);
         navigate('/inicio');

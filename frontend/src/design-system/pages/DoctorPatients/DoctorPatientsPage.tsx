@@ -97,22 +97,14 @@ export const DoctorPatientsPage: React.FC = () => {
     try {
       const response = await DoctorApiService.getMyPatients(token);
       // Mapear la respuesta del backend al formato esperado
-      const mappedPacientes: PacienteAsignado[] = response.pacientes.map((p: {
-        id: string;
-        full_name: string;
-        email: string;
-        cedula: string;
-        fecha_nacimiento: string;
-        ultima_consulta?: string | null;
-        diagnosticos?: number;
-      }) => ({
+      const mappedPacientes: PacienteAsignado[] = response.pacientes.map((p) => ({
         id: p.id,
-        fullName: p.full_name,
+        fullName: p.fullName,
         email: p.email,
         cedula: p.cedula,
-        fechaNacimiento: p.fecha_nacimiento,
-        ultimaConsulta: p.ultima_consulta || null,
-        diagnosticos: p.diagnosticos || 0,
+        fechaNacimiento: p.fechaNacimiento || '',
+        ultimaConsulta: p.ultimaConsulta || null,
+        diagnosticos: 0,
       }));
       setPacientes(mappedPacientes);
     } catch (err) {

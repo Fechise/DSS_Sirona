@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, FileText, Plus, Save } from 'lucide-react';
 
 import { useAuth } from '../../../contexts/AuthContext';
-import { DoctorApiService, PatientHistoryResponse } from '../../../services/api';
+import { DoctorApiService, type PatientHistoryResponse } from '../../../services/api';
 import { Button } from '../../atoms/Button/Button';
 import { Container } from '../../atoms/Container/Container';
 import { Input } from '../../atoms/Input/Input';
@@ -306,12 +306,12 @@ export const PatientRecordPage: React.FC = () => {
           <div className={styles.sectionHeader}>
             <h3>Datos Médicos</h3>
             {!editingHistory ? (
-              <Button variant="outlined" color="primary" size="small" onClick={() => setEditingHistory(true)}>
+              <Button variant="outlined" color="primary" onClick={() => setEditingHistory(true)}>
                 Editar
               </Button>
             ) : (
               <div className={styles.editActions}>
-                <Button variant="outlined" color="secondary" size="small" onClick={() => {
+                <Button variant="outlined" color="secondary" onClick={() => {
                   setEditingHistory(false);
                   setHistoryForm({
                     alergias: history.alergias.join('\n'),
@@ -325,7 +325,6 @@ export const PatientRecordPage: React.FC = () => {
                 <Button 
                   variant="filled" 
                   color="primary" 
-                  size="small" 
                   onClick={handleSaveHistory}
                   disabled={savingHistory}
                   startIcon={<Save size={14} />}
@@ -445,7 +444,6 @@ export const PatientRecordPage: React.FC = () => {
             <Button 
               variant="filled" 
               color="primary" 
-              size="small" 
               onClick={() => setShowConsultationForm(true)}
               startIcon={<Plus size={14} />}
             >
@@ -458,15 +456,17 @@ export const PatientRecordPage: React.FC = () => {
               <h4>Agregar Nueva Consulta</h4>
               <div className={styles.formGrid}>
                 <Input
+                  id="motivo"
                   label="Motivo de Consulta *"
                   value={consultationForm.motivo}
-                  onChange={(e) => setConsultationForm({ ...consultationForm, motivo: e.target.value })}
+                  onChange={(e) => setConsultationForm({ ...consultationForm, motivo: e })}
                   placeholder="Ej: Control de presión arterial"
                 />
                 <Input
+                  id="diagnostico"
                   label="Diagnóstico *"
                   value={consultationForm.diagnostico}
-                  onChange={(e) => setConsultationForm({ ...consultationForm, diagnostico: e.target.value })}
+                  onChange={(e) => setConsultationForm({ ...consultationForm, diagnostico: e })}
                   placeholder="Ej: Hipertensión controlada"
                 />
               </div>
