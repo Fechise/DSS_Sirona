@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../styles/tokens/_index' as *;
 
 .button {
@@ -192,6 +193,93 @@
       border-color: $on-quaternary-color;
       color: $on-quaternary-color;
     }
+  }
+}
+
+// Color danger para acciones destructivas
+.danger {
+  &.filled {
+    background-color: $error-color;
+    border-color: $error-color;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: color.adjust($error-color, $lightness: -10%);
+    }
+  }
+
+  &.outlined {
+    border-color: $error-color;
+    color: $error-color;
+
+    &:hover:not(:disabled) {
+      background-color: rgba($error-color, 0.05);
+    }
+  }
+
+  &.icon {
+    border-color: $error-color;
+    color: $error-color;
+
+    &:hover:not(:disabled) {
+      background-color: $error-color;
+      color: white;
+    }
+  }
+
+  &.ghost {
+    border: none;
+    background-color: transparent;
+    color: $error-color;
+
+    &:hover:not(:disabled) {
+      background-color: rgba($error-color, 0.1);
+    }
+  }
+}
+
+// Variante ghost (sin borde, transparente)
+.ghost {
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+  padding: $spacing-sm $spacing-md;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Ghost por color
+.primary.ghost {
+  color: $primary-color;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba($primary-color, 0.1);
+  }
+}
+
+.secondary.ghost {
+  color: $secondary-color;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba($secondary-color, 0.1);
+  }
+}
+
+.tertiary.ghost {
+  color: $tertiary-color;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba($tertiary-color, 0.1);
+  }
+}
+
+.quaternary.ghost {
+  color: $quaternary-color;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba($quaternary-color, 0.1);
   }
 }
 

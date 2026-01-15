@@ -8,7 +8,9 @@ import {
   AlertCircle,
   FileText,
   Calendar,
-  User
+  User,
+  Loader,
+  Clock
 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import {
@@ -21,6 +23,7 @@ import {
 } from '../../organisms/SectionsPatientHistory';
 import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
+import { PatientApiService, type AppointmentResponse } from '../../../services/api';
 
 type MedicalRecord = {
   id: string;
@@ -74,125 +77,109 @@ type MedicalRecord = {
 
 export const PatientHistoryPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [record, setRecord] = useState<MedicalRecord | null>(null);
+  const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<number | null>(null);
 
   useEffect(() => {
-    const loadPatientHistory = async () => {
+    const loadPatientData = async () => {
+      if (!token) {
+        setErrorCode(401);
+        setError('No se encontró token de autenticación');
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
       setErrorCode(null);
+      
       try {
-        // TODO: integrar con backend (GET /api/paciente/mi-historial)
-        // const res = await fetch('/api/paciente/mi-historial', {
-        //   headers: { 'Authorization': `Bearer ${token}` }
-        // });
-        // if (res.status === 401) {
-        //   setErrorCode(401);
-        //   setTimeout(() => navigate('/login'), 2000);
-        //   return;
-        // }
-        // if (res.status === 403) {
-        //   setErrorCode(403);
-        //   return;
-        // }
-        // if (!res.ok) throw new Error('Failed to load history');
-        // const data = await res.json();
-        // setRecord(data);
-
-        // Mock data: simular historial médico del paciente
-        await new Promise((r) => setTimeout(r, 800));
+        // Cargar citas del paciente (siempre disponible)
+        const appointmentsData = await PatientApiService.getMyAppointments(token);
+        setAppointments(appointmentsData);
         
-        const mockData: MedicalRecord = {
-          id: 'hist_001',
-          tipoSangre: 'O+',
-          alergias: ['Penicilina', 'Polen'],
-          condicionesCronicas: ['Hipertensión arterial', 'Diabetes tipo 2 controlada'],
-          medicamentosActuales: [
-            'Losartán 50mg - Una vez al día',
-            'Metformina 850mg - Dos veces al día',
-            'Aspirina 100mg - Una vez al día'
-          ],
-          medicoAsignado: {
-            nombre: 'Dr. Roberto García López',
-            especialidad: 'Medicina Interna',
-            telefono: '+34 912 345 678'
+        // Intentar cargar historial médico
+        try {
+          const data = await PatientApiService.getMyHistory(token);
+        
+        // Mapear respuesta del backend al formato esperado
+        const mappedRecord: MedicalRecord = {
+          id: data.id,
+          tipoSangre: data.tipoSangre || 'No especificado',
+          alergias: data.alergias || [],
+          condicionesCronicas: data.condicionesCronicas || [],
+          medicamentosActuales: data.medicamentosActuales || [],
+          medicoAsignado: data.medicoAsignado || {
+            nombre: 'No asignado',
+            especialidad: '',
+            telefono: ''
           },
-          contactoEmergencia: {
-            nombre: 'Pedro Martínez',
-            relacion: 'Esposo',
-            telefono: '+34 612 345 678'
+          contactoEmergencia: data.contactoEmergencia || {
+            nombre: 'No registrado',
+            relacion: '',
+            telefono: ''
           },
-          consultas: [
-            {
-              id: 'cons_003',
-              fecha: '2026-01-08',
-              motivo: 'Control trimestral',
-              diagnostico: 'Hipertensión arterial controlada',
-              tratamiento: 'Continuar con medicación actual',
-              notasMedico: 'Paciente muestra mejora significativa. Presión arterial estable. Se recomienda continuar con ejercicio regular y dieta baja en sodio.'
-            },
-            {
-              id: 'cons_002',
-              fecha: '2025-10-15',
-              motivo: 'Consulta de seguimiento',
-              diagnostico: 'Diabetes tipo 2 en control',
-              tratamiento: 'Ajuste de dosis de Metformina',
-              notasMedico: 'Niveles de glucosa en sangre dentro de rango objetivo. Se aumenta dosis de Metformina a 850mg dos veces al día.'
-            },
-            {
-              id: 'cons_001',
-              fecha: '2025-07-20',
-              motivo: 'Consulta inicial',
-              diagnostico: 'Hipertensión arterial leve, Prediabetes',
-              tratamiento: 'Inicio de tratamiento farmacológico y cambios en estilo de vida',
-              notasMedico: 'Primera consulta. Se inicia tratamiento con Losartán 50mg y Metformina 500mg. Se recomienda pérdida de peso y ejercicio regular.'
-            }
-          ],
-          vacunas: [
-            {
-              nombre: 'COVID-19 (Refuerzo)',
-              fecha: '2025-11-10'
-            },
-            {
-              nombre: 'Influenza',
-              fecha: '2025-10-05',
-              proximaDosis: '2026-10-05'
-            },
-            {
-              nombre: 'Tétanos',
-              fecha: '2024-03-15',
-              proximaDosis: '2034-03-15'
-            }
-          ],
-          antecedentesFamiliares: [
-            'Madre: Hipertensión arterial',
-            'Padre: Diabetes tipo 2',
-            'Hermano: Sin antecedentes relevantes'
-          ],
-          proximaCita: {
-            fecha: '2026-04-08',
-            motivo: 'Control trimestral de rutina',
-            medico: 'Dr. Roberto García López'
-          },
-          ultimaModificacion: '2026-01-08T14:30:00Z'
+          consultas: (data.consultas || []).map((c: { id: string; fecha: string; motivo: string; diagnostico: string; tratamiento: string; notasMedico: string }) => ({
+            id: c.id,
+            fecha: c.fecha,
+            motivo: c.motivo,
+            diagnostico: c.diagnostico,
+            tratamiento: c.tratamiento,
+            notasMedico: c.notasMedico
+          })),
+          vacunas: (data.vacunas || []).map((v: { nombre: string; fecha: string; proximaDosis?: string }) => ({
+            nombre: v.nombre,
+            fecha: v.fecha,
+            proximaDosis: v.proximaDosis
+          })),
+          antecedentesFamiliares: data.antecedentesFamiliares || [],
+          proximaCita: data.proximaCita ? {
+            fecha: data.proximaCita.fecha,
+            motivo: data.proximaCita.motivo,
+            medico: data.proximaCita.medico
+          } : undefined,
+          ultimaModificacion: data.ultimaModificacion
         };
         
-        setRecord(mockData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al cargar el historial');
+        setRecord(mappedRecord);
+        } catch (historyErr: unknown) {
+          // Si no hay historial, no es error crítico - el paciente puede ver sus citas
+          const histErr = historyErr as { status?: number };
+          if (histErr.status !== 404) {
+            console.error('Error loading history:', historyErr);
+          }
+          // record queda como null, lo cual es válido
+        }
+      } catch (err: unknown) {
+        console.error('Error loading patient data:', err);
+        const errorObj = err as { status?: number; detail?: string; message?: string };
+        
+        if (errorObj.status === 401) {
+          setErrorCode(401);
+          setError('Sesión expirada. Redirigiendo al login...');
+          setTimeout(() => navigate('/login'), 2000);
+          return;
+        }
+        if (errorObj.status === 403) {
+          setErrorCode(403);
+          setError('No tienes permisos para ver esta información');
+          return;
+        }
+        
+        setError(errorObj.detail || errorObj.message || 'Error al cargar los datos');
         setErrorCode(500);
       } finally {
         setLoading(false);
       }
     };
 
-    loadPatientHistory();
-  }, [navigate]);
+    loadPatientData();
+  }, [navigate, token]);
 
   return (
     <>
@@ -344,11 +331,53 @@ export const PatientHistoryPage: React.FC = () => {
             </div>
           )}
 
-          {!loading && !error && !record && (
+          {/* Sección de Citas Agendadas - siempre visible si hay citas */}
+          {!loading && !error && appointments.length > 0 && (
+            <div className={styles.recordCard}>
+              <div className={styles.cardHeader}>
+                <h2><Clock size={20} /> Mis Citas Agendadas</h2>
+                <span className={styles.badge}>{appointments.length} cita{appointments.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div className={styles.appointmentsList}>
+                {appointments.map((apt) => (
+                  <div key={apt.id} className={`${styles.appointmentItem} ${styles[`status${apt.estado.replace(' ', '')}`]}`}>
+                    <div className={styles.appointmentDate}>
+                      <Calendar size={16} />
+                      <span>{new Date(apt.fecha).toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</span>
+                    </div>
+                    <div className={styles.appointmentDetails}>
+                      <strong>{apt.doctor_name}</strong>
+                      <span>{apt.motivo}</span>
+                    </div>
+                    <span className={`${styles.statusBadge} ${styles[`status${apt.estado.replace(' ', '')}`]}`}>
+                      {apt.estado}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && !record && appointments.length === 0 && (
+            <div className={styles.emptyContainer}>
+              <FileText size={48} className={styles.emptyIcon} />
+              <h2>Sin Historial Clínico ni Citas</h2>
+              <p>Aún no tienes registros clínicos ni citas agendadas. Contacta con tu centro médico para agendar una cita.</p>
+            </div>
+          )}
+
+          {!loading && !error && !record && appointments.length > 0 && (
             <div className={styles.emptyContainer}>
               <FileText size={48} className={styles.emptyIcon} />
               <h2>Sin Historial Clínico</h2>
-              <p>Aún no tienes registros clínicos. Una vez que tu médico agregue información, aparecerá aquí.</p>
+              <p>Aún no tienes registros clínicos, pero tienes citas agendadas. Tu historial se creará después de tu primera consulta.</p>
             </div>
           )}
         </div>

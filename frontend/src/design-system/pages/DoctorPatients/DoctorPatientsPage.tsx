@@ -6,6 +6,8 @@ import { Button } from '../../atoms/Button/Button';
 import { useNavigate } from 'react-router-dom';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
+import { DoctorApiService } from '../../../services/api';
+import { useAuth } from '../../../contexts/AuthContext';
 
 type PacienteAsignado = {
   id: string;
@@ -20,7 +22,9 @@ type PacienteAsignado = {
 export const DoctorPatientsPage: React.FC = () => {
   const [pacientes, setPacientes] = useState<PacienteAsignado[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const columns: TableColumn<PacienteAsignado>[] = [
     {
@@ -82,50 +86,38 @@ export const DoctorPatientsPage: React.FC = () => {
     },
   ];
 
-  // Cargar pacientes asignados (mock por ahora, luego integrar con backend)
+  // Cargar pacientes asignados desde el backend
   const loadPacientes = async () => {
+    if (!token) {
+      setError('No se encontró token de autenticación');
+      return;
+    }
     setLoading(true);
+    setError(null);
     try {
-      // TODO: Integrar con FastAPI (GET /api/medico/pacientes-asignados)
-      // const res = await fetch('/api/medico/pacientes-asignados', {
-      //   headers: { 'Authorization': `Bearer ${token}` }
-      // });
-      // const data = await res.json();
-      // setPacientes(data.pacientes);
-      
-      // Mock data
-      await new Promise((r) => setTimeout(r, 600));
-      setPacientes([
-        {
-          id: 'pac-001',
-          fullName: 'María González',
-          email: 'maria@correo.com',
-          cedula: '1234567890',
-          fechaNacimiento: '1985-03-15',
-          ultimaConsulta: '2025-12-20',
-          diagnosticos: 3,
-        },
-        {
-          id: 'pac-002',
-          fullName: 'Carlos Ruiz',
-          email: 'carlos@correo.com',
-          cedula: '0987654321',
-          fechaNacimiento: '1990-07-22',
-          ultimaConsulta: '2025-11-10',
-          diagnosticos: 2,
-        },
-        {
-          id: 'pac-003',
-          fullName: 'Ana López',
-          email: 'ana@correo.com',
-          cedula: '5678901234',
-          fechaNacimiento: '1978-11-05',
-          ultimaConsulta: null,
-          diagnosticos: 0,
-        },
-      ]);
-    } catch (error) {
-      console.error('Error loading pacientes:', error);
+      const response = await DoctorApiService.getMyPatients(token);
+      // Mapear la respuesta del backend al formato esperado
+      const mappedPacientes: PacienteAsignado[] = response.pacientes.map((p: {
+        id: string;
+        full_name: string;
+        email: string;
+        cedula: string;
+        fecha_nacimiento: string;
+        ultima_consulta?: string | null;
+        diagnosticos?: number;
+      }) => ({
+        id: p.id,
+        fullName: p.full_name,
+        email: p.email,
+        cedula: p.cedula,
+        fechaNacimiento: p.fecha_nacimiento,
+        ultimaConsulta: p.ultima_consulta || null,
+        diagnosticos: p.diagnosticos || 0,
+      }));
+      setPacientes(mappedPacientes);
+    } catch (err) {
+      console.error('Error loading pacientes:', err);
+      setError('Error al cargar los pacientes. Por favor, intente nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -168,6 +160,12 @@ export const DoctorPatientsPage: React.FC = () => {
             Actualizar
           </Button>
         </div>
+
+        {error && (
+          <div className={styles.errorMessage}>
+            {error}
+          </div>
+        )}
 
         {loading ? (
           <div className={styles.loadingState}>

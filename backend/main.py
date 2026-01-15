@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from services.db import init_db, close_db
-from routers import auth, appointments, patients
+from routers import auth, appointments, patients, admin
 from middleware.rate_limiter import RateLimitMiddleware
 from uvicorn import *
 
@@ -40,8 +40,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configurar Rate Limiting (10 req/min)
-app.add_middleware(RateLimitMiddleware, max_requests=10, window_seconds=60)
+# Configurar Rate Limiting (100 req/min para desarrollo)
+app.add_middleware(RateLimitMiddleware, max_requests=100, window_seconds=60)
 
 
 @app.get("/")
@@ -56,6 +56,7 @@ async def root():
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(appointments.router, prefix="/api", tags=["Appointments"])
 app.include_router(patients.router, prefix="/api/paciente", tags=["Patients"])
+app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 uvicorn.run(app, host="localhost", port=8000)
 

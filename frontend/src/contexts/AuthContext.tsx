@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  user: { email: string; role: string; name: string; fullName: string } | null;
+  user: { id: string; email: string; role: string; name: string; fullName: string; status: string } | null;
   token: string | null;
   isLoading: boolean;
   login: (email: string, token: string, role?: string, name?: string) => void;
@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  * - localStorage es públicamente accesible pero eso es esperado:
  *   si un atacante ya tiene acceso (XSS), ya ganó - esto no lo hace peor
  */
-function decodeJWT(token: string): { email?: string; role?: string; exp?: number } | null {
+function decodeJWT(token: string): { sub?: string; email?: string; role?: string; exp?: number; status?: string } | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
@@ -40,7 +40,7 @@ function decodeJWT(token: string): { email?: string; role?: string; exp?: number
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ email: string; role: string; name: string; fullName: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email: string; role: string; name: string; fullName: string; status: string } | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -90,10 +90,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Restaurar sesión desde el JWT decodificado
         setToken(storedToken);
         setUser({
+          id: payload.sub || '',
           email: payload.email || '',
           role: payload.role || 'usuario',
           name: '',
           fullName: '',
+          status: payload.status || 'ACTIVO',
         });
         setIsAuthenticated(true);
         
@@ -115,7 +117,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * - No guardamos datos sensibles en localStorage
    */
   const login = (email: string, tokenValue: string, role = 'usuario', name = '') => {
-    const userData = { email, role, name, fullName: name };
+    // Decodificar el token para obtener id y status
+    const payload = decodeJWT(tokenValue);
+    const userData = {
+      id: payload?.sub || '',
+      email,
+      role,
+      name,
+      fullName: name,
+      status: payload?.status || 'ACTIVO',
+    };
     setToken(tokenValue);
     setUser(userData);
     setIsAuthenticated(true);

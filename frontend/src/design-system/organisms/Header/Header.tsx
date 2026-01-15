@@ -56,6 +56,18 @@ export const Header: React.FC = () => {
           label: 'Mis Pacientes',
           path: '/medico/pacientes',
         });
+        items.push({
+          id: 'availability',
+          icon: <Calendar size={18} />,
+          label: 'Mi Disponibilidad',
+          path: '/medico/disponibilidad',
+        });
+        items.push({
+          id: 'appointments',
+          icon: <Calendar size={18} />,
+          label: 'Mis Citas',
+          path: '/medico/citas',
+        });
         break;
       case 'Administrador':
         items.push({
@@ -63,6 +75,12 @@ export const Header: React.FC = () => {
           icon: <Users size={18} />,
           label: 'Gestión de Usuarios',
           path: '/admin/usuarios',
+        });
+        items.push({
+          id: 'audit-logs',
+          icon: <FileText size={18} />,
+          label: 'Logs de Auditoría',
+          path: '/admin/logs',
         });
         break;
       case 'Paciente':
@@ -75,6 +93,12 @@ export const Header: React.FC = () => {
         break;
       case 'Secretario':
         items.push({
+          id: 'register-user',
+          icon: <Users size={18} />,
+          label: 'Registro de Usuarios',
+          path: '/secretario/registro-usuario',
+        });
+        items.push({
           id: 'appointments',
           icon: <Calendar size={18} />,
           label: 'Agendamiento',
@@ -84,7 +108,7 @@ export const Header: React.FC = () => {
           id: 'patients-list',
           icon: <Users size={18} />,
           label: 'Listado de Pacientes',
-          path: '/pacientes',
+          path: '/secretario/pacientes',
         });
         break;
     }

@@ -1,7 +1,8 @@
 """
-Router de Administración - Gestión de Integridad y Auditoría
-=============================================================
+Router de Administración - Gestión de Usuarios, Integridad y Auditoría
+=======================================================================
 Endpoints para administradores del sistema:
+- CRUD de usuarios (PBI-18)
 - Validación de integridad de historiales (PBI-20)
 - Consulta de logs de auditoría (PBI-15)
 """
@@ -9,17 +10,541 @@ Endpoints para administradores del sistema:
 from fastapi import APIRouter, HTTPException, status, Depends, Request, BackgroundTasks
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from enum import Enum
 
-from models.models import PatientHistory, User, UserRole, AuditLog
+from models.models import PatientHistory, User, UserRole, UserStatus, AuditLog
 from services.auth import get_admin_user
 from services.integrity import integrity_service
 from services.audit import audit_logger, AuditEventType
+from services.security import hash_password, validate_password_strength
 
 router = APIRouter()
 
 
-# --- SCHEMAS ---
+# ==================== USER SCHEMAS ====================
+class UserListItemResponse(BaseModel):
+    """Datos de usuario para listado."""
+    id: str
+    fullName: str
+    email: str
+    cedula: str
+    role: str
+    status: str
+    created_at: datetime
+    last_login: Optional[datetime] = None
+    # Campos específicos por rol
+    especialidad: Optional[str] = None
+    numeroLicencia: Optional[str] = None
+    departamento: Optional[str] = None
+    telefonoContacto: Optional[str] = None
+
+
+class UsersListResponse(BaseModel):
+    """Lista de usuarios con total."""
+    total: int
+    users: List[UserListItemResponse]
+
+
+class CreateUserRequest(BaseModel):
+    """Crear un nuevo usuario (Admin)."""
+    email: EmailStr
+    password: str
+    fullName: str
+    cedula: str
+    role: str  # Administrador, Médico, Paciente, Secretario
+    # Campos específicos por rol
+    especialidad: Optional[str] = None
+    numeroLicencia: Optional[str] = None
+    departamento: Optional[str] = None
+    telefonoContacto: Optional[str] = None
+    fechaNacimiento: Optional[str] = None
+
+
+class UpdateUserRequest(BaseModel):
+    """Actualizar datos de un usuario."""
+    fullName: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
+    status: Optional[str] = None
+    # Campos específicos por rol
+    especialidad: Optional[str] = None
+    numeroLicencia: Optional[str] = None
+    departamento: Optional[str] = None
+    telefonoContacto: Optional[str] = None
+
+
+class UpdateUserRoleRequest(BaseModel):
+    """Cambiar el rol de un usuario."""
+    role: str  # Administrador, Médico, Paciente, Secretario
+
+
+# ==================== USER ENDPOINTS (PBI-18) ====================
+
+@router.get("/users", response_model=UsersListResponse)
+async def list_users(
+    request: Request,
+    role: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Listar todos los usuarios del sistema.
+    Solo administradores pueden ver esta lista.
+    
+    Parámetros:
+        role: Filtrar por rol (Administrador, Médico, Paciente, Secretario)
+        status_filter: Filtrar por estado (Activo, Inactivo, Bloqueado)
+        search: Buscar por nombre o email
+        limit: Límite de resultados
+        offset: Offset para paginación
+    """
+    # Construir query
+    query = {}
+    
+    if role:
+        try:
+            query["role"] = UserRole(role)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid role. Valid roles: {[r.value for r in UserRole]}"
+            )
+    
+    if status_filter:
+        try:
+            query["status"] = UserStatus(status_filter)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid status. Valid statuses: {[s.value for s in UserStatus]}"
+            )
+    
+    # Obtener total
+    total = await User.find(query).count()
+    
+    # Obtener usuarios con paginación
+    users = await User.find(query).sort(
+        [("created_at", -1)]
+    ).skip(offset).limit(limit).to_list()
+    
+    # Filtrar por búsqueda si se proporciona
+    if search:
+        search_lower = search.lower()
+        users = [
+            u for u in users 
+            if search_lower in u.fullName.lower() or search_lower in u.email.lower()
+        ]
+        total = len(users)
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.USUARIO_CONSULTADO,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "action": "list_users",
+            "filters": {"role": role, "status": status_filter, "search": search},
+            "total_returned": len(users)
+        }
+    )
+    
+    return UsersListResponse(
+        total=total,
+        users=[
+            UserListItemResponse(
+                id=str(u.id),
+                fullName=u.fullName,
+                email=u.email,
+                cedula=u.cedula,
+                role=u.role.value,
+                status=u.status.value,
+                created_at=u.created_at,
+                last_login=u.last_login,
+                especialidad=u.especialidad,
+                numeroLicencia=u.numeroLicencia,
+                departamento=u.departamento,
+                telefonoContacto=u.telefonoContacto
+            )
+            for u in users
+        ]
+    )
+
+
+@router.get("/users/{user_id}", response_model=UserListItemResponse)
+async def get_user(
+    user_id: str,
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Obtener datos de un usuario específico.
+    Solo administradores.
+    """
+    user = await User.get(user_id)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    return UserListItemResponse(
+        id=str(user.id),
+        fullName=user.fullName,
+        email=user.email,
+        cedula=user.cedula,
+        role=user.role.value,
+        status=user.status.value,
+        created_at=user.created_at,
+        last_login=user.last_login,
+        especialidad=user.especialidad,
+        numeroLicencia=user.numeroLicencia,
+        departamento=user.departamento,
+        telefonoContacto=user.telefonoContacto
+    )
+
+
+@router.post("/users", response_model=UserListItemResponse, status_code=status.HTTP_201_CREATED)
+async def create_user(
+    data: CreateUserRequest,
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Crear un nuevo usuario de cualquier rol.
+    Solo administradores pueden crear usuarios.
+    """
+    # Validar rol
+    try:
+        user_role = UserRole(data.role)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid role. Valid roles: {[r.value for r in UserRole]}"
+        )
+    
+    # Validar contraseña
+    is_valid, errors = validate_password_strength(data.password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": "Password does not meet requirements",
+                "details": errors
+            }
+        )
+    
+    # Verificar email único
+    existing_email = await User.find_one(User.email == data.email)
+    if existing_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Verificar cédula única
+    existing_cedula = await User.find_one(User.cedula == data.cedula)
+    if existing_cedula:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cedula already registered"
+        )
+    
+    # Crear usuario
+    new_user = User(
+        email=data.email,
+        password_hash=hash_password(data.password),
+        fullName=data.fullName,
+        cedula=data.cedula,
+        role=user_role,
+        status=UserStatus.ACTIVO,
+        especialidad=data.especialidad if user_role == UserRole.MEDICO else None,
+        numeroLicencia=data.numeroLicencia if user_role == UserRole.MEDICO else None,
+        departamento=data.departamento if user_role == UserRole.SECRETARIO else None,
+        telefonoContacto=data.telefonoContacto if user_role == UserRole.PACIENTE else None,
+        member_since=datetime.utcnow().strftime("%B %Y")
+    )
+    
+    await new_user.insert()
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.USUARIO_CREADO,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "action": "create_user",
+            "new_user_id": str(new_user.id),
+            "new_user_email": data.email,
+            "new_user_role": data.role
+        }
+    )
+    
+    return UserListItemResponse(
+        id=str(new_user.id),
+        fullName=new_user.fullName,
+        email=new_user.email,
+        cedula=new_user.cedula,
+        role=new_user.role.value,
+        status=new_user.status.value,
+        created_at=new_user.created_at,
+        last_login=new_user.last_login,
+        especialidad=new_user.especialidad,
+        numeroLicencia=new_user.numeroLicencia,
+        departamento=new_user.departamento,
+        telefonoContacto=new_user.telefonoContacto
+    )
+
+
+@router.put("/users/{user_id}", response_model=UserListItemResponse)
+async def update_user(
+    user_id: str,
+    data: UpdateUserRequest,
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Actualizar datos de un usuario.
+    Solo administradores.
+    """
+    user = await User.get(user_id)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Guardar valores anteriores para auditoría
+    old_values = {
+        "role": user.role.value,
+        "status": user.status.value,
+        "fullName": user.fullName,
+        "email": user.email
+    }
+    
+    # Actualizar campos si se proporcionan
+    if data.fullName is not None:
+        user.fullName = data.fullName
+    
+    if data.email is not None:
+        # Verificar que no exista otro usuario con ese email
+        existing = await User.find_one(User.email == data.email)
+        if existing and str(existing.id) != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+        user.email = data.email
+    
+    if data.role is not None:
+        try:
+            user.role = UserRole(data.role)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid role. Valid roles: {[r.value for r in UserRole]}"
+            )
+    
+    if data.status is not None:
+        try:
+            user.status = UserStatus(data.status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid status. Valid statuses: {[s.value for s in UserStatus]}"
+            )
+    
+    # Campos específicos por rol
+    if data.especialidad is not None:
+        user.especialidad = data.especialidad
+    if data.numeroLicencia is not None:
+        user.numeroLicencia = data.numeroLicencia
+    if data.departamento is not None:
+        user.departamento = data.departamento
+    if data.telefonoContacto is not None:
+        user.telefonoContacto = data.telefonoContacto
+    
+    await user.save()
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.USUARIO_EDITADO,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "action": "update_user",
+            "target_user_id": user_id,
+            "old_values": old_values,
+            "new_values": data.dict(exclude_unset=True)
+        }
+    )
+    
+    return UserListItemResponse(
+        id=str(user.id),
+        fullName=user.fullName,
+        email=user.email,
+        cedula=user.cedula,
+        role=user.role.value,
+        status=user.status.value,
+        created_at=user.created_at,
+        last_login=user.last_login,
+        especialidad=user.especialidad,
+        numeroLicencia=user.numeroLicencia,
+        departamento=user.departamento,
+        telefonoContacto=user.telefonoContacto
+    )
+
+
+@router.patch("/users/{user_id}/role", response_model=UserListItemResponse)
+async def update_user_role(
+    user_id: str,
+    data: UpdateUserRoleRequest,
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Cambiar el rol de un usuario.
+    Solo administradores.
+    
+    Previene que el último administrador pierda su rol.
+    """
+    user = await User.get(user_id)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Validar rol
+    try:
+        new_role = UserRole(data.role)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid role. Valid roles: {[r.value for r in UserRole]}"
+        )
+    
+    # Prevenir quedarse sin administradores
+    if user.role == UserRole.ADMINISTRADOR and new_role != UserRole.ADMINISTRADOR:
+        admin_count = await User.find(User.role == UserRole.ADMINISTRADOR).count()
+        if admin_count <= 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot change role. This is the last administrator."
+            )
+    
+    old_role = user.role.value
+    user.role = new_role
+    await user.save()
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.ROL_CAMBIADO,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "action": "change_role",
+            "target_user_id": user_id,
+            "target_user_email": user.email,
+            "old_role": old_role,
+            "new_role": new_role.value
+        }
+    )
+    
+    return UserListItemResponse(
+        id=str(user.id),
+        fullName=user.fullName,
+        email=user.email,
+        cedula=user.cedula,
+        role=user.role.value,
+        status=user.status.value,
+        created_at=user.created_at,
+        last_login=user.last_login,
+        especialidad=user.especialidad,
+        numeroLicencia=user.numeroLicencia,
+        departamento=user.departamento,
+        telefonoContacto=user.telefonoContacto
+    )
+
+
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    user_id: str,
+    request: Request,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Eliminar (desactivar) un usuario.
+    Solo administradores.
+    
+    No se elimina físicamente, solo se marca como inactivo.
+    """
+    user = await User.get(user_id)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Prevenir auto-eliminación
+    if str(current_user.id) == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own account"
+        )
+    
+    # Prevenir quedarse sin administradores
+    if user.role == UserRole.ADMINISTRADOR:
+        admin_count = await User.find(User.role == UserRole.ADMINISTRADOR).count()
+        if admin_count <= 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot delete. This is the last administrator."
+            )
+    
+    # Soft delete - marcar como inactivo
+    user.status = UserStatus.INACTIVO
+    await user.save()
+    
+    # Log de auditoría
+    await audit_logger.log_event(
+        event_type=AuditEventType.USUARIO_ELIMINADO,
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "action": "delete_user",
+            "deleted_user_id": user_id,
+            "deleted_user_email": user.email,
+            "deleted_user_role": user.role.value
+        }
+    )
+    
+    return None
+
+
+# ==================== INTEGRITY SCHEMAS ====================
 class IntegrityCheckResult(BaseModel):
     """Resultado de verificación de integridad de un historial."""
     history_id: str
@@ -209,9 +734,9 @@ async def get_corrupted_histories(
     Obtener lista de historiales marcados como corruptos.
     Solo administradores pueden ver esta información.
     """
-    corrupted = await PatientHistory.find(
-        PatientHistory.is_corrupted == True
-    ).to_list()
+    corrupted = await PatientHistory.find({
+        "is_corrupted": True
+    }).to_list()
     
     results = []
     for history in corrupted:

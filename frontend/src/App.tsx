@@ -14,6 +14,10 @@ import { ProfilePage } from './design-system/pages/Profile/ProfilePage';
 import { AppointmentSchedulingPage } from './design-system/pages/AppointmentScheduling/AppointmentSchedulingPage';
 import { PaymentCheckoutPage } from './design-system/pages/PaymentCheckout/PaymentCheckoutPage';
 import { PatientListPage } from './design-system/pages/PatientList/PatientListPage';
+import { SecretaryUserRegisterPage } from './design-system/pages/SecretaryUserRegister/SecretaryUserRegisterPage';
+import { DoctorAvailabilityPage } from './design-system/pages/DoctorAvailability/DoctorAvailabilityPage';
+import { DoctorAppointmentsPage } from './design-system/pages/DoctorAppointments/DoctorAppointmentsPage';
+import { AuditLogsPage } from './design-system/pages/AuditLogs/AuditLogsPage';
 
 const RutaInicial: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -68,11 +72,41 @@ function App() {
             }
           />
           <Route
+            path="/admin/logs"
+            element={
+              <ProtectedRoute requiredRole="Administrador">
+                <AppLayout>
+                  <AuditLogsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/medico/pacientes"
             element={
               <ProtectedRoute requiredRole="Médico">
                 <AppLayout>
                   <DoctorPatientsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medico/disponibilidad"
+            element={
+              <ProtectedRoute requiredRole="Médico">
+                <AppLayout>
+                  <DoctorAvailabilityPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medico/citas"
+            element={
+              <ProtectedRoute requiredRole="Médico">
+                <AppLayout>
+                  <DoctorAppointmentsPage />
                 </AppLayout>
               </ProtectedRoute>
             }
@@ -103,6 +137,36 @@ function App() {
               <ProtectedRoute requiredRole="Paciente">
                 <AppLayout>
                   <PaymentCheckoutPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/secretario/registro-usuario"
+            element={
+              <ProtectedRoute requiredRole="Secretario">
+                <AppLayout>
+                  <SecretaryUserRegisterPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/secretario/citas"
+            element={
+              <ProtectedRoute requiredRole="Secretario">
+                <AppLayout>
+                  <AppointmentSchedulingPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/secretario/pacientes"
+            element={
+              <ProtectedRoute requiredRole="Secretario">
+                <AppLayout>
+                  <PatientListPage />
                 </AppLayout>
               </ProtectedRoute>
             }

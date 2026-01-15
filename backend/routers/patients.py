@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Request
-from typing import List
+from typing import List, Optional
 from datetime import datetime, date
 
-from models.models import PatientHistory, User, UserRole, AuditLog, Consulta
+from models.models import PatientHistory, User, UserRole, AuditLog, Consulta, MedicoAsignado, ContactoEmergencia
 from schemas.patient_schemas import (
     PatientHistoryResponse,
     ConsultaCreateRequest,
@@ -20,34 +20,34 @@ from services.auth import get_current_user
 router = APIRouter()
 
 
-@router.get("/listado-pacientes", response_model=List[PatientMinimalResponse])
+@router.get("/listado-pacientes")
 async def list_patients_minimal(
     request: Request,
     current_user: User = Depends(get_current_user)
 ):
     """
     Listar pacientes con datos mínimos para agendamiento de citas.
-    Solo secretarios pueden acceder a este listado.
+    Secretarios y Administradores pueden acceder a este listado.
     """
-    # Verificar que el usuario es un secretario
-    if current_user.role != UserRole.SECRETARIO:
+    # Verificar que el usuario es un secretario o administrador
+    if current_user.role not in [UserRole.SECRETARIO, UserRole.ADMINISTRADOR]:
         audit_log = AuditLog(
             event="unauthorized_patient_list_access",
             user_email=current_user.email,
             user_id=str(current_user.id),
             ip_address=request.client.host,
             user_agent=request.headers.get("user-agent", ""),
-            details={"reason": "not_a_secretary", "role": current_user.role.value}
+            details={"reason": "not_authorized", "role": current_user.role.value}
         )
         await audit_log.insert()
         
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Only secretaries can access patient list."
+            detail="Access denied. Only secretaries and administrators can access patient list."
         )
     
     # Obtener todos los pacientes (solo usuarios con rol PACIENTE)
-    patients = await User.find(User.role == UserRole.PACIENTE).to_list()
+    patients = await User.find({"role": UserRole.PACIENTE.value}).to_list()
     
     # Log de auditoría
     audit_log = AuditLog(
@@ -60,18 +60,21 @@ async def list_patients_minimal(
     )
     await audit_log.insert()
     
-    # Retornar datos mínimos
-    return [
-        PatientMinimalResponse(
-            id=str(patient.id),
-            fullName=patient.fullName,
-            cedula=patient.cedula,
-            fechaNacimiento=patient.fechaNacimiento,
-            telefonoContacto=patient.telefonoContacto,
-            email=patient.email
-        )
-        for patient in patients
-    ]
+    # Retornar datos con estructura esperada por el frontend
+    return {
+        "patients": [
+            {
+                "id": str(patient.id),
+                "fullName": patient.fullName,
+                "cedula": patient.cedula,
+                "fechaNacimiento": patient.fechaNacimiento.isoformat() if patient.fechaNacimiento else None,
+                "telefonoContacto": patient.telefonoContacto,
+                "email": patient.email,
+                "status": patient.status.value if patient.status else "Activo"
+            }
+            for patient in patients
+        ]
+    }
 
 
 @router.get("/mi-historial", response_model=PatientHistoryResponse)
@@ -102,7 +105,7 @@ async def get_my_history(
         )
     
     # Buscar historial del paciente
-    history = await PatientHistory.find_one(PatientHistory.patient_id == str(current_user.id))
+    history = await PatientHistory.find_one({"patient_id": str(current_user.id)})
     
     if not history:
         raise HTTPException(
@@ -187,13 +190,48 @@ async def get_patient_history(
         )
     
     # Buscar historial del paciente
-    history = await PatientHistory.find_one(PatientHistory.patient_id == patient_id)
+    history = await PatientHistory.find_one({"patient_id": patient_id})
     
+    # Si no existe historial, crear uno automáticamente
     if not history:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Medical history not found"
+        history = PatientHistory(
+            patient_id=patient_id,
+            tipoSangre="No especificado",
+            alergias=[],
+            condicionesCronicas=[],
+            medicamentosActuales=[],
+            medicoAsignado=MedicoAsignado(
+                nombre=current_user.fullName,
+                especialidad=current_user.especialidad or "General",
+                telefono=current_user.telefonoContacto or ""
+            ),
+            contactoEmergencia=ContactoEmergencia(
+                nombre="No registrado",
+                relacion="",
+                telefono=""
+            ),
+            consultas=[],
+            vacunas=[],
+            antecedentesFamiliares=[],
+            ultimaModificacion=datetime.utcnow()
         )
+        
+        await history.insert()
+        
+        # Log de auditoría para creación automática
+        audit_log_create = AuditLog(
+            event="patient_history_auto_created",
+            user_email=current_user.email,
+            user_id=str(current_user.id),
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            details={
+                "patient_id": patient_id,
+                "history_id": str(history.id),
+                "doctor_id": str(current_user.id)
+            }
+        )
+        await audit_log_create.insert()
     
     # Verificar que el médico está asignado a este paciente
     # El médico debe estar asignado al paciente para poder ver su historial
@@ -290,7 +328,7 @@ async def create_consulta(
         )
     
     # Buscar historial del paciente
-    history = await PatientHistory.find_one(PatientHistory.patient_id == patient_id)
+    history = await PatientHistory.find_one({"patient_id": patient_id})
     
     if not history:
         raise HTTPException(
@@ -381,7 +419,7 @@ async def get_patient_consultas(
     elif current_user.role == UserRole.MEDICO:
         # Médicos solo pueden ver consultas de sus pacientes asignados
         # Buscar historial primero para verificar asignación
-        temp_history = await PatientHistory.find_one(PatientHistory.patient_id == patient_id)
+        temp_history = await PatientHistory.find_one({"patient_id": patient_id})
         if temp_history and temp_history.medicoAsignado.nombre != current_user.fullName:
             audit_log = AuditLog(
                 event="unauthorized_consultations_access",
@@ -409,7 +447,7 @@ async def get_patient_consultas(
         )
     
     # Buscar historial
-    history = await PatientHistory.find_one(PatientHistory.patient_id == patient_id)
+    history = await PatientHistory.find_one({"patient_id": patient_id})
     
     if not history:
         raise HTTPException(
@@ -481,7 +519,7 @@ async def update_patient_history(
         )
     
     # Buscar historial del paciente
-    history = await PatientHistory.find_one(PatientHistory.patient_id == patient_id)
+    history = await PatientHistory.find_one({"patient_id": patient_id})
     
     if not history:
         raise HTTPException(
@@ -570,5 +608,93 @@ async def update_patient_history(
         ],
         antecedentesFamiliares=history.antecedentesFamiliares,
         proximaCita=ProximaCitaResponse(**history.proximaCita.dict()) if history.proximaCita else None,
+        ultimaModificacion=history.ultimaModificacion
+    )
+
+
+@router.post("/pacientes/{patient_id}/historial", response_model=PatientHistoryResponse, status_code=status.HTTP_201_CREATED)
+async def create_patient_history(
+    patient_id: str,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Crear historial clínico para un paciente.
+    Solo médicos pueden crear historiales.
+    """
+    if current_user.role != UserRole.MEDICO:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Only doctors can create patient histories."
+        )
+    
+    # Verificar que el paciente existe
+    patient = await User.get(patient_id)
+    if not patient or patient.role != UserRole.PACIENTE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient not found"
+        )
+    
+    # Verificar que no exista ya un historial
+    existing = await PatientHistory.find_one({"patient_id": patient_id})
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Patient already has a medical history"
+        )
+    
+    # Crear historial con datos iniciales
+    history = PatientHistory(
+        patient_id=patient_id,
+        tipoSangre="No especificado",
+        alergias=[],
+        condicionesCronicas=[],
+        medicamentosActuales=[],
+        medicoAsignado=MedicoAsignado(
+            nombre=current_user.fullName,
+            especialidad=current_user.especialidad or "General",
+            telefono=current_user.telefonoContacto or ""
+        ),
+        contactoEmergencia=ContactoEmergencia(
+            nombre="No registrado",
+            relacion="",
+            telefono=""
+        ),
+        consultas=[],
+        vacunas=[],
+        antecedentesFamiliares=[],
+        ultimaModificacion=datetime.utcnow()
+    )
+    
+    await history.insert()
+    
+    # Log de auditoría
+    audit_log = AuditLog(
+        event="patient_history_created",
+        user_email=current_user.email,
+        user_id=str(current_user.id),
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={
+            "patient_id": patient_id,
+            "history_id": str(history.id),
+            "doctor_id": str(current_user.id)
+        }
+    )
+    await audit_log.insert()
+    
+    return PatientHistoryResponse(
+        id=str(history.id),
+        tipoSangre=history.tipoSangre,
+        alergias=history.alergias,
+        condicionesCronicas=history.condicionesCronicas,
+        medicamentosActuales=history.medicamentosActuales,
+        medicoAsignado=MedicoAsignadoResponse(**history.medicoAsignado.dict()),
+        contactoEmergencia=ContactoEmergenciaResponse(**history.contactoEmergencia.dict()),
+        consultas=[],
+        vacunas=[],
+        antecedentesFamiliares=history.antecedentesFamiliares,
+        proximaCita=None,
         ultimaModificacion=history.ultimaModificacion
     )

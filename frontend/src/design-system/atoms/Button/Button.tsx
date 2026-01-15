@@ -4,13 +4,14 @@ import styles from './Button.module.scss';
 type ButtonProps = {
   children: React.ReactNode;
   type?: 'button' | 'submit';
-  variant?: 'filled' | 'outlined' | 'icon';
-  color?: 'primary' | 'secondary' | 'tertiary' | 'quaternary';
+  variant?: 'filled' | 'outlined' | 'icon' | 'ghost';
+  color?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'danger';
   disabled?: boolean;
   onClick?: () => void;
   fullWidth?: boolean;
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
+  title?: string;
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -23,6 +24,7 @@ export const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   startIcon,
   endIcon,
+  title,
 }) => {
   const variantClass = variant === 'icon' ? styles.icon : styles[variant];
   const colorClass = styles[color];
@@ -38,6 +40,7 @@ export const Button: React.FC<ButtonProps> = ({
       ].join(' ')}
       disabled={disabled}
       onClick={onClick}
+      title={title}
     >
       {startIcon && <span className={styles.startIcon}>{startIcon}</span>}
       {children}

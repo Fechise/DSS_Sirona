@@ -3,14 +3,18 @@ import styles from './Input.module.scss';
 
 type InputProps = {
   id: string;
-  label: string;
-  type?: 'text' | 'email' | 'password';
+  label?: string;
+  type?: 'text' | 'email' | 'password' | 'date' | 'time' | 'tel' | 'number';
   value: string;
   placeholder?: string;
   onChange: (value: string) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   error?: string;
   autoComplete?: string;
   icon?: React.ReactNode;
+  disabled?: boolean;
+  min?: string;
+  max?: string;
 };
 
 export const Input: React.FC<InputProps> = ({
@@ -20,9 +24,13 @@ export const Input: React.FC<InputProps> = ({
   value,
   placeholder,
   onChange,
+  onKeyDown,
   error,
   autoComplete,
   icon,
+  disabled,
+  min,
+  max,
 }) => {
   return (
     <div className={styles.field}>
@@ -39,9 +47,13 @@ export const Input: React.FC<InputProps> = ({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
         autoComplete={autoComplete}
+        disabled={disabled}
+        min={min}
+        max={max}
       />
       {error && (
         <div id={`${id}-error`} className={styles.error}>
