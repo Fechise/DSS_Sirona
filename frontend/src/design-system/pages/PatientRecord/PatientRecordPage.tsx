@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, FileText } from 'lucide-react';
+import { AlertCircle, ArrowLeft, FileText, Plus, Save } from 'lucide-react';
 
+import { useAuth } from '../../../contexts/AuthContext';
+import { DoctorApiService, type PatientHistoryResponse } from '../../../services/api';
 import { Button } from '../../atoms/Button/Button';
 import { Container } from '../../atoms/Container/Container';
+import { Input } from '../../atoms/Input/Input';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
-import { ConsultationInfoSection } from './sections/ConsultationInfoSection';
-import { MedicalHistorySection } from './sections/MedicalHistorySection';
-import { MedicationsSection } from './sections/MedicationsSection';
-import { SocialHistorySection } from './sections/SocialHistorySection';
-import { FamilyHistorySection } from './sections/FamilyHistorySection';
-import { SystemsReviewSection } from './sections/SystemsReviewSection';
-import { PhysicalExamSection } from './sections/PhysicalExamSection';
-import { LaboratorySection } from './sections/LaboratorySection';
-import { ImagingSection } from './sections/ImagingSection';
-import { EvaluationSection } from './sections/EvaluationSection';
-import { FollowUpSection } from './sections/FollowUpSection';
 import styles from './PatientRecordPage.module.scss';
 
 /**
@@ -36,269 +28,163 @@ import styles from './PatientRecordPage.module.scss';
  * Only authentication tokens are persisted (managed by AuthContext).
  */
 
-type ClinicalRecord = {
-  id: string;
-  patientId: string;
-  patientName: string;
-  patientCedula: string;
-  doctorId: string;
-  doctorName: string;
-  fecha: string;
-  motivoConsulta: string;
-  historiaEnfermedadActual: string;
-  antecedentesPersonales: string[];
-  antecedentesQuirurgicos: string[];
-  medicamentos: string[];
-  alergias: string[];
-  historiaSocial: {
-    tabaquismo: string;
-    alcohol: string;
-    ocupacion: string;
-    actividadFisica: string;
-  };
-  antecedentesFamiliares: string[];
-  revisionSistemas: { sistema: string; hallazgos: string }[];
-  examenFisico: {
-    signosVitales: {
-      tensionArterial: string;
-      frecuenciaCardiaca: string;
-      temperatura: string;
-      frecuenciaRespiratoria: string;
-      saturacion: string;
-    };
-    hallazgos: {
-      general: string;
-      cardiovascular: string;
-      respiratorio: string;
-      abdomen: string;
-      neurologico: string;
-    };
-  };
-  laboratorios: { prueba: string; valor: string; unidad?: string; referencia?: string; fecha: string }[];
-  imagenes: { estudio: string; fecha: string; impresion: string }[];
+type ConsultationForm = {
+  motivo: string;
   diagnostico: string;
   tratamiento: string;
-  observaciones: string;
-  seguimiento?: { fecha: string; instrucciones: string };
-  ultimaModificacion: string;
+  notasMedico: string;
 };
 
-type EvalForm = Pick<ClinicalRecord, 'diagnostico' | 'tratamiento' | 'observaciones'>;
-type InfoForm = Pick<ClinicalRecord, 'motivoConsulta' | 'historiaEnfermedadActual'>;
-type AntecedentesForm = { personales: string; quirurgicos: string };
-type MedsForm = { medicamentos: string; alergias: string };
-type SocialForm = ClinicalRecord['historiaSocial'];
-
-const buildMockRecord = (patientId?: string): ClinicalRecord => {
-  const resolved = patientId || '1';
-  const patientName =
-    resolved === '1' ? 'Juan Pérez' : resolved === '2' ? 'María González' : resolved === '3' ? 'Carlos Ruiz' : 'Ana López';
-  const patientCedula =
-    resolved === '1' ? '1234567890' : resolved === '2' ? '0987654321' : resolved === '3' ? '1122334455' : '5566778899';
-
-  return {
-    id: 'rec-1',
-    patientId: resolved,
-    patientName,
-    patientCedula,
-    doctorId: 'doc-1',
-    doctorName: 'Dr. Roberto García',
-    fecha: '2026-01-08',
-    motivoConsulta: 'Control de hipertensión y evaluación de síntomas recientes',
-    historiaEnfermedadActual:
-      'Paciente masculino de 52 años con antecedente de hipertensión arterial. Refiere cefaleas leves y mareos ocasionales desde hace 2 semanas. Niega dolor torácico, disnea o edema. Cumple tratamiento de forma regular. Dieta con moderación de sodio y ejercicio 3 veces por semana.',
-    antecedentesPersonales: ['Hipertensión arterial (diagnóstico hace 6 años)', 'Prediabetes (control con dieta y ejercicio)', 'Hiperlipidemia leve'],
-    antecedentesQuirurgicos: ['Apendicectomía en 2001'],
-    medicamentos: ['Losartán 50 mg cada 12 horas', 'Atorvastatina 20 mg en la noche'],
-    alergias: ['Penicilina'],
-    historiaSocial: {
-      tabaquismo: 'Exfumador, dejó hace 5 años (10 paquetes/año previos)',
-      alcohol: 'Social, 1-2 unidades por semana',
-      ocupacion: 'Contador público',
-      actividadFisica: 'Camina 30 min, 3-4 veces por semana',
-    },
-    antecedentesFamiliares: ['Madre: Hipertensión arterial', 'Padre: Diabetes tipo 2'],
-    revisionSistemas: [
-      { sistema: 'Cardiovascular', hallazgos: 'Niega dolor torácico, palpitaciones o disnea.' },
-      { sistema: 'Respiratorio', hallazgos: 'Niega tos, sibilancias o disnea de esfuerzo.' },
-      { sistema: 'Neurológico', hallazgos: 'Cefaleas leves, sin focalidad neurológica.' },
-    ],
-    examenFisico: {
-      signosVitales: {
-        tensionArterial: '132/84 mmHg',
-        frecuenciaCardiaca: '72 lpm',
-        temperatura: '36.7 °C',
-        frecuenciaRespiratoria: '16 rpm',
-        saturacion: '98%',
-      },
-      hallazgos: {
-        general: 'Buen estado general, consciente y orientado.',
-        cardiovascular: 'Ritmo regular, sin soplos.',
-        respiratorio: 'Murmullo vesicular conservado, sin ruidos agregados.',
-        abdomen: 'Blando, depresible, no doloroso, sin masas.',
-        neurologico: 'Sin déficit motor ni sensitivo aparente.',
-      },
-    },
-    laboratorios: [
-      { prueba: 'Glucosa', valor: '98', unidad: 'mg/dL', referencia: '70-99', fecha: '2025-12-20' },
-      { prueba: 'Colesterol LDL', valor: '132', unidad: 'mg/dL', referencia: '<130', fecha: '2025-12-20' },
-      { prueba: 'Creatinina', valor: '0.9', unidad: 'mg/dL', referencia: '0.7-1.3', fecha: '2025-12-20' },
-    ],
-    imagenes: [{ estudio: 'ECG', fecha: '2025-10-10', impresion: 'Ritmo sinusal, sin alteraciones significativas.' }],
-    diagnostico: 'Hipertensión arterial controlada',
-    tratamiento: 'Continuar Losartán 50 mg cada 12 horas. Mantener dieta baja en sodio y ejercicio moderado.',
-    observaciones:
-      'Se sugiere monitoreo domiciliario de la presión arterial 3 veces por semana y registro en app. Evaluar lípidos nuevamente en 3 meses. Educación sobre signos de alarma.',
-    seguimiento: {
-      fecha: '2026-02-08',
-      instrucciones: 'Control en consulta externa, llevar registros de presión arterial y resultados de laboratorio si se realizan antes.',
-    },
-    ultimaModificacion: '2026-01-08T14:30:00Z',
-  };
+type HistoryUpdateForm = {
+  alergias: string;
+  condicionesCronicas: string;
+  medicamentosActuales: string;
+  antecedentesFamiliares: string;
 };
 
 export const PatientRecordPage: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
+  const { token } = useAuth();
 
-  const [record, setRecord] = useState<ClinicalRecord | null>(null);
+  const [history, setHistory] = useState<PatientHistoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [authError, setAuthError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [creating, setCreating] = useState(false);
 
-  // Per-section edit flags
-  const [editInfo, setEditInfo] = useState(false);
-  const [editAntecedentes, setEditAntecedentes] = useState(false);
-  const [editMeds, setEditMeds] = useState(false);
-  const [editSocial, setEditSocial] = useState(false);
-  const [editEval, setEditEval] = useState(false);
+  // Edit mode states
+  const [editingHistory, setEditingHistory] = useState(false);
+  const [historyForm, setHistoryForm] = useState<HistoryUpdateForm>({
+    alergias: '',
+    condicionesCronicas: '',
+    medicamentosActuales: '',
+    antecedentesFamiliares: '',
+  });
 
-  // Per-section forms
-  const [infoForm, setInfoForm] = useState<InfoForm>({ motivoConsulta: '', historiaEnfermedadActual: '' });
-  const [antecedentesForm, setAntecedentesForm] = useState<AntecedentesForm>({ personales: '', quirurgicos: '' });
-  const [medsForm, setMedsForm] = useState<MedsForm>({ medicamentos: '', alergias: '' });
-  const [socialForm, setSocialForm] = useState<SocialForm>({ tabaquismo: '', alcohol: '', ocupacion: '', actividadFisica: '' });
-  const [evalForm, setEvalForm] = useState<EvalForm>({ diagnostico: '', tratamiento: '', observaciones: '' });
+  // New consultation form
+  const [showConsultationForm, setShowConsultationForm] = useState(false);
+  const [consultationForm, setConsultationForm] = useState<ConsultationForm>({
+    motivo: '',
+    diagnostico: '',
+    tratamiento: '',
+    notasMedico: '',
+  });
+  const [savingConsultation, setSavingConsultation] = useState(false);
+  const [savingHistory, setSavingHistory] = useState(false);
 
-  useEffect(() => {
-    // PBI-14: Race condition protection - only the latest request should update state
-    let isCurrent = true;
-    const abortController = new AbortController();
+  const loadHistory = async () => {
+    if (!token || !patientId) return;
 
-    // PBI-14: Clear all previous patient data immediately when patientId changes
-    const clearAllPatientData = () => {
-      setRecord(null);
-      setInfoForm({ motivoConsulta: '', historiaEnfermedadActual: '' });
-      setAntecedentesForm({ personales: '', quirurgicos: '' });
-      setMedsForm({ medicamentos: '', alergias: '' });
-      setSocialForm({ tabaquismo: '', alcohol: '', ocupacion: '', actividadFisica: '' });
-      setEvalForm({ diagnostico: '', tratamiento: '', observaciones: '' });
-      setEditInfo(false);
-      setEditAntecedentes(false);
-      setEditMeds(false);
-      setEditSocial(false);
-      setEditEval(false);
-      setError(null);
-      setAuthError(null);
-    };
+    setLoading(true);
+    setError(null);
+    setNotFound(false);
 
-    const fetchRecord = async () => {
-      // PBI-14: Clear previous patient data IMMEDIATELY before fetching new data
-      // This ensures no data from Patient A is visible while loading Patient B
-      clearAllPatientData();
-      setLoading(true);
-
-      try {
-        // Simulate API call: GET /api/doctor/patients/:patientId/clinical-record
-        // In production, pass abortController.signal to fetch options
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        
-        // PBI-14: Ignore response if this request is no longer current (race condition)
-        if (!isCurrent || abortController.signal.aborted) return;
-
-        const data = buildMockRecord(patientId);
-        
-        // PBI-14: Double-check isCurrent before updating state
-        if (!isCurrent) return;
-
-        setRecord(data);
-        setInfoForm({ motivoConsulta: data.motivoConsulta, historiaEnfermedadActual: data.historiaEnfermedadActual });
-        setAntecedentesForm({ personales: data.antecedentesPersonales.join('\n'), quirurgicos: data.antecedentesQuirurgicos.join('\n') });
-        setMedsForm({ medicamentos: data.medicamentos.join('\n'), alergias: data.alergias.join('\n') });
-        setSocialForm({ ...data.historiaSocial });
-        setEvalForm({ diagnostico: data.diagnostico, tratamiento: data.tratamiento, observaciones: data.observaciones });
-      } catch (err) {
-        // PBI-14: Ignore errors from aborted/stale requests
-        if (!isCurrent || abortController.signal.aborted) return;
-        setError('Error al cargar el historial médico');
-      } finally {
-        // PBI-14: Only update loading state if this is still the current request
-        if (isCurrent) setLoading(false);
-      }
-    };
-
-    fetchRecord();
-
-    return () => {
-      // PBI-14: Mark this request as stale and abort any ongoing fetch
-      isCurrent = false;
-      abortController.abort();
-      // PBI-14: Cleanup on unmount to prevent memory leaks and data exposure
-      clearAllPatientData();
-    };
-  }, [patientId]);
-
-  const formatDate = (iso: string) => new Date(iso).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-
-  const saveSection = async (section: 'info' | 'antecedentes' | 'meds' | 'social' | 'eval') => {
-    if (!record) return;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const updated: ClinicalRecord = { ...record, ultimaModificacion: new Date().toISOString() };
-
-      if (section === 'info') {
-        updated.motivoConsulta = infoForm.motivoConsulta;
-        updated.historiaEnfermedadActual = infoForm.historiaEnfermedadActual;
-        setRecord(updated);
-        setEditInfo(false);
-        return;
+      const data = await DoctorApiService.getPatientHistory(token, patientId);
+      setHistory(data);
+      setHistoryForm({
+        alergias: data.alergias.join('\n'),
+        condicionesCronicas: data.condicionesCronicas.join('\n'),
+        medicamentosActuales: data.medicamentosActuales.join('\n'),
+        antecedentesFamiliares: data.antecedentesFamiliares.join('\n'),
+      });
+    } catch (err: unknown) {
+      const apiError = err as { status?: number };
+      if (apiError.status === 404) {
+        setNotFound(true);
+      } else {
+        setError('Error al cargar el historial médico');
       }
-      if (section === 'antecedentes') {
-        updated.antecedentesPersonales = antecedentesForm.personales.split('\n').filter(Boolean);
-        updated.antecedentesQuirurgicos = antecedentesForm.quirurgicos.split('\n').filter(Boolean);
-        setRecord(updated);
-        setEditAntecedentes(false);
-        return;
-      }
-      if (section === 'meds') {
-        updated.medicamentos = medsForm.medicamentos.split('\n').filter(Boolean);
-        updated.alergias = medsForm.alergias.split('\n').filter(Boolean);
-        setRecord(updated);
-        setEditMeds(false);
-        return;
-      }
-      if (section === 'social') {
-        updated.historiaSocial = { ...socialForm };
-        setRecord(updated);
-        setEditSocial(false);
-        return;
-      }
-      if (section === 'eval') {
-        updated.diagnostico = evalForm.diagnostico;
-        updated.tratamiento = evalForm.tratamiento;
-        updated.observaciones = evalForm.observaciones;
-        setRecord(updated);
-        setEditEval(false);
-        return;
-      }
-    } catch (err) {
-      setError('Error al guardar la sección');
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    loadHistory();
+    // Cleanup on unmount
+    return () => {
+      setHistory(null);
+      setHistoryForm({ alergias: '', condicionesCronicas: '', medicamentosActuales: '', antecedentesFamiliares: '' });
+    };
+  }, [patientId, token]);
+
+  const handleCreateHistory = async () => {
+    if (!token || !patientId) return;
+
+    setCreating(true);
+    setError(null);
+
+    try {
+      const newHistory = await DoctorApiService.createPatientHistory(token, patientId);
+      setHistory(newHistory);
+      setHistoryForm({
+        alergias: newHistory.alergias.join('\n'),
+        condicionesCronicas: newHistory.condicionesCronicas.join('\n'),
+        medicamentosActuales: newHistory.medicamentosActuales.join('\n'),
+        antecedentesFamiliares: newHistory.antecedentesFamiliares.join('\n'),
+      });
+      setNotFound(false);
+    } catch {
+      setError('Error al crear el historial médico');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleSaveHistory = async () => {
+    if (!token || !patientId) return;
+
+    setSavingHistory(true);
+    setError(null);
+
+    try {
+      const updated = await DoctorApiService.updatePatientHistory(token, patientId, {
+        alergias: historyForm.alergias.split('\n').filter(Boolean),
+        condicionesCronicas: historyForm.condicionesCronicas.split('\n').filter(Boolean),
+        medicamentosActuales: historyForm.medicamentosActuales.split('\n').filter(Boolean),
+        antecedentesFamiliares: historyForm.antecedentesFamiliares.split('\n').filter(Boolean),
+      });
+      setHistory(updated);
+      setEditingHistory(false);
+    } catch {
+      setError('Error al guardar los cambios');
+    } finally {
+      setSavingHistory(false);
+    }
+  };
+
+  const handleAddConsultation = async () => {
+    if (!token || !patientId) return;
+
+    if (!consultationForm.motivo || !consultationForm.diagnostico) {
+      setError('El motivo y diagnóstico son obligatorios');
+      return;
+    }
+
+    setSavingConsultation(true);
+    setError(null);
+
+    try {
+      await DoctorApiService.addConsultation(token, patientId, consultationForm);
+      setConsultationForm({ motivo: '', diagnostico: '', tratamiento: '', notasMedico: '' });
+      setShowConsultationForm(false);
+      // Reload to get updated consultations
+      await loadHistory();
+    } catch {
+      setError('Error al agregar la consulta');
+    } finally {
+      setSavingConsultation(false);
+    }
+  };
+
+  const formatDate = (iso: string) => {
+    const date = new Date(iso);
+    return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
   if (loading) {
-    // PBI-14: During loading, NO patient data is rendered
-    // This prevents Patient A's data from being visible while Patient B loads
     return (
       <Container>
         <div className={styles.loading}>
@@ -309,30 +195,44 @@ export const PatientRecordPage: React.FC = () => {
     );
   }
 
-  if (authError) {
-    // PBI-14: Authorization error - no patient data is exposed
+  if (notFound) {
     return (
       <Container>
-        <div className={styles.errorContainer}>
-          <AlertCircle size={48} className={styles.errorIcon} />
-          <h2>Acceso Denegado</h2>
-          <p className={styles.errorMessage}>{authError}</p>
-          <p className={styles.errorDetail}>No tienes permiso para ver el historial de este paciente. Solo puedes acceder a los historiales de tus pacientes asignados.</p>
-          <Button variant="filled" color="primary" onClick={() => navigate('/medico/pacientes')} startIcon={<ArrowLeft size={16} />}>Volver a Mis Pacientes</Button>
+        <div className={styles.page}>
+          <div className={styles.backButton}>
+            <Button variant="filled" color="secondary" onClick={() => navigate('/medico/pacientes')} startIcon={<ArrowLeft size={16} />}>
+              Volver
+            </Button>
+          </div>
+          <div className={styles.emptyState}>
+            <FileText size={48} className={styles.emptyIcon} />
+            <h2>Sin Historial Médico</h2>
+            <p>Este paciente aún no tiene un historial médico registrado.</p>
+            <Button 
+              variant="filled" 
+              color="primary" 
+              onClick={handleCreateHistory} 
+              disabled={creating}
+              startIcon={<Plus size={16} />}
+            >
+              {creating ? 'Creando...' : 'Crear Historial Médico'}
+            </Button>
+          </div>
         </div>
       </Container>
     );
   }
 
-  if (!record) {
-    // PBI-14: No record loaded - show error without exposing any patient data
+  if (!history) {
     return (
       <Container>
         <div className={styles.errorContainer}>
           <AlertCircle size={48} className={styles.errorIcon} />
-          <h2>Historial No Encontrado</h2>
-          <p className={styles.errorMessage}>No se encontró el historial médico del paciente.</p>
-          <Button variant="filled" color="primary" onClick={() => navigate('/medico/pacientes')} startIcon={<ArrowLeft size={16} />}>Volver a Mis Pacientes</Button>
+          <h2>Error</h2>
+          <p className={styles.errorMessage}>{error || 'No se pudo cargar el historial'}</p>
+          <Button variant="filled" color="primary" onClick={() => navigate('/medico/pacientes')} startIcon={<ArrowLeft size={16} />}>
+            Volver a Mis Pacientes
+          </Button>
         </div>
       </Container>
     );
@@ -355,89 +255,313 @@ export const PatientRecordPage: React.FC = () => {
           </div>
         )}
 
-        <ConsultationInfoSection
-          motivoConsulta={record.motivoConsulta}
-          historiaEnfermedadActual={record.historiaEnfermedadActual}
-          isEditing={editInfo}
-          formData={infoForm}
-          onEdit={() => setEditInfo(true)}
-          onCancel={() => {
-            setInfoForm({ motivoConsulta: record.motivoConsulta, historiaEnfermedadActual: record.historiaEnfermedadActual });
-            setEditInfo(false);
-          }}
-          onSave={() => saveSection('info')}
-          onChange={(field, value) => setInfoForm({ ...infoForm, [field]: value })}
-        />
+        {/* Información General */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h3>Información General</h3>
+          </div>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Tipo de Sangre</span>
+              <span className={styles.value}>{history.tipoSangre}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Médico Asignado</span>
+              <span className={styles.value}>{history.medicoAsignado.nombre}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Especialidad</span>
+              <span className={styles.value}>{history.medicoAsignado.especialidad}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Última Modificación</span>
+              <span className={styles.value}>{formatDate(history.ultimaModificacion.toString())}</span>
+            </div>
+          </div>
+        </section>
 
-        <MedicalHistorySection
-          antecedentesPersonales={record.antecedentesPersonales}
-          antecedentesQuirurgicos={record.antecedentesQuirurgicos}
-          isEditing={editAntecedentes}
-          formData={antecedentesForm}
-          onEdit={() => setEditAntecedentes(true)}
-          onCancel={() => {
-            setAntecedentesForm({ personales: record.antecedentesPersonales.join('\n'), quirurgicos: record.antecedentesQuirurgicos.join('\n') });
-            setEditAntecedentes(false);
-          }}
-          onSave={() => saveSection('antecedentes')}
-          onChange={(field, value) => setAntecedentesForm({ ...antecedentesForm, [field]: value })}
-        />
+        {/* Contacto de Emergencia */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h3>Contacto de Emergencia</h3>
+          </div>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Nombre</span>
+              <span className={styles.value}>{history.contactoEmergencia.nombre}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Relación</span>
+              <span className={styles.value}>{history.contactoEmergencia.relacion}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Teléfono</span>
+              <span className={styles.value}>{history.contactoEmergencia.telefono}</span>
+            </div>
+          </div>
+        </section>
 
-        <MedicationsSection
-          medicamentos={record.medicamentos}
-          alergias={record.alergias}
-          isEditing={editMeds}
-          formData={medsForm}
-          onEdit={() => setEditMeds(true)}
-          onCancel={() => {
-            setMedsForm({ medicamentos: record.medicamentos.join('\n'), alergias: record.alergias.join('\n') });
-            setEditMeds(false);
-          }}
-          onSave={() => saveSection('meds')}
-          onChange={(field, value) => setMedsForm({ ...medsForm, [field]: value })}
-        />
+        {/* Datos Médicos Editables */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h3>Datos Médicos</h3>
+            {!editingHistory ? (
+              <Button variant="outlined" color="primary" onClick={() => setEditingHistory(true)}>
+                Editar
+              </Button>
+            ) : (
+              <div className={styles.editActions}>
+                <Button variant="outlined" color="secondary" onClick={() => {
+                  setEditingHistory(false);
+                  setHistoryForm({
+                    alergias: history.alergias.join('\n'),
+                    condicionesCronicas: history.condicionesCronicas.join('\n'),
+                    medicamentosActuales: history.medicamentosActuales.join('\n'),
+                    antecedentesFamiliares: history.antecedentesFamiliares.join('\n'),
+                  });
+                }}>
+                  Cancelar
+                </Button>
+                <Button 
+                  variant="filled" 
+                  color="primary" 
+                  onClick={handleSaveHistory}
+                  disabled={savingHistory}
+                  startIcon={<Save size={14} />}
+                >
+                  {savingHistory ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
+            )}
+          </div>
 
-        <SocialHistorySection
-          historiaSocial={record.historiaSocial}
-          isEditing={editSocial}
-          formData={socialForm}
-          onEdit={() => setEditSocial(true)}
-          onCancel={() => {
-            setSocialForm({ ...record.historiaSocial });
-            setEditSocial(false);
-          }}
-          onSave={() => saveSection('social')}
-          onChange={(field, value) => setSocialForm({ ...socialForm, [field]: value })}
-        />
+          {!editingHistory ? (
+            <div className={styles.medicalData}>
+              <div className={styles.dataBlock}>
+                <h4>Alergias</h4>
+                {history.alergias.length > 0 ? (
+                  <ul>{history.alergias.map((a, i) => <li key={i}>{a}</li>)}</ul>
+                ) : (
+                  <p className={styles.noData}>Sin alergias registradas</p>
+                )}
+              </div>
+              <div className={styles.dataBlock}>
+                <h4>Condiciones Crónicas</h4>
+                {history.condicionesCronicas.length > 0 ? (
+                  <ul>{history.condicionesCronicas.map((c, i) => <li key={i}>{c}</li>)}</ul>
+                ) : (
+                  <p className={styles.noData}>Sin condiciones crónicas</p>
+                )}
+              </div>
+              <div className={styles.dataBlock}>
+                <h4>Medicamentos Actuales</h4>
+                {history.medicamentosActuales.length > 0 ? (
+                  <ul>{history.medicamentosActuales.map((m, i) => <li key={i}>{m}</li>)}</ul>
+                ) : (
+                  <p className={styles.noData}>Sin medicamentos registrados</p>
+                )}
+              </div>
+              <div className={styles.dataBlock}>
+                <h4>Antecedentes Familiares</h4>
+                {history.antecedentesFamiliares.length > 0 ? (
+                  <ul>{history.antecedentesFamiliares.map((a, i) => <li key={i}>{a}</li>)}</ul>
+                ) : (
+                  <p className={styles.noData}>Sin antecedentes registrados</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.editForm}>
+              <div className={styles.formGroup}>
+                <label>Alergias (una por línea)</label>
+                <textarea
+                  value={historyForm.alergias}
+                  onChange={(e) => setHistoryForm({ ...historyForm, alergias: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Condiciones Crónicas (una por línea)</label>
+                <textarea
+                  value={historyForm.condicionesCronicas}
+                  onChange={(e) => setHistoryForm({ ...historyForm, condicionesCronicas: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Medicamentos Actuales (uno por línea)</label>
+                <textarea
+                  value={historyForm.medicamentosActuales}
+                  onChange={(e) => setHistoryForm({ ...historyForm, medicamentosActuales: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Antecedentes Familiares (uno por línea)</label>
+                <textarea
+                  value={historyForm.antecedentesFamiliares}
+                  onChange={(e) => setHistoryForm({ ...historyForm, antecedentesFamiliares: e.target.value })}
+                  rows={3}
+                />
+              </div>
+            </div>
+          )}
+        </section>
 
-        <FamilyHistorySection antecedentesFamiliares={record.antecedentesFamiliares} />
+        {/* Vacunas */}
+        {history.vacunas.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h3>Vacunas</h3>
+            </div>
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Vacuna</th>
+                    <th>Fecha</th>
+                    <th>Próxima Dosis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.vacunas.map((v, i) => (
+                    <tr key={i}>
+                      <td>{v.nombre}</td>
+                      <td>{formatDate(v.fecha.toString())}</td>
+                      <td>{v.proximaDosis ? formatDate(v.proximaDosis.toString()) : 'N/A'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
-        <SystemsReviewSection revisionSistemas={record.revisionSistemas} />
+        {/* Consultas */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h3>Historial de Consultas</h3>
+            <Button 
+              variant="filled" 
+              color="primary" 
+              onClick={() => setShowConsultationForm(true)}
+              startIcon={<Plus size={14} />}
+            >
+              Nueva Consulta
+            </Button>
+          </div>
 
-        <PhysicalExamSection examenFisico={record.examenFisico} />
+          {showConsultationForm && (
+            <div className={styles.consultationForm}>
+              <h4>Agregar Nueva Consulta</h4>
+              <div className={styles.formGrid}>
+                <Input
+                  id="motivo"
+                  label="Motivo de Consulta *"
+                  value={consultationForm.motivo}
+                  onChange={(e) => setConsultationForm({ ...consultationForm, motivo: e })}
+                  placeholder="Ej: Control de presión arterial"
+                />
+                <Input
+                  id="diagnostico"
+                  label="Diagnóstico *"
+                  value={consultationForm.diagnostico}
+                  onChange={(e) => setConsultationForm({ ...consultationForm, diagnostico: e })}
+                  placeholder="Ej: Hipertensión controlada"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Tratamiento</label>
+                <textarea
+                  value={consultationForm.tratamiento}
+                  onChange={(e) => setConsultationForm({ ...consultationForm, tratamiento: e.target.value })}
+                  placeholder="Indicaciones de tratamiento..."
+                  rows={3}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Notas del Médico</label>
+                <textarea
+                  value={consultationForm.notasMedico}
+                  onChange={(e) => setConsultationForm({ ...consultationForm, notasMedico: e.target.value })}
+                  placeholder="Observaciones adicionales..."
+                  rows={3}
+                />
+              </div>
+              <div className={styles.formActions}>
+                <Button variant="outlined" color="secondary" onClick={() => {
+                  setShowConsultationForm(false);
+                  setConsultationForm({ motivo: '', diagnostico: '', tratamiento: '', notasMedico: '' });
+                }}>
+                  Cancelar
+                </Button>
+                <Button 
+                  variant="filled" 
+                  color="primary" 
+                  onClick={handleAddConsultation}
+                  disabled={savingConsultation}
+                >
+                  {savingConsultation ? 'Guardando...' : 'Guardar Consulta'}
+                </Button>
+              </div>
+            </div>
+          )}
 
-        <LaboratorySection laboratorios={record.laboratorios} />
+          {history.consultas.length > 0 ? (
+            <div className={styles.consultationsList}>
+              {history.consultas.map((consulta) => (
+                <div key={consulta.id} className={styles.consultationCard}>
+                  <div className={styles.consultationHeader}>
+                    <span className={styles.consultationDate}>{formatDate(consulta.fecha.toString())}</span>
+                  </div>
+                  <div className={styles.consultationContent}>
+                    <div className={styles.consultationField}>
+                      <strong>Motivo:</strong> {consulta.motivo}
+                    </div>
+                    <div className={styles.consultationField}>
+                      <strong>Diagnóstico:</strong> {consulta.diagnostico}
+                    </div>
+                    {consulta.tratamiento && (
+                      <div className={styles.consultationField}>
+                        <strong>Tratamiento:</strong> {consulta.tratamiento}
+                      </div>
+                    )}
+                    {consulta.notasMedico && (
+                      <div className={styles.consultationField}>
+                        <strong>Notas:</strong> {consulta.notasMedico}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className={styles.noData}>No hay consultas registradas</p>
+          )}
+        </section>
 
-        <ImagingSection imagenes={record.imagenes} />
-
-        <EvaluationSection
-          diagnostico={record.diagnostico}
-          tratamiento={record.tratamiento}
-          observaciones={record.observaciones}
-          ultimaModificacion={record.ultimaModificacion}
-          isEditing={editEval}
-          formData={evalForm}
-          onEdit={() => setEditEval(true)}
-          onCancel={() => {
-            setEvalForm({ diagnostico: record.diagnostico, tratamiento: record.tratamiento, observaciones: record.observaciones });
-            setEditEval(false);
-          }}
-          onSave={() => saveSection('eval')}
-          onChange={(field, value) => setEvalForm({ ...evalForm, [field]: value })}
-          formatDate={formatDate}
-        />
-
-        <FollowUpSection seguimiento={record.seguimiento} formatDate={formatDate} />
+        {/* Próxima Cita */}
+        {history.proximaCita && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h3>Próxima Cita</h3>
+            </div>
+            <div className={styles.infoGrid}>
+              <div className={styles.infoItem}>
+                <span className={styles.label}>Fecha</span>
+                <span className={styles.value}>{formatDate(history.proximaCita.fecha.toString())}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.label}>Motivo</span>
+                <span className={styles.value}>{history.proximaCita.motivo}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.label}>Médico</span>
+                <span className={styles.value}>{history.proximaCita.medico}</span>
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </Container>
   );

@@ -6,6 +6,8 @@ import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { Table } from '../../molecules/Table/Table';
 import { Modal } from '../../atoms/Modal/Modal';
+import { useAuth } from '../../../contexts/AuthContext';
+import { PatientApiService, AppointmentApiService } from '../../../services/api';
 import styles from './AppointmentSchedulingPage.module.scss';
 
 type Patient = {
@@ -40,6 +42,7 @@ type AppointmentForm = {
 };
 
 export const AppointmentSchedulingPage: React.FC = () => {
+  const { token } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -55,55 +58,54 @@ export const AppointmentSchedulingPage: React.FC = () => {
     time: '',
   });
 
-  // Load mock data
+  // Load real data from API
   useEffect(() => {
     const loadData = async () => {
+      if (!token) {
+        setError('No se encontró token de autenticación');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
 
-        // Simulate API calls: GET /api/secretary/patients, GET /api/secretary/doctors, GET /api/secretary/appointments
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Mock patients (demographic data only - no clinical records)
-        setPatients([
-          { id: '1', name: 'Juan Pérez', cedula: '1234567890', phone: '555-0101' },
-          { id: '2', name: 'María González', cedula: '0987654321', phone: '555-0102' },
-          { id: '3', name: 'Carlos Ruiz', cedula: '1122334455', phone: '555-0103' },
-          { id: '4', name: 'Ana López', cedula: '5566778899', phone: '555-0104' },
+        // Cargar pacientes, médicos y citas en paralelo
+        const [patientsRes, doctorsRes, appointmentsRes] = await Promise.all([
+          PatientApiService.getPatientsList(token),
+          AppointmentApiService.getDoctors(token),
+          AppointmentApiService.getAppointments(token)
         ]);
 
-        // Mock doctors
-        setDoctors([
-          { id: 'doc-1', name: 'Dr. Roberto García', specialization: 'Cardiología' },
-          { id: 'doc-2', name: 'Dra. Laura Martínez', specialization: 'Pediatría' },
-          { id: 'doc-3', name: 'Dr. Fernando López', specialization: 'Traumatología' },
-        ]);
+        // Mapear pacientes
+        setPatients(patientsRes.patients.map(p => ({
+          id: p.id,
+          name: p.fullName,
+          cedula: p.cedula,
+          phone: '' // El endpoint no devuelve teléfono actualmente
+        })));
 
-        // Mock appointments
-        setAppointments([
-          {
-            id: 'apt-1',
-            patientId: '1',
-            patientName: 'Juan Pérez',
-            doctorId: 'doc-1',
-            doctorName: 'Dr. Roberto García',
-            date: '2026-01-15',
-            time: '09:00',
-            status: 'scheduled',
-          },
-          {
-            id: 'apt-2',
-            patientId: '2',
-            patientName: 'María González',
-            doctorId: 'doc-2',
-            doctorName: 'Dra. Laura Martínez',
-            date: '2026-01-16',
-            time: '14:30',
-            status: 'scheduled',
-          },
-        ]);
+        // Mapear médicos
+        setDoctors(doctorsRes.map(d => ({
+          id: d.id,
+          name: d.fullName,
+          specialization: d.especialidad || ''
+        })));
+
+        // Mapear citas
+        setAppointments(appointmentsRes.map(apt => ({
+          id: apt.id,
+          patientId: apt.patient_id,
+          patientName: apt.patientName,
+          doctorId: apt.doctor_id,
+          doctorName: apt.doctorName,
+          date: apt.fecha.split('T')[0],
+          time: apt.fecha.split('T')[1]?.substring(0, 5) || '',
+          status: apt.estado.toLowerCase() as 'scheduled' | 'completed' | 'cancelled'
+        })));
       } catch (err) {
+        console.error('Error loading data:', err);
         setError('Error al cargar los datos de citas');
       } finally {
         setLoading(false);
@@ -111,11 +113,16 @@ export const AppointmentSchedulingPage: React.FC = () => {
     };
 
     loadData();
-  }, []);
+  }, [token]);
 
-  const handleAddAppointment = () => {
+  const handleAddAppointment = async () => {
     if (!formData.patientId || !formData.doctorId || !formData.date || !formData.time) {
       setError('Por favor completa todos los campos');
+      return;
+    }
+
+    if (!token) {
+      setError('No se encontró token de autenticación');
       return;
     }
 
@@ -127,42 +134,58 @@ export const AppointmentSchedulingPage: React.FC = () => {
       return;
     }
 
-    if (editingId) {
-      // Update existing appointment
-      setAppointments(
-        appointments.map((apt) =>
-          apt.id === editingId
-            ? {
-              ...apt,
-              patientId: formData.patientId,
-              patientName: patient.name,
-              doctorId: formData.doctorId,
-              doctorName: doctor.name,
-              date: formData.date,
-              time: formData.time,
-            }
-            : apt
-        )
-      );
-      setEditingId(null);
-    } else {
-      // Create new appointment
-      const newAppointment: Appointment = {
-        id: `apt-${Date.now()}`,
-        patientId: formData.patientId,
-        patientName: patient.name,
-        doctorId: formData.doctorId,
-        doctorName: doctor.name,
-        date: formData.date,
-        time: formData.time,
-        status: 'scheduled',
-      };
-      setAppointments([...appointments, newAppointment]);
-    }
+    try {
+      if (editingId) {
+        // Update existing appointment
+        await AppointmentApiService.updateAppointment(token, editingId, {
+          fecha: `${formData.date}T${formData.time}:00`
+        });
+        setAppointments(
+          appointments.map((apt) =>
+            apt.id === editingId
+              ? {
+                ...apt,
+                patientId: formData.patientId,
+                patientName: patient.name,
+                doctorId: formData.doctorId,
+                doctorName: doctor.name,
+                date: formData.date,
+                time: formData.time,
+              }
+              : apt
+          )
+        );
+        setEditingId(null);
+      } else {
+        // Create new appointment via API
+        const newApt = await AppointmentApiService.createAppointment(token, {
+          patient_id: formData.patientId,
+          doctor_id: formData.doctorId,
+          fecha: `${formData.date}T${formData.time}:00`,
+          motivo: 'Consulta médica'
+        });
+        
+        const newAppointment: Appointment = {
+          id: newApt.id,
+          patientId: newApt.patient_id,
+          patientName: newApt.patientName,
+          doctorId: newApt.doctor_id,
+          doctorName: newApt.doctorName,
+          date: newApt.fecha.split('T')[0],
+          time: newApt.fecha.split('T')[1]?.substring(0, 5) || '',
+          status: 'scheduled',
+        };
+        setAppointments([...appointments, newAppointment]);
+      }
 
-    setFormData({ patientId: '', doctorId: '', date: '', time: '' });
-    setShowForm(false);
-    setError(null);
+      setFormData({ patientId: '', doctorId: '', date: '', time: '' });
+      setShowForm(false);
+      setError(null);
+    } catch (err: unknown) {
+      console.error('Error saving appointment:', err);
+      const errorObj = err as { detail?: string };
+      setError(errorObj.detail || 'Error al guardar la cita');
+    }
   };
 
   const handleEditAppointment = (apt: Appointment) => {
@@ -176,8 +199,20 @@ export const AppointmentSchedulingPage: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleDeleteAppointment = (id: string) => {
-    setAppointments(appointments.filter((apt) => apt.id !== id));
+  const handleDeleteAppointment = async (id: string) => {
+    if (!token) {
+      setError('No se encontró token de autenticación');
+      return;
+    }
+
+    try {
+      await AppointmentApiService.deleteAppointment(token, id);
+      setAppointments(appointments.filter((apt) => apt.id !== id));
+    } catch (err: unknown) {
+      console.error('Error deleting appointment:', err);
+      const errorObj = err as { detail?: string };
+      setError(errorObj.detail || 'Error al eliminar la cita');
+    }
   };
 
   const handleCancel = () => {

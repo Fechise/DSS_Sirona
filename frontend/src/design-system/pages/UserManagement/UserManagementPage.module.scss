@@ -12,8 +12,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $spacing-xl;
+  margin-bottom: $spacing-lg;
   gap: $spacing-md;
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-sm;
 }
 
 .subtitle {
@@ -22,11 +27,63 @@
   font-size: 0.9375rem;
 }
 
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+  padding: $spacing-lg;
+  background: #fff;
+  border-radius: $radius-medium;
+  box-shadow: $shadow-small;
+}
+
+.filterSelect {
+  padding: 0.5rem 1rem;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  background: #fff;
+  font-size: 0.875rem;
+  min-width: 160px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+.searchGroup {
+  display: flex;
+  gap: $spacing-xs;
+  flex: 1;
+  min-width: 200px;
+}
+
 .tableContainer {
   background: #fff;
   border-radius: $radius-medium;
   overflow: hidden;
   box-shadow: $shadow-small;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  
+  strong {
+    color: $text-color;
+  }
+  
+  .email {
+    font-size: 0.8125rem;
+    color: rgba($text-color, 0.6);
+  }
+}
+
+.actionsCell {
+  display: flex;
+  gap: $spacing-xs;
 }
 
 // Estilos personalizados para badges dentro de la tabla
@@ -140,4 +197,66 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+// Messages
+.errorMessage {
+  padding: $spacing-md;
+  background: rgba($error-color, 0.1);
+  border: 1px solid rgba($error-color, 0.3);
+  border-radius: $radius-small;
+  color: $error-color;
+  margin-bottom: $spacing-md;
+}
+
+.successMessage {
+  padding: $spacing-md;
+  background: rgba($success-color, 0.1);
+  border: 1px solid rgba($success-color, 0.3);
+  border-radius: $radius-small;
+  color: $success-color;
+  margin-bottom: $spacing-md;
+}
+
+// Create Form Modal
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $text-color;
+}
+
+.select {
+  padding: 0.75rem;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  background: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
 }

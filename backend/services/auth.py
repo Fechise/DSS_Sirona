@@ -73,9 +73,10 @@ async def get_admin_user(current_user: User = Depends(get_current_user)) -> User
 
 async def get_secretary_user(current_user: User = Depends(get_current_user)) -> User:
     """
-    Retorna el usuario solo si es Secretario.
+    Retorna el usuario solo si es Secretario o Administrador.
+    Los administradores tienen acceso a todas las funcionalidades de secretarios.
     """
-    await require_role(current_user, [UserRole.SECRETARIO])
+    await require_role(current_user, [UserRole.SECRETARIO, UserRole.ADMINISTRADOR])
     return current_user
 
 

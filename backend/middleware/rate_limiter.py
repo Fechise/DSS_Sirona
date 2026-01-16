@@ -10,7 +10,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """
     Middleware para limitar las solicitudes a 10 req/min por IP.
     """
-    def __init__(self, app, max_requests: int = 10, window_seconds: int = 60):
+    def __init__(self, app, max_requests: int = 100, window_seconds: int = 60):
         super().__init__(app)
         self.max_requests = max_requests
         self.window_seconds = window_seconds
@@ -18,6 +18,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.lock = asyncio.Lock()
     
     async def dispatch(self, request: Request, call_next):
+        # Excluir peticiones OPTIONS (preflight CORS) del rate limiting
+        if request.method == "OPTIONS":
+            return await call_next(request)
+        
         # Obtener IP del cliente
         client_ip = request.client.host
         

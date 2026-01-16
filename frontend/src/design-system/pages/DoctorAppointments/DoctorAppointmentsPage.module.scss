@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @use '../../../styles/tokens/_index' as *;
 
 .controls {
@@ -11,10 +12,29 @@
     flex-direction: column;
     align-items: stretch;
   }
+=======
+.main {
+  padding: 2rem 0;
+}
+
+.subtitle {
+  color: var(--text-secondary, #666);
+  font-size: 1rem;
+}
+
+.headerActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+>>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
 }
 
 .filters {
   display: flex;
+<<<<<<< HEAD
   align-items: center;
   gap: $spacing-md;
 
@@ -38,10 +58,28 @@
   &:focus {
     outline: none;
     border-color: $primary-color;
+=======
+  gap: 0.75rem;
+}
+
+.select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: var(--bg-primary, #fff);
+  cursor: pointer;
+  min-width: 180px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color, #8b7bd0);
+>>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
   }
 }
 
 .tableContainer {
+<<<<<<< HEAD
   background: white;
   border-radius: 12px;
   overflow: hidden;
@@ -190,3 +228,160 @@
     font-size: $font-size-base;
   }
 }
+=======
+  background: var(--bg-primary, #fff);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dateCell,
+.timeCell,
+.patientCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary, #333);
+
+  svg {
+    color: var(--primary-color, #8b7bd0);
+    flex-shrink: 0;
+  }
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.statusProgramada {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.statusCompletada {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.statusCancelada {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.statusNoAsistio {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.loadingState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-secondary, #666);
+
+  p {
+    margin-top: 1rem;
+    font-size: 1.125rem;
+  }
+}
+
+.emptyState {
+  background: var(--bg-secondary, #f5f5f5);
+  border-radius: 12px;
+
+  svg {
+    color: var(--text-tertiary, #999);
+  }
+}
+
+.errorMessage {
+  padding: 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.actionsCell {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.completeModalContent {
+  padding: 1rem 0;
+}
+
+.modalInfo {
+  font-size: 1rem;
+  color: var(--text-primary, #333);
+  margin-bottom: 1.5rem;
+
+  strong {
+    color: var(--primary-color, #8b7bd0);
+  }
+}
+
+.notesField {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    margin-bottom: 0.5rem;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    resize: vertical;
+    min-height: 100px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color, #8b7bd0);
+      box-shadow: 0 0 0 3px rgba(139, 123, 208, 0.1);
+    }
+
+    &::placeholder {
+      color: var(--text-tertiary, #999);
+    }
+  }
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+}
+>>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb

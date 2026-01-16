@@ -234,6 +234,257 @@
   line-height: 1.6;
 }
 
+/* Empty state for no history */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl * 3;
+  text-align: center;
+  gap: $spacing-lg;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+
+  p {
+    font-size: 1rem;
+    color: rgba($text-color, 0.75);
+    margin: 0;
+    max-width: 400px;
+  }
+}
+
+.emptyIcon {
+  color: rgba($text-color, 0.4);
+}
+
+/* Section styles */
+.section {
+  background: #fff;
+  border-radius: 12px;
+  padding: $spacing-lg;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-small;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-color;
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0;
+  }
+}
+
+.editActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+/* Info grid */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+/* Medical data display */
+.medicalData {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+}
+
+.dataBlock {
+  h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0 0 $spacing-sm 0;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: $spacing-lg;
+    
+    li {
+      font-size: 0.9375rem;
+      color: $text-color;
+      margin-bottom: $spacing-xs;
+      line-height: 1.5;
+    }
+  }
+}
+
+.noData {
+  font-size: 0.9375rem;
+  color: rgba($text-color, 0.5);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Edit form */
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-color;
+  }
+
+  textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    color: $text-color;
+    background: #fafafa;
+    border: 1px solid $border-color;
+    border-radius: $radius-small;
+    padding: $spacing-md;
+    resize: vertical;
+    min-height: 80px;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-md;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+}
+
+/* Table */
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $border-color;
+  }
+
+  th {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba($text-color, 0.75);
+    background: #fafafa;
+  }
+
+  td {
+    font-size: 0.9375rem;
+    color: $text-color;
+  }
+}
+
+/* Consultation form */
+.consultationForm {
+  background: #f8f9fa;
+  border-radius: $radius-small;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  border: 1px solid $border-color;
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0 0 $spacing-lg 0;
+  }
+}
+
+/* Consultations list */
+.consultationsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.consultationCard {
+  background: #fafafa;
+  border-radius: $radius-small;
+  padding: $spacing-lg;
+  border: 1px solid $border-color;
+}
+
+.consultationHeader {
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $border-color;
+}
+
+.consultationDate {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $primary-color;
+}
+
+.consultationContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.consultationField {
+  font-size: 0.9375rem;
+  color: $text-color;
+  line-height: 1.5;
+
+  strong {
+    color: rgba($text-color, 0.75);
+    margin-right: $spacing-xs;
+  }
+}
+
 @media (max-width: 768px) {
   .page {
     padding: $spacing-md;
@@ -269,6 +520,36 @@
     
     button {
       flex: 1;
+    }
+  }
+
+  .section {
+    padding: $spacing-md;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .medicalData {
+    grid-template-columns: 1fr;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
     }
   }
 }

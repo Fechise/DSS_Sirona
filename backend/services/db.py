@@ -11,6 +11,7 @@ from models.models import (
     PatientHistory,
     ClinicalRecord,
     Appointment,
+    DoctorAvailability,
     AuditLog
 )
 
@@ -73,9 +74,10 @@ async def init_db():
         await init_beanie(
             database=db_core,
             document_models=[
-                PatientHistory,    # Historiales de pacientes
-                ClinicalRecord,    # Registros médicos
-                Appointment        # Citas médicas
+                PatientHistory,      # Historiales de pacientes
+                ClinicalRecord,      # Registros médicos
+                Appointment,         # Citas médicas
+                DoctorAvailability   # Disponibilidad de médicos
             ]
         )
         
