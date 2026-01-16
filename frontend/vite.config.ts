@@ -12,5 +12,13 @@ export default defineConfig({
   },
   server: {
     port: 3000, // Cambia aquí al puerto que prefieras (ej: 3000, 4000, 8080)
+    // Proxy para evitar CORS en desarrollo: redirige /api al backend online
+    proxy: {
+      '/api': {
+        target: 'https://sirona-api.ecuconsult.net',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
   },
 });

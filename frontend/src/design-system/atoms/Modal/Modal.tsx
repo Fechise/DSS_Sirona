@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import styles from './Modal.module.scss';
 import { X } from 'lucide-react';
+import { Button } from '../Button/Button';
 
 export type ModalProps = {
   /**
@@ -81,13 +82,14 @@ export const Modal: React.FC<ModalProps> = ({
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>{title}</h2>
           {showCloseButton && (
-            <button
-              className={styles.closeButton}
+            <Button
+              variant="ghost"
               onClick={onClose}
               aria-label="Cerrar modal"
+              className={styles.closeButton}
             >
-              <X size={24} />
-            </button>
+              <X size={20} />
+            </Button>
           )}
         </div>
         <div className={styles.modalBody}>{children}</div>

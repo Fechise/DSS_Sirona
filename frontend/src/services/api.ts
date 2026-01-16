@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sirona-api.ecuconsult.net';
+// Base de la API: permite vacío para usar proxy "/api" en desarrollo
+const API_BASE_URL = (import.meta.env.VITE_API_URL ?? 'https://sirona-api.ecuconsult.net').replace(/\/+$/, '');
 
 export interface LoginRequest {
   email: string;

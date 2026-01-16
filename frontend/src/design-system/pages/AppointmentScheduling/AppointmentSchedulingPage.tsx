@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, Edit2, Trash2, AlertCircle } from 'lucide-react';
+import { Calendar, Plus, Edit2, Trash2, AlertCircle, User, Stethoscope, Clock } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
+import { Badge } from '../../atoms/Badge/Badge';
 import { Container } from '../../atoms/Container/Container';
+import { SectionHeader } from '../../atoms/SectionHeader/SectionHeader';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
-import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { Table } from '../../molecules/Table/Table';
 import { Modal } from '../../atoms/Modal/Modal';
 import styles from './AppointmentSchedulingPage.module.scss';
@@ -211,19 +212,13 @@ export const AppointmentSchedulingPage: React.FC = () => {
         <div className={styles.buttonSection}>
           <Button
             variant="filled"
-            color="primary"
+            color="tertiary"
             onClick={() => (showForm ? handleCancel() : setShowForm(true))}
             startIcon={<Plus size={16} />}
           >
             {showForm ? 'Cerrar' : 'Nueva Cita'}
           </Button>
         </div>
-
-        {/* Security Note */}
-        <AlertNote title="Nota de Seguridad (PBI-16):">
-          Solo tienes acceso a datos demográficos de pacientes (nombre, teléfono).
-          Los historiales clínicos no son accesibles desde esta sección.
-        </AlertNote>
 
         {/* Error Alert */}
         {error && (
@@ -242,7 +237,10 @@ export const AppointmentSchedulingPage: React.FC = () => {
           <div className={styles.formSection}>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label htmlFor="patient">Paciente</label>
+                <label htmlFor="patient">
+                  <User size={16} className={styles.labelIcon} />
+                  Paciente
+                </label>
                 <select
                   id="patient"
                   value={formData.patientId}
@@ -259,7 +257,10 @@ export const AppointmentSchedulingPage: React.FC = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="doctor">Médico</label>
+                <label htmlFor="doctor">
+                  <Stethoscope size={16} className={styles.labelIcon} />
+                  Médico
+                </label>
                 <select
                   id="doctor"
                   value={formData.doctorId}
@@ -276,7 +277,10 @@ export const AppointmentSchedulingPage: React.FC = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="date">Fecha</label>
+                <label htmlFor="date">
+                  <Calendar size={16} className={styles.labelIcon} />
+                  Fecha
+                </label>
                 <input
                   id="date"
                   type="date"
@@ -287,7 +291,10 @@ export const AppointmentSchedulingPage: React.FC = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="time">Hora</label>
+                <label htmlFor="time">
+                  <Clock size={16} className={styles.labelIcon} />
+                  Hora
+                </label>
                 <input
                   id="time"
                   type="time"
@@ -299,12 +306,12 @@ export const AppointmentSchedulingPage: React.FC = () => {
             </div>
 
             <div className={styles.formActions}>
-              <Button variant="filled" color="secondary" onClick={handleCancel}>
+              <Button variant="outlined" color="error" onClick={handleCancel}>
                 Cancelar
               </Button>
               <Button
                 variant="filled"
-                color="primary"
+                color="tertiary"
                 onClick={handleAddAppointment}
               >
                 {editingId ? 'Actualizar' : 'Crear'} Cita
@@ -315,7 +322,10 @@ export const AppointmentSchedulingPage: React.FC = () => {
 
         {/* Appointments Table */}
         <div className={styles.tableSection}>
-          <h2>Citas Agendadas</h2>
+          <SectionHeader 
+            title="Citas Agendadas" 
+            icon={<Calendar size={20} />} 
+          />
           <Table<Appointment>
             columns={[
               {
@@ -347,27 +357,24 @@ export const AppointmentSchedulingPage: React.FC = () => {
                 key: 'status' as keyof Appointment,
                 label: 'Estado',
                 render: (value) => {
-                  const statusText =
-                    value === 'scheduled'
-                      ? 'Agendada'
-                      : value === 'completed'
-                        ? 'Completada'
-                        : 'Cancelada';
+                  const statusMap: Record<string, string> = {
+                    scheduled: 'Agendada',
+                    completed: 'Completada',
+                    cancelled: 'Cancelada',
+                  };
                   return (
-                    <span className={`${styles.status} ${styles[value]}`}>
-                      {statusText}
-                    </span>
+                    <Badge value={statusMap[value]} type="status" />
                   );
                 },
               },
               {
                 key: 'id' as keyof Appointment,
                 label: 'Acciones',
-                align: 'right',
+                align: 'center',
                 render: (_, row) => (
                   <div className={styles.actions}>
                     <Button
-                      variant="filled"
+                      variant="outlined"
                       color="secondary"
                       onClick={() => handleEditAppointment(row)}
                       startIcon={<Edit2 size={16} />}
@@ -375,7 +382,7 @@ export const AppointmentSchedulingPage: React.FC = () => {
                       Editar
                     </Button>
                     <Button
-                      variant="filled"
+                      variant="outlined"
                       color="tertiary"
                       onClick={() => handleDeleteAppointment(row.id)}
                       startIcon={<Trash2 size={16} />}

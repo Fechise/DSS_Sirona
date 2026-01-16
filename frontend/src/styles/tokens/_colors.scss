@@ -67,3 +67,20 @@ $quaternary-color-active: color.mix($quaternary-color, #000, 8%);
   --quaternary-color-hover: #{$quaternary-color-hover};
   --quaternary-color-active: #{$quaternary-color-active};
 }
+
+// Override primary color based on user role
+body[data-role="Médico"] {
+  --primary-color: #{$primary-color};
+}
+
+body[data-role="Paciente"] {
+  --primary-color: #{$secondary-color};
+}
+
+body[data-role="Secretario"] {
+  --primary-color: #{$tertiary-color};
+}
+
+body[data-role="Administrador"] {
+  --primary-color: #{$quaternary-color};
+}

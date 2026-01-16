@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './AppLayout.module.scss';
 import { Header } from '../organisms/Header/Header';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,6 +26,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   };
 
   const variant = getVariant();
+
+  // Establecer data-role en el body para que CSS variables se adapten
+  useEffect(() => {
+    if (user?.role) {
+      document.body.setAttribute('data-role', user.role);
+    }
+    return () => {
+      document.body.removeAttribute('data-role');
+    };
+  }, [user?.role]);
 
   return (
     <div className={`${styles.appContainer} ${styles[variant]}`}>
