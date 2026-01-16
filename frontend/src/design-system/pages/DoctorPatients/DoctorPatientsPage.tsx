@@ -3,6 +3,7 @@ import styles from './DoctorPatientsPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
 import { Users, RefreshCw, FileText, Calendar } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
+import { Badge } from '../../atoms/Badge/Badge';
 import { useNavigate } from 'react-router-dom';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
@@ -65,9 +66,10 @@ export const DoctorPatientsPage: React.FC = () => {
       key: 'diagnosticos',
       label: 'Diagnósticos',
       render: (value) => (
-        <span className={styles.badge}>
-          {value} registro{value !== 1 ? 's' : ''}
-        </span>
+        <Badge
+          value={`${value} registro${value !== 1 ? 's' : ''}`}
+          type="outlined"
+        />
       ),
     },
     {
@@ -173,14 +175,12 @@ export const DoctorPatientsPage: React.FC = () => {
             </span>
           </div>
         ) : (
-          <div className={styles.tableContainer}>
-            <Table
-              columns={columns}
-              data={pacientes}
-              emptyMessage="No hay pacientes para mostrar"
-              rowKey="id"
-            />
-          </div>
+          <Table
+            columns={columns}
+            data={pacientes}
+            emptyMessage="No hay pacientes para mostrar"
+            rowKey="id"
+          />
         )}
       </main>
     </Container>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './UserManagementPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
+<<<<<<< HEAD
 import { Users, RefreshCw, Plus, Trash2, Loader2, Edit2, CheckCircle } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Input } from '../../atoms/Input/Input';
@@ -13,12 +14,24 @@ import { AdminApiService, type UserListItem, type CreateUserRequest, type Update
 
 const ALL_ROLES = ['Administrador', 'Médico', 'Paciente', 'Secretario'] as const;
 const ALL_STATUSES = ['Activo', 'Inactivo', 'Bloqueado'] as const;
+=======
+import { Badge } from '../../atoms/Badge/Badge';
+import { Users, RefreshCw, AlertCircle, Pencil } from 'lucide-react';
+import { Button } from '../../atoms/Button/Button';
+import { Modal } from '../../atoms/Modal/Modal';
+import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { PageHeader } from '../../molecules/PageHeader/PageHeader';
+import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
+import type { User, UserRole } from '../../../types/user';
+import { ALL_ROLES } from '../../../types/user';
+>>>>>>> feature/PBI-15-20-auditoria-integridad
 
 export const UserManagementPage: React.FC = () => {
   const { token } = useAuth();
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
+<<<<<<< HEAD
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   
@@ -47,6 +60,10 @@ export const UserManagementPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<UserListItem | null>(null);
   const [editForm, setEditForm] = useState<UpdateUserRequest>({});
   const [saving, setSaving] = useState(false);
+=======
+  const [roleChangeModal, setRoleChangeModal] = useState<{ userId: string; currentRole: UserRole } | null>(null);
+  const [selectedNewRole, setSelectedNewRole] = useState<UserRole | null>(null);
+>>>>>>> feature/PBI-15-20-auditoria-integridad
 
   const loadUsers = async () => {
     if (!token) return;
@@ -72,6 +89,7 @@ export const UserManagementPage: React.FC = () => {
     loadUsers();
   }, [token, roleFilter, statusFilter]);
 
+<<<<<<< HEAD
   const handleSearch = () => {
     loadUsers();
   };
@@ -89,11 +107,28 @@ export const UserManagementPage: React.FC = () => {
     } catch (err: unknown) {
       const apiError = err as { detail?: string };
       setError(apiError?.detail || 'Error al actualizar rol');
+=======
+  const handleRoleChangeConfirm = async () => {
+    if (!roleChangeModal || !selectedNewRole) return;
+    setUpdating(roleChangeModal.userId);
+    try {
+      await new Promise((r) => setTimeout(r, 400));
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === roleChangeModal.userId ? { ...user, role: selectedNewRole } : user
+        )
+      );
+      setRoleChangeModal(null);
+      setSelectedNewRole(null);
+    } catch (error) {
+      console.error('Error updating role:', error);
+>>>>>>> feature/PBI-15-20-auditoria-integridad
     } finally {
       setUpdating(null);
     }
   };
 
+<<<<<<< HEAD
   const handleDeleteUser = async (userId: string) => {
     if (!token) return;
     if (!window.confirm('¿Estás seguro de desactivar este usuario?')) return;
@@ -220,6 +255,15 @@ export const UserManagementPage: React.FC = () => {
   };
 
   const columns: TableColumn<UserListItem>[] = [
+=======
+  const handleOpenRoleChangeModal = (user: User) => {
+    setRoleChangeModal({ userId: user.id, currentRole: user.role });
+    setSelectedNewRole(user.role);
+  };
+
+  // Definir columnas de la tabla
+  const columns: TableColumn<User>[] = [
+>>>>>>> feature/PBI-15-20-auditoria-integridad
     {
       key: 'fullName',
       label: 'Nombre',
@@ -237,23 +281,33 @@ export const UserManagementPage: React.FC = () => {
     {
       key: 'role',
       label: 'Rol Actual',
+<<<<<<< HEAD
       render: (value: string) => (
         <span className={`${styles.roleBadge} ${styles[`role${value.replace('é', 'e')}`]}`}>
           {value}
         </span>
+=======
+      render: (value: UserRole) => (
+        <Badge value={value} type="role" />
+>>>>>>> feature/PBI-15-20-auditoria-integridad
       ),
     },
     {
       key: 'status',
       label: 'Estado',
       render: (value: string) => (
+<<<<<<< HEAD
         <span className={`${styles.statusBadge} ${styles[`status${value}`]}`}>
           {value}
         </span>
+=======
+        <Badge value={value} type="status" />
+>>>>>>> feature/PBI-15-20-auditoria-integridad
       ),
     },
     {
       key: 'id',
+<<<<<<< HEAD
       label: 'Cambiar Rol',
       render: (_value: string, user: UserListItem) => (
         <select
@@ -268,6 +322,19 @@ export const UserManagementPage: React.FC = () => {
             </option>
           ))}
         </select>
+=======
+      label: 'Acciones',
+      render: (_value: string, user: User) => (
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={() => handleOpenRoleChangeModal(user)}
+        disabled={updating === user.id}
+        startIcon={<Pencil size={16} />}
+      >
+        Editar Rol
+      </Button>
+>>>>>>> feature/PBI-15-20-auditoria-integridad
       ),
     },
     {
@@ -316,8 +383,10 @@ export const UserManagementPage: React.FC = () => {
         <PageHeader
           title="Gestión de Usuarios"
           icon={<Users size={32} />}
+          subtitle="Administra los roles y permisos de los usuarios del sistema"
         />
 
+<<<<<<< HEAD
         <div className={styles.headerActions}>
           <p className={styles.subtitle}>
             Administra los roles y permisos de los usuarios del sistema
@@ -333,6 +402,12 @@ export const UserManagementPage: React.FC = () => {
             </Button>
             <Button
               variant="outlined"
+=======
+        <TableToolbar
+          right={
+            <Button
+              variant="filled"
+>>>>>>> feature/PBI-15-20-auditoria-integridad
               color="secondary"
               onClick={loadUsers}
               disabled={loading}
@@ -340,8 +415,13 @@ export const UserManagementPage: React.FC = () => {
             >
               Actualizar
             </Button>
+<<<<<<< HEAD
           </div>
         </div>
+=======
+          }
+        />
+>>>>>>> feature/PBI-15-20-auditoria-integridad
 
         {/* Filters */}
         <div className={styles.filters}>
@@ -624,6 +704,73 @@ export const UserManagementPage: React.FC = () => {
           </form>
         </Modal>
       </main>
+
+      {/* Modal de confirmación para cambio de rol */}
+      <Modal
+        isOpen={roleChangeModal !== null}
+        onClose={() => {
+          setRoleChangeModal(null);
+          setSelectedNewRole(null);
+        }}
+        title="Cambiar Rol de Usuario"
+        maxWidth="450px"
+      >
+        {roleChangeModal && (
+          <div className={styles.modalContent}>
+            <div className={styles.warningBox}>
+              <AlertCircle size={24} />
+              <p>Está a punto de cambiar el rol de este usuario. Esta acción puede afectar sus permisos y acceso al sistema.</p>
+            </div>
+
+            <div className={styles.roleSelection}>
+              <label className={styles.selectionLabel}>Rol actual:</label>
+              <Badge value={roleChangeModal.currentRole} type="role" />
+            </div>
+
+            <div className={styles.roleSelection}>
+              <label htmlFor="role-select" className={styles.selectionLabel}>Nuevo rol:</label>
+              <select
+                id="role-select"
+                className={styles.roleSelectModal}
+                value={selectedNewRole || ''}
+                onChange={(e) => setSelectedNewRole(e.target.value as UserRole)}
+              >
+                <option value="" disabled>
+                  Selecciona un rol
+                </option>
+                {ALL_ROLES.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.modalActions}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => {
+                  setRoleChangeModal(null);
+                  setSelectedNewRole(null);
+                }}
+                fullWidth
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="filled"
+                color="primary"
+                onClick={handleRoleChangeConfirm}
+                disabled={!selectedNewRole || selectedNewRole === roleChangeModal.currentRole || updating === roleChangeModal.userId}
+                fullWidth
+              >
+                {updating === roleChangeModal.userId ? 'Cambiando...' : 'Confirmar Cambio'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </Container>
   );
 };

@@ -1,0 +1,95 @@
+@use '../../../styles/tokens/_index' as *;
+
+// Estilos de badges tipo "dot" para una apariencia moderna y compacta
+.roleBadge,
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: $font-size-sm;
+  font-weight: normal;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.label {
+  color: $text-color;
+}
+
+// Mapear colores por rol
+.roleAdministrador {
+  .dot { background: $quaternary-color; }
+}
+
+.roleMédico {
+  .dot { background: $primary-color; }
+}
+
+.rolePaciente {
+  .dot { background: $secondary-color; }
+}
+
+.roleSecretario {
+  .dot { background: $warning-color; }
+}
+
+// Mapear colores por estado
+.statusActivo {
+  .dot { background: $success-color; }
+}
+
+.statusInactivo {
+  .dot { background: $border-color; }
+}
+
+.statusBloqueado {
+  .dot { background: $error-color; }
+}
+
+// Appointment status variants
+.statusScheduled {
+  .dot { background: $primary-color; }
+}
+
+.statusCompleted {
+  .dot { background: $success-color; }
+}
+
+.statusCancelled {
+  .dot { background: $error-color; }
+}
+
+// Alias de nombres en español para citas
+.statusAgendada {
+  .dot { background: $primary-color; }
+}
+
+.statusCompletada {
+  .dot { background: $success-color; }
+}
+
+.statusCancelada {
+  .dot { background: $error-color; }
+}
+
+// Variante outlined para badges decorativos (ej: recuentos, categorías)
+.outlinedBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--primary-color) 15%, white);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  white-space: nowrap;
+}

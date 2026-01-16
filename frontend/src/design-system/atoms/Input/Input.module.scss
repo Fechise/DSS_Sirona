@@ -20,7 +20,7 @@
 .labelIcon {
   display: inline-flex;
   align-items: center;
-  color: $primary-color;
+  color: var(--primary-color);
 }
 
 .input {
@@ -40,8 +40,8 @@
   }
 
   &:focus {
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px color-mix(in srgb, $primary-color 25%, transparent);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent);
   }
 }
 

@@ -3,14 +3,20 @@
 .tableWrapper {
   width: 100%;
   overflow-x: auto;
+  border-radius: $radius-medium;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid $border-color;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: $radius-medium;
 
   thead {
-    border-bottom: 2px solid $border-color;
+    border-bottom: 1px solid $border-color;
 
     th {
       padding: $spacing-sm $spacing-md;
@@ -31,8 +37,13 @@
 
   tbody {
     tr {
+      background-color: white;
       border-bottom: 1px solid $border-color;
       transition: background-color 0.2s;
+
+      &:first-child {
+        border-top: none;
+      }
 
       &:hover {
         background-color: rgba($primary-color, 0.02);

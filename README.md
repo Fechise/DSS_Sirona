@@ -27,6 +27,23 @@ git clone <URL_DEL_REPOSITORIO>
 cd sirona
 ```
 
+### Configurar remotos Git (Azure DevOps + GitHub)
+
+Este proyecto sincroniza automáticamente con **Azure DevOps** y **GitHub**. Después de clonar, ejecuta:
+
+**Windows (PowerShell):**
+```powershell
+.\setup-git-remotes.ps1
+```
+
+**Linux/Mac:**
+```bash
+chmod +x setup-git-remotes.sh
+./setup-git-remotes.sh
+```
+
+Esto configurará push dual para que `git push origin` suba a ambos repositorios simultáneamente.
+
 ### Ejecutar backend (FastAPI)
 
 ```bash

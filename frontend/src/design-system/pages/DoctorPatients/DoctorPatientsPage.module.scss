@@ -16,50 +16,7 @@
   font-size: 0.9375rem;
 }
 
-.tableContainer {
-  background: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table thead {
-  background: color-mix(in srgb, var(--primary-color) 8%, white);
-  border-bottom: 2px solid var(--border-color);
-}
-
-.table th {
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 0.875rem;
-}
-
-.table tbody tr {
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 160ms ease;
-}
-
-.table tbody tr:hover {
-  background: color-mix(in srgb, var(--primary-color) 4%, white);
-}
-
-.table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.table td {
-  padding: 1rem;
-  color: var(--text-color);
-  font-size: 0.9375rem;
-}
+// Tabla ahora tiene sus propios estilos en Table.module.scss
 
 .patientName {
   display: flex;
@@ -87,18 +44,6 @@
   color: color-mix(in srgb, var(--text-color) 50%, white);
   font-style: italic;
   font-size: 0.875rem;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  background: color-mix(in srgb, var(--primary-color) 15%, white);
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
 }
 
 .loadingState,

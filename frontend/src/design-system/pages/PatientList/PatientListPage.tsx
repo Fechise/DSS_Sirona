@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { PatientApiService, type PatientInfo } from '../../../services/api';
 import styles from './PatientListPage.module.scss';
-import { AlertCircle, Users, Search, Loader } from 'lucide-react';
+import { AlertCircle, Users, Search, Eye, Pencil } from 'lucide-react';
+import { Badge } from '../../atoms/Badge/Badge';
+import { Button } from '../../atoms/Button/Button';
 import { Input } from '../../atoms/Input/Input';
 import { Container } from '../../atoms/Container/Container';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
+import { Table, type TableColumn } from '../../molecules/Table/Table';
 
 export const PatientListPage: React.FC = () => {
   const { token } = useAuth();
@@ -14,6 +17,58 @@ export const PatientListPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Definir columnas de la tabla
+  const columns: TableColumn<PatientInfo>[] = [
+    {
+      key: 'fullName',
+      label: 'Nombre',
+    },
+    {
+      key: 'email',
+      label: 'Email',
+    },
+    {
+      key: 'cedula',
+      label: 'Cédula',
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      render: (value: string) => (
+        <Badge value={value} type="status" />
+      ),
+    },
+    {
+      key: 'created_at',
+      label: 'Registrado',
+      render: (value: string) => new Date(value).toLocaleDateString('es-ES'),
+    },
+    {
+      key: 'id',
+      label: 'Acciones',
+      render: (_value: string, patient: PatientInfo) => (
+        <div className={styles.actionButtons}>
+          <Button
+            variant="outlined"
+            color="quaternary"
+            onClick={() => handleViewHistory(patient.id)}
+            startIcon={<Eye size={16} />}
+          >
+            Ver
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => handleEditPatient(patient.id)}
+            startIcon={<Pencil size={16} />}
+          >
+            Editar
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -46,11 +101,20 @@ export const PatientListPage: React.FC = () => {
     setFilteredPatients(filtered);
   };
 
+  const handleViewHistory = (patientId: string) => {
+    // TODO: Navegar a historial del paciente
+    console.log('Ver historial del paciente:', patientId);
+  };
+
+  const handleEditPatient = (patientId: string) => {
+    // TODO: Abrir modal de edición o navegar a página de edición
+    console.log('Editar paciente:', patientId);
+  };
+
   if (loading) {
     return (
       <Container>
         <div className={styles.loadingState}>
-          <Loader size={48} className={styles.spinner} />
           <p>Cargando lista de pacientes...</p>
         </div>
       </Container>
@@ -75,75 +139,38 @@ export const PatientListPage: React.FC = () => {
         <PageHeader 
           title="Listado de Pacientes" 
           icon={<Users size={32} />}
+          subtitle={`Total de pacientes: ${patients.length}`}
         />
 
-        <div className={styles.statsSection}>
-          <p>Total de pacientes: <strong>{patients.length}</strong></p>
-        </div>
-
-        <div className={styles.searchBox}>
-          <Search size={20} />
+        <div className={styles.searchSection}>
           <Input
             id="patient-search"
             label=""
             placeholder="Buscar por nombre, email o cédula..."
             value={searchQuery}
             onChange={(value) => handleSearch(value)}
+            icon={<Search size={20} />}
           />
         </div>
 
-        <div className={styles.content}>
-          {filteredPatients.length > 0 ? (
-            <div className={styles.patientsList}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Cédula</th>
-                    <th>Estado</th>
-                    <th>Registrado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPatients.map((patient) => (
-                    <tr key={patient.id} className={styles.tableRow}>
-                      <td className={styles.name}>{patient.fullName}</td>
-                      <td className={styles.email}>{patient.email}</td>
-                      <td className={styles.cedula}>{patient.cedula}</td>
-                      <td className={styles.status}>
-                        <span className={`${styles.statusBadge} ${styles[patient.status.toLowerCase()]}`}>
-                          {patient.status}
-                        </span>
-                      </td>
-                      <td className={styles.date}>
-                        {new Date(patient.created_at).toLocaleDateString('es-ES')}
-                      </td>
-                      <td className={styles.actions}>
-                        <button className={styles.actionBtn} title="Ver historial">
-                          👁️
-                        </button>
-                        <button className={styles.actionBtn} title="Editar">
-                          ✏️
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className={styles.emptyState}>
-              <Users size={48} />
-              <p>
-                {searchQuery 
-                  ? 'No se encontraron pacientes con los criterios de búsqueda.' 
-                  : 'No hay pacientes registrados aún.'}
-              </p>
-            </div>
-          )}
-        </div>
+        {filteredPatients.length > 0 ? (
+          <div className={styles.tableWrapper}>
+            <Table<PatientInfo>
+              columns={columns}
+              data={filteredPatients}
+              emptyMessage="No se encontraron pacientes"
+            />
+          </div>
+        ) : (
+          <div className={styles.emptyState}>
+            <Users size={48} />
+            <p>
+              {searchQuery 
+                ? 'No se encontraron pacientes con los criterios de búsqueda.' 
+                : 'No hay pacientes registrados aún.'}
+            </p>
+          </div>
+        )}
       </div>
     </Container>
   );

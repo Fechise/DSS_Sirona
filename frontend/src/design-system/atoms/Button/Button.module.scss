@@ -284,6 +284,36 @@
   }
 }
 
+.error {
+  &.filled {
+    background-color: $error-color;
+    border-color: $error-color;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: darken($error-color, 10%);
+    }
+  }
+
+  &.outlined {
+    border-color: $error-color;
+    color: $error-color;
+
+    &:hover:not(:disabled) {
+      background-color: rgba($error-color, 0.05);
+    }
+  }
+
+  &.ghost {
+    border-color: transparent;
+    color: $error-color;
+
+    &:hover:not(:disabled) {
+      background-color: rgba($error-color, 0.05);
+    }
+  }
+}
+
 .fullWidth {
   width: 100%;
 }
