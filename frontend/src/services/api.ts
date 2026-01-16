@@ -493,8 +493,6 @@ export class AppointmentApiService {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Alias para listDoctors (compatibilidad)
    */
   static async getDoctors(token: string): Promise<DoctorInfo[]> {
@@ -509,7 +507,6 @@ export class AppointmentApiService {
   }
 
   /**
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
    * Obtener disponibilidad de un médico
    */
   static async getDoctorAvailability(token: string, doctorId: string, fecha?: string): Promise<DoctorAvailability[]> {
@@ -555,8 +552,6 @@ export interface AuditLogsResponse {
   logs: AuditLogEntry[];
 }
 
-<<<<<<< HEAD
-=======
 export interface UserListItem {
   id: string;
   fullName: string;
@@ -601,7 +596,6 @@ export interface UpdateUserRequest {
   telefonoContacto?: string;
 }
 
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
 // ============================================================
 // ADMIN SERVICE
 // ============================================================
@@ -610,10 +604,6 @@ export class AdminApiService {
   /**
    * Obtener logs de auditoría (solo Administradores)
    */
-<<<<<<< HEAD
-  static async getAuditLogs(token: string, skip: number = 0, limit: number = 50): Promise<AuditLogsResponse> {
-    return authenticatedFetch(`${API_BASE_URL}/api/admin/audit-logs?skip=${skip}&limit=${limit}`, token);
-=======
   static async getAuditLogs(
     token: string, 
     skip: number = 0, 
@@ -837,6 +827,5 @@ export class DoctorApiService {
       method: 'POST',
       body: JSON.stringify({ patient_id: patientId, ...data }),
     });
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
   }
 }
