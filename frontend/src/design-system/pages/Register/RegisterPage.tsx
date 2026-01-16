@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styles from './RegisterPage.module.scss';
 import { RegisterForm } from '../../molecules/RegisterForm/RegisterForm';
 import type { RegisterData } from '../../molecules/RegisterForm/RegisterForm';
-import { ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from '../../atoms/Link/Link';
 
