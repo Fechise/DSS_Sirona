@@ -15,6 +15,7 @@ import { Button } from '../../atoms/Button/Button';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import {
   PersonalInfoSection,
+  DemographicInfoSection,
   ContactInfoSection,
   ConsultasSection,
   VacunasSection,
@@ -27,6 +28,13 @@ import { PatientApiService, type AppointmentResponse } from '../../../services/a
 
 type MedicalRecord = {
   id: string;
+  // Datos demográficos
+  direccion: string | null;
+  ciudad: string | null;
+  pais: string | null;
+  genero: string | null;
+  estadoCivil: string | null;
+  ocupacion: string | null;
   // Información Personal Médica
   tipoSangre: string;
   alergias: string[];
@@ -110,6 +118,14 @@ export const PatientHistoryPage: React.FC = () => {
         // Mapear respuesta del backend al formato esperado
         const mappedRecord: MedicalRecord = {
           id: data.id,
+          // Datos demográficos
+          direccion: data.direccion || null,
+          ciudad: data.ciudad || null,
+          pais: data.pais || null,
+          genero: data.genero || null,
+          estadoCivil: data.estadoCivil || null,
+          ocupacion: data.ocupacion || null,
+          // Información médica
           tipoSangre: data.tipoSangre || 'No especificado',
           alergias: data.alergias || [],
           condicionesCronicas: data.condicionesCronicas || [],
@@ -310,6 +326,16 @@ export const PatientHistoryPage: React.FC = () => {
                 alergias={record.alergias}
                 condicionesCronicas={record.condicionesCronicas}
                 medicamentosActuales={record.medicamentosActuales}
+              />
+
+              {/* Datos Demográficos */}
+              <DemographicInfoSection
+                direccion={record.direccion}
+                ciudad={record.ciudad}
+                pais={record.pais}
+                genero={record.genero}
+                estadoCivil={record.estadoCivil}
+                ocupacion={record.ocupacion}
               />
 
               <ContactInfoSection

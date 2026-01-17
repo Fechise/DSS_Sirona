@@ -305,6 +305,39 @@ export const PatientRecordPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Datos Demográficos */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h3>Datos Demográficos</h3>
+          </div>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Género</span>
+              <span className={styles.value}>{history.genero || 'No especificado'}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Estado Civil</span>
+              <span className={styles.value}>{history.estadoCivil || 'No especificado'}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Ocupación</span>
+              <span className={styles.value}>{history.ocupacion || 'No especificada'}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Dirección</span>
+              <span className={styles.value}>{history.direccion || 'No especificada'}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>Ciudad</span>
+              <span className={styles.value}>{history.ciudad || 'No especificada'}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.label}>País</span>
+              <span className={styles.value}>{history.pais || 'No especificado'}</span>
+            </div>
+          </div>
+        </section>
+
         {/* Datos Médicos Editables */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>

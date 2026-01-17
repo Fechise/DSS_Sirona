@@ -431,6 +431,14 @@ async def register_patient(
     from models.models import MedicoAsignado, ContactoEmergencia
     patient_history = PatientHistory(
         patient_id=str(new_user.id),
+        # Datos demográficos
+        direccion=data.direccion,
+        ciudad=data.ciudad,
+        pais=data.pais,
+        genero=data.genero,
+        estadoCivil=data.estadoCivil,
+        ocupacion=data.ocupacion,
+        # Información médica
         tipoSangre=data.grupoSanguineo or "No especificado",
         alergias=[],
         condicionesCronicas=[],

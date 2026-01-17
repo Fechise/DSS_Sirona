@@ -190,6 +190,16 @@ class MFASecret(Document):
 # 4. Historial Clínico del Paciente (Solo Lectura para Paciente)
 class PatientHistory(Document):
     patient_id: Indexed(str, unique=True)  # Referencia al User ID del paciente
+    
+    # Datos demográficos
+    direccion: Optional[str] = None
+    ciudad: Optional[str] = None
+    pais: Optional[str] = None
+    genero: Optional[str] = None
+    estadoCivil: Optional[str] = None
+    ocupacion: Optional[str] = None
+    
+    # Información médica
     tipoSangre: str
     alergias: List[str] = []
     condicionesCronicas: List[str] = []

@@ -177,6 +177,14 @@ export interface ProximaCita {
 
 export interface PatientHistoryResponse {
   id: string;
+  // Datos demográficos
+  direccion: string | null;
+  ciudad: string | null;
+  pais: string | null;
+  genero: string | null;
+  estadoCivil: string | null;
+  ocupacion: string | null;
+  // Información médica
   tipoSangre: string;
   alergias: string[];
   condicionesCronicas: string[];
@@ -361,11 +369,11 @@ export interface PatientMinimalInfo {
 
 export interface DoctorAssignedPatient {
   id: string;
-  fullName: string;
+  full_name: string;
   email: string;
   cedula: string;
-  fechaNacimiento?: string;
-  ultimaConsulta?: string;
+  fecha_nacimiento?: string;
+  ultima_consulta?: string;
   diagnosticos?: number;
   condicionesCronicas?: string[];
 }

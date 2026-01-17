@@ -106,11 +106,11 @@ export const DoctorPatientsPage: React.FC = () => {
       // Mapear la respuesta del backend al formato esperado
       const mappedPacientes: PacienteAsignado[] = response.pacientes.map((p) => ({
         id: p.id,
-        fullName: p.fullName,
+        fullName: p.full_name,
         email: p.email,
         cedula: p.cedula,
-        fechaNacimiento: p.fechaNacimiento || '',
-        ultimaConsulta: p.ultimaConsulta || null,
+        fechaNacimiento: p.fecha_nacimiento || '',
+        ultimaConsulta: p.ultima_consulta || null,
         diagnosticos: p.diagnosticos || 0,
       }));
       setPacientes(mappedPacientes);

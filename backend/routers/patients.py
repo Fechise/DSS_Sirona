@@ -279,6 +279,14 @@ async def get_patient_history(
     # Construir response
     return PatientHistoryResponse(
         id=str(history.id),
+        # Datos demográficos
+        direccion=history.direccion,
+        ciudad=history.ciudad,
+        pais=history.pais,
+        genero=history.genero,
+        estadoCivil=history.estadoCivil,
+        ocupacion=history.ocupacion,
+        # Información médica
         tipoSangre=history.tipoSangre,
         alergias=history.alergias,
         condicionesCronicas=history.condicionesCronicas,
@@ -601,6 +609,14 @@ async def update_patient_history(
     # Retornar historial actualizado
     return PatientHistoryResponse(
         id=str(history.id),
+        # Datos demográficos
+        direccion=history.direccion,
+        ciudad=history.ciudad,
+        pais=history.pais,
+        genero=history.genero,
+        estadoCivil=history.estadoCivil,
+        ocupacion=history.ocupacion,
+        # Información médica
         tipoSangre=history.tipoSangre,
         alergias=history.alergias,
         condicionesCronicas=history.condicionesCronicas,
@@ -703,6 +719,14 @@ async def create_patient_history(
     
     return PatientHistoryResponse(
         id=str(history.id),
+        # Datos demográficos
+        direccion=history.direccion,
+        ciudad=history.ciudad,
+        pais=history.pais,
+        genero=history.genero,
+        estadoCivil=history.estadoCivil,
+        ocupacion=history.ocupacion,
+        # Información médica
         tipoSangre=history.tipoSangre,
         alergias=history.alergias,
         condicionesCronicas=history.condicionesCronicas,
