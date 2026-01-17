@@ -7,7 +7,8 @@ import {
   ArrowLeft,
   AlertCircle,
   FileText,
-  User
+  User,
+  Calendar,
 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
@@ -18,7 +19,6 @@ import {
   ConsultasSection,
   VacunasSection,
   AntecedentesSection,
-  ProximaCitaSection,
 } from '../../organisms/SectionsPatientHistory';
 import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
@@ -71,13 +71,6 @@ type MedicalRecord = {
   // Antecedentes
   antecedentesFamiliares: string[];
   
-  // Citas
-  proximaCita?: {
-    fecha: string;
-    motivo: string;
-    medico: string;
-  };
-  
   ultimaModificacion: string;
 };
 
@@ -104,7 +97,6 @@ export const PatientHistoryPage: React.FC = () => {
       setErrorCode(null);
       
       try {
-        // Cargar historial médico
         const data = await PatientApiService.getMyHistory(token);
         
         // Mapear respuesta del backend al formato esperado
@@ -146,33 +138,28 @@ export const PatientHistoryPage: React.FC = () => {
             proximaDosis: v.proximaDosis
           })),
           antecedentesFamiliares: data.antecedentesFamiliares || [],
-          proximaCita: data.proximaCita ? {
-            fecha: data.proximaCita.fecha,
-            motivo: data.proximaCita.motivo,
-            medico: data.proximaCita.medico
-          } : undefined,
           ultimaModificacion: data.ultimaModificacion
         };
         
         setRecord(mappedRecord);
-      } catch (historyErr: unknown) {
-        // Si no hay historial
-        const histErr = historyErr as { status?: number };
-        if (histErr.status === 404) {
-          setError('Aún no tienes un historial médico registrado');
-          setErrorCode(404);
-        } else if (histErr.status === 401) {
+      } catch (err: unknown) {
+        console.error('Error loading patient data:', err);
+        const errorObj = err as { status?: number; detail?: string; message?: string };
+        
+        if (errorObj.status === 401) {
           setErrorCode(401);
           setError('Sesión expirada. Redirigiendo al login...');
           setTimeout(() => navigate('/login'), 2000);
-        } else if (histErr.status === 403) {
+          return;
+        }
+        if (errorObj.status === 403) {
           setErrorCode(403);
           setError('No tienes permisos para ver esta información');
-        } else {
-          console.error('Error loading history:', historyErr);
-          setError('Error al cargar el historial médico');
-          setErrorCode(500);
+          return;
         }
+        
+        setError(errorObj.detail || errorObj.message || 'Error al cargar los datos');
+        setErrorCode(500);
       } finally {
         setLoading(false);
       }
@@ -289,6 +276,7 @@ export const PatientHistoryPage: React.FC = () => {
                   <div className={styles.infoField}>
                     <label>Última Actualización</label>
                     <div className={styles.fieldValue}>
+                      <Calendar size={16} />
                       <span>
                         {new Date(record.ultimaModificacion).toLocaleDateString('es-ES', {
                           year: 'numeric',
@@ -331,14 +319,6 @@ export const PatientHistoryPage: React.FC = () => {
               <VacunasSection vacunas={record.vacunas} />
 
               <AntecedentesSection antecedentesFamiliares={record.antecedentesFamiliares} />
-
-              <ProximaCitaSection
-                proximaCita={record.proximaCita ? {
-                  fecha: record.proximaCita.fecha,
-                  motivo: record.proximaCita.motivo,
-                  doctor: record.proximaCita.medico,
-                } : null}
-              />
             </div>
           )}
 
@@ -346,7 +326,7 @@ export const PatientHistoryPage: React.FC = () => {
             <div className={styles.emptyContainer}>
               <FileText size={48} className={styles.emptyIcon} />
               <h2>Sin Historial Clínico</h2>
-              <p>Aún no tienes un historial clínico registrado. Contacta con tu centro médico para tu primera consulta.</p>
+              <p>Aún no tienes registros clínicos. Tu historial se creará después de tu primera consulta médica.</p>
             </div>
           )}
         </div>
