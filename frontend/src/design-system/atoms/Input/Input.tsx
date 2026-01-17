@@ -16,6 +16,7 @@ type InputProps = {
   min?: string;
   max?: string;
   focusColor?: string;
+  required?: boolean;
 };
 
 export const Input: React.FC<InputProps> = ({
@@ -33,6 +34,7 @@ export const Input: React.FC<InputProps> = ({
   min,
   max,
   focusColor,
+  required,
 }) => {
   return (
     <div className={styles.field}>
@@ -56,6 +58,7 @@ export const Input: React.FC<InputProps> = ({
         disabled={disabled}
         min={min}
         max={max}
+        required={required}
         style={focusColor ? {
           '--input-focus-color': focusColor,
         } as React.CSSProperties : undefined}

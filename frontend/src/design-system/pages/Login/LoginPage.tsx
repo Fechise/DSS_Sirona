@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
 import styles from './LoginPage.module.scss';
 import { LoginForm } from '../../molecules/LoginForm/LoginForm';
-import { ShieldCheck, AlertCircle, Mail, Hash } from 'lucide-react';
+import { ShieldCheck, AlertCircle, Hash } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Button } from '../../atoms/Button/Button';
 import { Input } from '../../atoms/Input/Input';
-import { FaceCameraCapture } from '../../atoms/FaceCameraCapture/FaceCameraCapture';
 import { Link } from '../../atoms/Link/Link';
 import { AuthApiService } from '../../../services/api';
 import { BackgroundBlobs } from './BackgroundBlobs';
 
 export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [modo, setModo] = useState<'password' | 'face'>('password');
-  const [faceEmail, setFaceEmail] = useState('');
-  const [faceCapture, setFaceCapture] = useState<File | null>(null);
   const [mfaRequired, setMfaRequired] = useState(false);
   const [otp, setOtp] = useState('');
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
@@ -49,39 +45,6 @@ export const LoginPage: React.FC = () => {
         setErrorMessage(`Cuenta bloqueada hasta ${error.locked_until || '15 minutos'}`);
       } else {
         setErrorMessage(error.detail || 'Error al iniciar sesión. Verifica tus credenciales.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFaceSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setAccountLocked(false);
-    setErrorMessage(null);
-
-    try {
-      if (!faceCapture) {
-        setErrorMessage('Debes capturar tu rostro para continuar');
-        return;
-      }
-
-      const response = await AuthApiService.loginWithFace(faceEmail, faceCapture);
-
-      if (response.requires_mfa) {
-        setMfaRequired(true);
-        setPendingEmail(faceEmail);
-      } else {
-        login(faceEmail, response.token, response.role, faceEmail.split('@')[0]);
-        navigate('/inicio');
-      }
-    } catch (error: any) {
-      if (error.account_locked) {
-        setAccountLocked(true);
-        setErrorMessage(`Cuenta bloqueada hasta ${error.locked_until || '15 minutos'}`);
-      } else {
-        setErrorMessage(error.detail || 'Error en reconocimiento facial. Intenta nuevamente.');
       }
     } finally {
       setLoading(false);
@@ -126,68 +89,9 @@ export const LoginPage: React.FC = () => {
         )}
 
         {!mfaRequired && (
-          <>
-            <div className={styles.modes}>
-              <button
-                type="button"
-                className={[styles.modeButton, modo === 'password' ? styles.active : ''].join(' ')}
-                onClick={() => setModo('password')}
-                disabled={loading}
-              >
-                Ingresar con contraseña
-              </button>
-              <button
-                type="button"
-                className={[styles.modeButton, modo === 'face' ? styles.active : ''].join(' ')}
-                onClick={() => setModo('face')}
-                disabled={loading}
-              >
-                Ingresar con reconocimiento facial
-              </button>
-            </div>
-
-            {modo === 'password' && (
-              <div className={styles.panel}>
-                <LoginForm onSubmit={handlePasswordSubmit} loading={loading} isAccountLocked={accountLocked} />
-              </div>
-            )}
-
-            {modo === 'face' && (
-              <div className={styles.panel}>
-                <form className={styles.faceForm} onSubmit={handleFaceSubmit}>
-                  {accountLocked && (
-                    <div className={styles.alertLocked}>
-                      <AlertCircle size={20} />
-                      <span>Cuenta bloqueada por 15 minutos</span>
-                    </div>
-                  )}
-
-                  <Input
-                    id="face-email"
-                    label="Correo"
-                    type="email"
-                    value={faceEmail}
-                    onChange={setFaceEmail}
-                    placeholder="tu@correo.com"
-                    autoComplete="email"
-                    icon={<Mail size={16} />}
-                  />
-
-                  <div className={styles.captureSection}>
-                    <FaceCameraCapture
-                      onCapture={setFaceCapture}
-                      onClear={() => setFaceCapture(null)}
-                      disabled={loading || accountLocked}
-                    />
-                  </div>
-
-                  <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || !faceCapture || accountLocked}>
-                    {loading ? 'Verificando...' : 'Iniciar reconocimiento facial'}
-                  </Button>
-                </form>
-              </div>
-            )}
-          </>
+          <div className={styles.panel}>
+            <LoginForm onSubmit={handlePasswordSubmit} loading={loading} isAccountLocked={accountLocked} />
+          </div>
         )}
 
         {mfaRequired && (
