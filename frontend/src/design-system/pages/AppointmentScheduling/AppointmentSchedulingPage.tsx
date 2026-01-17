@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, Edit2, Trash2, AlertCircle, User, Stethoscope, Clock } from 'lucide-react';
+import { Calendar, Plus, Edit2, X, AlertCircle, User, Stethoscope, Clock } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Badge } from '../../atoms/Badge/Badge';
 import { Container } from '../../atoms/Container/Container';
@@ -27,13 +27,16 @@ type Doctor = {
 
 type Appointment = {
   id: string;
-  patientId: string;
+  patient_id: string;
   patientName: string;
-  doctorId: string;
+  doctor_id: string;
   doctorName: string;
-  date: string;
-  time: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
+  fecha: string;
+  motivo: string;
+  estado: string;
+  notas: string | null | undefined;
+  created_at: string;
+  updated_at: string;
 };
 
 type AppointmentForm = {
@@ -59,6 +62,10 @@ export const AppointmentSchedulingPage: React.FC = () => {
     date: '',
     time: '',
   });
+  
+  // Estados para consultar disponibilidad
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [availability, setAvailability] = useState<string[]>([]);
 
   // Load real data from API
   useEffect(() => {
@@ -98,13 +105,16 @@ export const AppointmentSchedulingPage: React.FC = () => {
         // Mapear citas
         setAppointments(appointmentsRes.map(apt => ({
           id: apt.id,
-          patientId: apt.patient_id,
+          patient_id: apt.patient_id,
           patientName: apt.patientName,
-          doctorId: apt.doctor_id,
+          doctor_id: apt.doctor_id,
           doctorName: apt.doctorName,
-          date: apt.fecha.split('T')[0],
-          time: apt.fecha.split('T')[1]?.substring(0, 5) || '',
-          status: apt.estado.toLowerCase() as 'scheduled' | 'completed' | 'cancelled'
+          fecha: apt.fecha,
+          motivo: apt.motivo,
+          estado: apt.estado,
+          notas: apt.notas ?? null,
+          created_at: apt.created_at,
+          updated_at: apt.updated_at
         })));
       } catch (err) {
         console.error('Error loading data:', err);
@@ -138,25 +148,27 @@ export const AppointmentSchedulingPage: React.FC = () => {
 
     try {
       if (editingId) {
-        // Update existing appointment
+        // Update existing appointment - solo fecha y hora
         await AppointmentApiService.updateAppointment(token, editingId, {
           fecha: `${formData.date}T${formData.time}:00`
         });
-        setAppointments(
-          appointments.map((apt) =>
-            apt.id === editingId
-              ? {
-                ...apt,
-                patientId: formData.patientId,
-                patientName: patient.name,
-                doctorId: formData.doctorId,
-                doctorName: doctor.name,
-                date: formData.date,
-                time: formData.time,
-              }
-              : apt
-          )
-        );
+        
+        // Recargar las citas para obtener los datos actualizados
+        const appointmentsRes = await AppointmentApiService.getAppointments(token);
+        setAppointments(appointmentsRes.map(apt => ({
+          id: apt.id,
+          patient_id: apt.patient_id,
+          patientName: apt.patientName,
+          doctor_id: apt.doctor_id,
+          doctorName: apt.doctorName,
+          fecha: apt.fecha,
+          motivo: apt.motivo,
+          estado: apt.estado,
+          notas: apt.notas ?? null,
+          created_at: apt.created_at,
+          updated_at: apt.updated_at
+        })));
+        
         setEditingId(null);
       } else {
         // Create new appointment via API
@@ -169,13 +181,16 @@ export const AppointmentSchedulingPage: React.FC = () => {
         
         const newAppointment: Appointment = {
           id: newApt.id,
-          patientId: newApt.patient_id,
+          patient_id: newApt.patient_id,
           patientName: newApt.patientName,
-          doctorId: newApt.doctor_id,
+          doctor_id: newApt.doctor_id,
           doctorName: newApt.doctorName,
-          date: newApt.fecha.split('T')[0],
-          time: newApt.fecha.split('T')[1]?.substring(0, 5) || '',
-          status: 'scheduled',
+          fecha: newApt.fecha,
+          motivo: newApt.motivo,
+          estado: newApt.estado,
+          notas: newApt.notas ?? null,
+          created_at: newApt.created_at,
+          updated_at: newApt.updated_at
         };
         setAppointments([...appointments, newAppointment]);
       }
@@ -191,29 +206,39 @@ export const AppointmentSchedulingPage: React.FC = () => {
   };
 
   const handleEditAppointment = (apt: Appointment) => {
+    const [date, timeWithSeconds] = apt.fecha.split('T');
+    const time = timeWithSeconds?.substring(0, 5) || '';
+    
     setFormData({
-      patientId: apt.patientId,
-      doctorId: apt.doctorId,
-      date: apt.date,
-      time: apt.time,
+      patientId: apt.patient_id,
+      doctorId: apt.doctor_id,
+      date: date,
+      time: time,
     });
     setEditingId(apt.id);
     setShowForm(true);
   };
 
-  const handleDeleteAppointment = async (id: string) => {
+  const handleCancelAppointment = async (id: string) => {
     if (!token) {
       setError('No se encontró token de autenticación');
       return;
     }
 
     try {
-      await AppointmentApiService.deleteAppointment(token, id);
-      setAppointments(appointments.filter((apt) => apt.id !== id));
+      // Cambiar el estado a "Cancelada" en lugar de eliminar
+      await AppointmentApiService.updateAppointment(token, id, {
+        estado: 'Cancelada'
+      });
+      
+      // Actualizar el estado local
+      setAppointments(appointments.map(apt => 
+        apt.id === id ? { ...apt, estado: 'Cancelada' } : apt
+      ));
     } catch (err: unknown) {
-      console.error('Error deleting appointment:', err);
+      console.error('Error cancelling appointment:', err);
       const errorObj = err as { detail?: string };
-      setError(errorObj.detail || 'Error al eliminar la cita');
+      setError(errorObj.detail || 'Error al cancelar la cita');
     }
   };
 
@@ -222,6 +247,53 @@ export const AppointmentSchedulingPage: React.FC = () => {
     setEditingId(null);
     setShowForm(false);
     setError(null);
+    setAvailability([]);
+  };
+
+  const handleCheckAvailability = async () => {
+    if (!formData.doctorId || !formData.date) {
+      setError('Por favor selecciona un médico y una fecha para consultar disponibilidad');
+      return;
+    }
+
+    if (!token) {
+      setError('No se encontró token de autenticación');
+      return;
+    }
+
+    try {
+      setLoadingAvailability(true);
+      setError(null);
+      
+      const scheduleData = await AppointmentApiService.getDoctorSchedule(token, formData.doctorId, formData.date);
+      
+      if (scheduleData.slots && scheduleData.slots.length > 0) {
+        // Extraer solo las horas disponibles (disponible === true)
+        const availableTimes = scheduleData.slots
+          .filter(slot => slot.disponible)
+          .map(slot => {
+            const date = new Date(slot.fecha);
+            return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+          });
+        
+        if (availableTimes.length > 0) {
+          setAvailability(availableTimes);
+        } else {
+          setAvailability([]);
+          setError('No hay horarios disponibles para esta fecha');
+        }
+      } else {
+        setAvailability([]);
+        setError('El médico no tiene disponibilidad configurada para esta fecha');
+      }
+    } catch (err: unknown) {
+      console.error('Error checking availability:', err);
+      const errorObj = err as { detail?: string };
+      setError(errorObj.detail || 'Error al consultar disponibilidad');
+      setAvailability([]);
+    } finally {
+      setLoadingAvailability(false);
+    }
   };
 
   if (loading) {
@@ -284,6 +356,7 @@ export const AppointmentSchedulingPage: React.FC = () => {
                   value={formData.patientId}
                   onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
                   className={styles.select}
+                  disabled={!!editingId}
                 >
                   <option value="">Selecciona un paciente</option>
                   {patients.map((p) => (
@@ -304,6 +377,7 @@ export const AppointmentSchedulingPage: React.FC = () => {
                   value={formData.doctorId}
                   onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
                   className={styles.select}
+                  disabled={!!editingId}
                 >
                   <option value="">Selecciona un médico</option>
                   {doctors.map((d) => (
@@ -343,6 +417,40 @@ export const AppointmentSchedulingPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Botón para consultar disponibilidad */}
+            {!editingId && (
+              <div className={styles.availabilitySection}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleCheckAvailability}
+                  disabled={!formData.doctorId || !formData.date || loadingAvailability}
+                  startIcon={<Calendar size={16} />}
+                >
+                  {loadingAvailability ? 'Consultando...' : 'Consultar Disponibilidad'}
+                </Button>
+                
+                {availability.length > 0 && (
+                  <div className={styles.availabilityList}>
+                    <p><strong>Horarios disponibles:</strong></p>
+                    <div className={styles.timeSlots}>
+                      {availability.map((time, index) => (
+                        <Button
+                          key={index}
+                          variant="outlined"
+                          color="tertiary"
+                          onClick={() => setFormData({ ...formData, time: time })}
+                          className={formData.time === time ? styles.selectedSlot : ''}
+                        >
+                          {time}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className={styles.formActions}>
               <Button variant="outlined" color="error" onClick={handleCancel}>
                 Cancelar
@@ -371,39 +479,32 @@ export const AppointmentSchedulingPage: React.FC = () => {
                 label: 'Paciente',
               },
               {
-                key: 'patientId' as keyof Appointment,
-                label: 'Cédula',
-                render: (value) => {
-                  const patient = patients.find((p) => p.id === value);
-                  return patient?.cedula;
-                },
-              },
-              {
                 key: 'doctorName' as keyof Appointment,
                 label: 'Médico',
               },
               {
-                key: 'date' as keyof Appointment,
-                label: 'Fecha',
-                render: (value) => new Date(value as string).toLocaleDateString('es-ES'),
-              },
-              {
-                key: 'time' as keyof Appointment,
-                label: 'Hora',
-              },
-              {
-                key: 'status' as keyof Appointment,
-                label: 'Estado',
+                key: 'fecha' as keyof Appointment,
+                label: 'Fecha y Hora',
                 render: (value) => {
-                  const statusMap: Record<string, string> = {
-                    scheduled: 'Agendada',
-                    completed: 'Completada',
-                    cancelled: 'Cancelada',
-                  };
-                  return (
-                    <Badge value={statusMap[value]} type="status" />
-                  );
+                  const date = new Date(value as string);
+                  return `${date.toLocaleDateString('es-ES')} ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
                 },
+              },
+              {
+                key: 'motivo' as keyof Appointment,
+                label: 'Motivo',
+              },
+              {
+                key: 'estado' as keyof Appointment,
+                label: 'Estado',
+                render: (value) => (
+                  <Badge value={value as string} type="status" />
+                ),
+              },
+              {
+                key: 'notas' as keyof Appointment,
+                label: 'Notas',
+                render: (value) => (value as string) || '-',
               },
               {
                 key: 'id' as keyof Appointment,
@@ -416,16 +517,18 @@ export const AppointmentSchedulingPage: React.FC = () => {
                       color="secondary"
                       onClick={() => handleEditAppointment(row)}
                       startIcon={<Edit2 size={16} />}
+                      disabled={row.estado === 'Cancelada'}
                     >
                       Editar
                     </Button>
                     <Button
                       variant="outlined"
-                      color="tertiary"
-                      onClick={() => handleDeleteAppointment(row.id)}
-                      startIcon={<Trash2 size={16} />}
+                      color="error"
+                      onClick={() => handleCancelAppointment(row.id)}
+                      startIcon={<X size={16} />}
+                      disabled={row.estado === 'Cancelada'}
                     >
-                      Eliminar
+                      Cancelar
                     </Button>
                   </div>
                 ),

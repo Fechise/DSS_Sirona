@@ -62,6 +62,7 @@ async def list_patients_minimal(
     
     # Retornar datos con estructura esperada por el frontend
     return {
+        "total": len(patients),
         "patients": [
             {
                 "id": str(patient.id),

@@ -110,6 +110,45 @@
   }
 }
 
+.availabilitySection {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.availabilityList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  
+  p {
+    margin: 0;
+    font-weight: 600;
+    color: rgba($text-color, 0.85);
+    font-size: 0.9rem;
+  }
+}
+
+.timeSlots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: $spacing-sm;
+  
+  button {
+    padding: $spacing-sm;
+    font-size: 0.9rem;
+  }
+}
+
+.selectedSlot {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  border-color: var(--primary-color) !important;
+}
+
 .tableSection {
   display: flex;
   flex-direction: column;

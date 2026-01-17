@@ -195,13 +195,13 @@ export interface PatientInfo {
   fullName: string;
   email: string;
   cedula: string;
+  fechaNacimiento?: string;
+  telefonoContacto?: string;
   status: string;
-  role: string;
-  created_at: string;
 }
 
 export interface PatientListResponse {
-  total: number;
+  total?: number;
   patients: PatientInfo[];
 }
 
@@ -334,6 +334,13 @@ export interface DoctorAvailability {
 export interface AvailableSlot {
   fecha: string;
   disponible: boolean;
+}
+
+export interface DoctorScheduleResponse {
+  doctor_id: string;
+  doctorName: string;
+  fecha: string;
+  slots: AvailableSlot[];
 }
 
 export interface CreateAvailabilityRequest {
@@ -488,7 +495,7 @@ export class AppointmentApiService {
   /**
    * Obtener horario de un médico (slots disponibles)
    */
-  static async getDoctorSchedule(token: string, doctorId: string, fecha: string): Promise<AvailableSlot[]> {
+  static async getDoctorSchedule(token: string, doctorId: string, fecha: string): Promise<DoctorScheduleResponse> {
     return authenticatedFetch(`${API_BASE_URL}/api/doctors/${doctorId}/schedule?fecha=${fecha}`, token);
   }
 
