@@ -111,7 +111,7 @@ export const DoctorPatientsPage: React.FC = () => {
         cedula: p.cedula,
         fechaNacimiento: p.fechaNacimiento || '',
         ultimaConsulta: p.ultimaConsulta || null,
-        diagnosticos: 0,
+        diagnosticos: p.diagnosticos || 0,
       }));
       setPacientes(mappedPacientes);
     } catch (err) {

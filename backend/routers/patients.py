@@ -236,7 +236,7 @@ async def get_patient_history(
     
     # Verificar que el médico está asignado a este paciente
     # El médico debe estar asignado al paciente para poder ver su historial
-    if history.medicoAsignado.nombre != current_user.fullName:
+    if history.medicoAsignado.medicoId != str(current_user.id):
         # Log de auditoría para intento de acceso no autorizado
         audit_log = AuditLog(
             event="unauthorized_patient_access",
@@ -247,8 +247,10 @@ async def get_patient_history(
             details={
                 "reason": "doctor_not_assigned_to_patient",
                 "patient_id": patient_id,
+                "assigned_doctor_id": history.medicoAsignado.medicoId,
                 "assigned_doctor": history.medicoAsignado.nombre,
-                "requesting_doctor": current_user.fullName
+                "requesting_doctor": current_user.fullName,
+                "requesting_doctor_id": str(current_user.id)
             }
         )
         await audit_log.insert()
@@ -338,7 +340,7 @@ async def create_consulta(
         )
     
     # Verificar que el médico está asignado a este paciente
-    if history.medicoAsignado.nombre != current_user.fullName:
+    if history.medicoAsignado.medicoId != str(current_user.id):
         audit_log = AuditLog(
             event="unauthorized_consultation_attempt",
             user_email=current_user.email,
@@ -348,8 +350,10 @@ async def create_consulta(
             details={
                 "reason": "doctor_not_assigned_to_patient",
                 "patient_id": patient_id,
+                "assigned_doctor_id": history.medicoAsignado.medicoId,
                 "assigned_doctor": history.medicoAsignado.nombre,
-                "requesting_doctor": current_user.fullName
+                "requesting_doctor": current_user.fullName,
+                "requesting_doctor_id": str(current_user.id)
             }
         )
         await audit_log.insert()
@@ -421,7 +425,7 @@ async def get_patient_consultas(
         # Médicos solo pueden ver consultas de sus pacientes asignados
         # Buscar historial primero para verificar asignación
         temp_history = await PatientHistory.find_one({"patient_id": patient_id})
-        if temp_history and temp_history.medicoAsignado.nombre != current_user.fullName:
+        if temp_history and temp_history.medicoAsignado.medicoId != str(current_user.id):
             audit_log = AuditLog(
                 event="unauthorized_consultations_access",
                 user_email=current_user.email,
@@ -431,8 +435,10 @@ async def get_patient_consultas(
                 details={
                     "reason": "doctor_not_assigned_to_patient",
                     "patient_id": patient_id,
+                    "assigned_doctor_id": temp_history.medicoAsignado.medicoId,
                     "assigned_doctor": temp_history.medicoAsignado.nombre,
-                    "requesting_doctor": current_user.fullName
+                    "requesting_doctor": current_user.fullName,
+                    "requesting_doctor_id": str(current_user.id)
                 }
             )
             await audit_log.insert()
@@ -529,7 +535,7 @@ async def update_patient_history(
         )
     
     # Verificar que el médico está asignado a este paciente
-    if history.medicoAsignado.nombre != current_user.fullName:
+    if history.medicoAsignado.medicoId != str(current_user.id):
         audit_log = AuditLog(
             event="unauthorized_history_update",
             user_email=current_user.email,
@@ -539,8 +545,10 @@ async def update_patient_history(
             details={
                 "reason": "doctor_not_assigned_to_patient",
                 "patient_id": patient_id,
+                "assigned_doctor_id": history.medicoAsignado.medicoId,
                 "assigned_doctor": history.medicoAsignado.nombre,
-                "requesting_doctor": current_user.fullName
+                "requesting_doctor": current_user.fullName,
+                "requesting_doctor_id": str(current_user.id)
             }
         )
         await audit_log.insert()
@@ -653,6 +661,7 @@ async def create_patient_history(
         condicionesCronicas=[],
         medicamentosActuales=[],
         medicoAsignado=MedicoAsignado(
+            medicoId=str(current_user.id),
             nombre=current_user.fullName,
             especialidad=current_user.especialidad or "General",
             telefono=current_user.telefonoContacto or ""

@@ -30,6 +30,7 @@ class SecuritySettings(BaseModel):
 
 # --- SUB-MODELOS HISTORIAL PACIENTE ---
 class MedicoAsignado(BaseModel):
+    medicoId: str  # ID del médico asignado para verificación de acceso
     nombre: str
     especialidad: str
     telefono: str

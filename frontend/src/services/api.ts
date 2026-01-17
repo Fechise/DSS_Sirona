@@ -366,6 +366,7 @@ export interface DoctorAssignedPatient {
   cedula: string;
   fechaNacimiento?: string;
   ultimaConsulta?: string;
+  diagnosticos?: number;
   condicionesCronicas?: string[];
 }
 

@@ -5,6 +5,7 @@ from datetime import date, datetime
 
 # --- PATIENT HISTORY (Historial del Paciente) ---
 class MedicoAsignadoResponse(BaseModel):
+    medicoId: str
     nombre: str
     especialidad: str
     telefono: str
