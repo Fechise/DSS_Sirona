@@ -1,0 +1,20 @@
+@use '../../../styles/tokens/_index' as *;
+
+.container {
+  position: fixed;
+  top: $spacing-lg;
+  right: $spacing-lg;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  .container {
+    top: $spacing-md;
+    right: $spacing-md;
+    left: $spacing-md;
+  }
+}

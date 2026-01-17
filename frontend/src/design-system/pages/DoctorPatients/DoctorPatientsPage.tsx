@@ -11,6 +11,7 @@ import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { DoctorApiService } from '../../../services/api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useToast } from '../../../hooks/useToast';
 
 type PacienteAsignado = {
   id: string;
@@ -25,9 +26,9 @@ type PacienteAsignado = {
 export const DoctorPatientsPage: React.FC = () => {
   const [pacientes, setPacientes] = useState<PacienteAsignado[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { token } = useAuth();
+  const { error, success } = useToast();
 
   const columns: TableColumn<PacienteAsignado>[] = [
     {
@@ -96,11 +97,10 @@ export const DoctorPatientsPage: React.FC = () => {
   // Cargar pacientes asignados desde el backend
   const loadPacientes = async () => {
     if (!token) {
-      setError('No se encontró token de autenticación');
+      error('No se encontró token de autenticación');
       return;
     }
     setLoading(true);
-    setError(null);
     try {
       const response = await DoctorApiService.getMyPatients(token);
       // Mapear la respuesta del backend al formato esperado
@@ -114,9 +114,10 @@ export const DoctorPatientsPage: React.FC = () => {
         diagnosticos: 0,
       }));
       setPacientes(mappedPacientes);
+      success('Pacientes cargados exitosamente');
     } catch (err) {
       console.error('Error loading pacientes:', err);
-      setError('Error al cargar los pacientes. Por favor, intente nuevamente.');
+      error('Error al cargar los pacientes. Por favor, intente nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -149,12 +150,6 @@ export const DoctorPatientsPage: React.FC = () => {
         icon={<Users size={28} />} 
         subtitle="Lista de pacientes bajo tu cuidado médico"
         />
-
-        {error && (
-          <div className={styles.errorMessage}>
-            {error}
-          </div>
-        )}
 
         <TableToolbar
           right={

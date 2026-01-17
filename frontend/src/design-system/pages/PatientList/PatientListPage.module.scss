@@ -1,15 +1,15 @@
 @use '../../../styles/tokens/_index' as *;
 
 .page {
-  padding: $spacing-xl;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
   max-width: $content-max-width;
   margin: 0 auto;
 }
 
 .searchSection {
-  margin: $spacing-xl 0;
-  
   // Personalizar Input para búsqueda
   :global(.field) {
     margin: 0;
@@ -25,8 +25,6 @@
 }
 
 .tableWrapper {
-  margin-top: $spacing-xl;
-
   // Centrar la columna de Acciones
   :global(table thead th:last-child) {
     text-align: center !important;

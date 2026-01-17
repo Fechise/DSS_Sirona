@@ -1,12 +1,12 @@
+@use '../../../styles/tokens/_index' as *;
+
 .main {
-  flex: 1;
-  padding: 2rem;
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+  max-width: $content-max-width;
+  margin: 0 auto;
 }
 
 .subtitle {

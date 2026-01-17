@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styles from './UserManagementPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
 import { Badge } from '../../atoms/Badge/Badge';
-import { Users, RefreshCw, AlertCircle, Pencil, Edit2, CheckCircle, Trash2, Plus, Loader2 } from 'lucide-react';
+import { FilterSelect } from '../../atoms/FilterSelect/FilterSelect';
+import { Users, RefreshCw, AlertCircle, Pencil, Edit2, CheckCircle, Trash2, Plus, Loader2, Search } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Modal } from '../../atoms/Modal/Modal';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
@@ -215,7 +216,6 @@ export const UserManagementPage: React.FC = () => {
     setError(null);
 
     try {
-      // TODO: Implementar AdminApiService.deactivateUser cuando esté disponible
       // await AdminApiService.deactivateUser(token, userId);
       setSuccess('Usuario desactivado exitosamente');
       loadUsers();
@@ -307,33 +307,33 @@ export const UserManagementPage: React.FC = () => {
       render: (_value: string, user: UserListItem) => (
         <div className={styles.actionsCell}>
           <Button
-            variant="ghost"
+            variant="outlined"
             color="primary"
             onClick={() => openEditModal(user)}
             disabled={updating === user.id}
-            aria-label="Editar usuario"
+            startIcon={<Edit2 size={16} />}
           >
-            <Edit2 size={18} />
+            Editar
           </Button>
           {user.status === 'Inactivo' || user.status === 'Bloqueado' ? (
             <Button
-              variant="ghost"
+              variant="outlined"
               color="tertiary"
               onClick={() => handleReactivateUser(user.id)}
               disabled={updating === user.id}
-              aria-label="Reactivar usuario"
+              startIcon={<CheckCircle size={16} />}
             >
-              <CheckCircle size={18} />
+              Activar
             </Button>
           ) : (
             <Button
-              variant="ghost"
+              variant="outlined"
               color="error"
               onClick={() => handleDeleteUser(user.id)}
               disabled={updating === user.id}
-              aria-label="Desactivar usuario"
+              startIcon={<Trash2 size={16} />}
             >
-              <Trash2 size={18} />
+              Desactivar
             </Button>
           )}
         </div>
@@ -343,7 +343,7 @@ export const UserManagementPage: React.FC = () => {
 
   return (
     <Container>
-      <main className={styles.main}>
+      <main className={styles.main} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader
           title="Gestión de Usuarios"
           icon={<Users size={32} />}
@@ -351,6 +351,42 @@ export const UserManagementPage: React.FC = () => {
         />
 
         <TableToolbar
+          left={
+            <>
+              <FilterSelect
+                id="role-filter"
+                value={roleFilter}
+                onChange={setRoleFilter}
+                placeholder="Todos los roles"
+                options={ALL_ROLES.map((role) => ({ value: role, label: role }))}
+              />
+              <FilterSelect
+                id="status-filter"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                placeholder="Todos los estados"
+                options={ALL_STATUSES.map((status) => ({ value: status, label: status }))}
+              />
+              <div className={styles.searchGroup}>
+                <Input
+                  id="search-users"
+                  type="text"
+                  placeholder="Buscar por nombre o email..."
+                  value={searchTerm}
+                  onChange={(value) => setSearchTerm(value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                />
+                <Button 
+                variant="filled" 
+                color="primary" 
+                onClick={handleSearch}
+                startIcon={<Search size={16} />}
+                >
+                  Buscar
+                </Button>
+              </div>
+            </>
+          }
           right={
             <Button
               variant="filled"
@@ -363,43 +399,6 @@ export const UserManagementPage: React.FC = () => {
             </Button>
           }
         />
-
-        {/* Filters */}
-        <div className={styles.filters}>
-          <select
-            className={styles.filterSelect}
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-          >
-            <option value="">Todos los roles</option>
-            {ALL_ROLES.map((role) => (
-              <option key={role} value={role}>{role}</option>
-            ))}
-          </select>
-          <select
-            className={styles.filterSelect}
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">Todos los estados</option>
-            {ALL_STATUSES.map((status) => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
-          <div className={styles.searchGroup}>
-            <Input
-              id="search-users"
-              type="text"
-              placeholder="Buscar por nombre o email..."
-              value={searchTerm}
-              onChange={(value) => setSearchTerm(value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <Button variant="filled" color="primary" onClick={handleSearch}>
-              Buscar
-            </Button>
-          </div>
-        </div>
 
         {/* Messages */}
         {error && <div className={styles.errorMessage}>{error}</div>}

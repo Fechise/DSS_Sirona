@@ -6,6 +6,8 @@
   flex-direction: column;
   gap: $spacing-lg;
   padding: $spacing-lg;
+  max-width: $content-max-width;
+  margin: 0 auto;
 }
 
 .buttonSection {

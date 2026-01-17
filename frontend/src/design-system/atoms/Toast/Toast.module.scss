@@ -1,0 +1,142 @@
+@use '../../../styles/tokens/_index' as *;
+
+.toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $radius-medium;
+  min-width: 300px;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s ease-out;
+  backdrop-filter: blur(4px);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.message {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+/* Temas por tipo de toast */
+
+.success {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.95),
+    rgba(5, 150, 105, 0.95)
+  );
+  color: #ffffff;
+
+  .icon {
+    color: #ecfdf5;
+  }
+
+  .closeButton {
+    color: #ffffff;
+  }
+}
+
+.error {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.95),
+    rgba(220, 38, 38, 0.95)
+  );
+  color: #ffffff;
+
+  .icon {
+    color: #fee2e2;
+  }
+
+  .closeButton {
+    color: #ffffff;
+  }
+}
+
+.warning {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.95),
+    rgba(217, 119, 6, 0.95)
+  );
+  color: #ffffff;
+
+  .icon {
+    color: #fef3c7;
+  }
+
+  .closeButton {
+    color: #ffffff;
+  }
+}
+
+.info {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.95),
+    rgba(37, 99, 235, 0.95)
+  );
+  color: #ffffff;
+
+  .icon {
+    color: #dbeafe;
+  }
+
+  .closeButton {
+    color: #ffffff;
+  }
+}
+
+/* Animación de entrada */
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Respuesta en móvil */
+@media (max-width: 640px) {
+  .toast {
+    min-width: auto;
+    width: calc(100% - 2rem);
+  }
+}
