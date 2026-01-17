@@ -47,17 +47,11 @@ class AuditEventType(str, Enum):
     CUENTA_BLOQUEADA = "CUENTA_BLOQUEADA"
     CUENTA_DESBLOQUEADA = "CUENTA_DESBLOQUEADA"
     
-<<<<<<< HEAD
-    # Eventos de usuario
-    USUARIO_CREADO = "USUARIO_CREADO"
-    USUARIO_EDITADO = "USUARIO_EDITADO"
-=======
     # Eventos de usuario (CRUD)
     USUARIO_CREADO = "USUARIO_CREADO"
     USUARIO_EDITADO = "USUARIO_EDITADO"
     USUARIO_ELIMINADO = "USUARIO_ELIMINADO"
     USUARIO_CONSULTADO = "USUARIO_CONSULTADO"
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
     ROL_CAMBIADO = "ROL_CAMBIADO"
     CONTRASENA_CAMBIADA = "CONTRASENA_CAMBIADA"
     
@@ -67,8 +61,6 @@ class AuditEventType(str, Enum):
     
     # Eventos de rate limiting
     RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED"
-<<<<<<< HEAD
-=======
     
     # Eventos de citas
     CITA_CREADA = "CITA_CREADA"
@@ -78,7 +70,6 @@ class AuditEventType(str, Enum):
     # Eventos de disponibilidad
     DISPONIBILIDAD_CREADA = "DISPONIBILIDAD_CREADA"
     DISPONIBILIDAD_EDITADA = "DISPONIBILIDAD_EDITADA"
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
 
 
 class AuditLogger:

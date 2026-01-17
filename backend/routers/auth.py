@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Request, Depends
 from datetime import datetime, timedelta
 import os
 
-from models.models import User, AuditLog, UserStatus, UserRole
+from models.models import User, AuditLog, UserStatus, UserRole, PatientHistory
 from schemas.auth_schemas import (
     LoginRequest,
     LoginResponse,
@@ -16,6 +16,7 @@ from schemas.auth_schemas import (
 )
 from services.security import verify_password, create_access_token, hash_password, validate_password_strength
 from services.auth import get_admin_user, get_secretary_user
+from services.email_service import generate_temporary_password, send_temporary_password_email, EmailServiceError
 
 router = APIRouter()
 
@@ -167,26 +168,8 @@ async def register_doctor(
     """
     Endpoint para registrar un nuevo médico.
     Solo secretarios pueden crear doctores.
+    La contraseña se genera automáticamente y se envía por email.
     """
-    # Validar fortaleza de contraseña
-    is_valid, errors = validate_password_strength(data.password)
-    if not is_valid:
-        await log_audit_event(
-            event="register_doctor_failed",
-            user_email=data.email,
-            ip_address=request.client.host,
-            user_agent=request.headers.get("user-agent", ""),
-            user_id=str(current_user.id),
-            details={"reason": "weak_password", "errors": errors}
-        )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "error": "Password does not meet requirements",
-                "details": errors
-            }
-        )
-    
     # Verificar si el email ya existe
     existing_user = await User.find_one(User.email == data.email)
     if existing_user:
@@ -219,10 +202,13 @@ async def register_doctor(
             detail={"error": "Cedula already registered"}
         )
     
+    # Generar contraseña temporal
+    temporary_password = generate_temporary_password()
+    
     # Crear usuario médico
     new_user = User(
         email=data.email,
-        password_hash=hash_password(data.password),
+        password_hash=hash_password(temporary_password),
         fullName=data.fullName,
         cedula=data.cedula,
         role=UserRole.MEDICO,
@@ -234,6 +220,25 @@ async def register_doctor(
     )
     
     await new_user.insert()
+    
+    # Enviar email con contraseña temporal
+    try:
+        await send_temporary_password_email(
+            to_email=data.email,
+            full_name=data.fullName,
+            temporary_password=temporary_password,
+            role="Médico"
+        )
+    except EmailServiceError as e:
+        # Log pero no fallar el registro si el email falla
+        await log_audit_event(
+            event="email_send_failed",
+            user_email=data.email,
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            user_id=str(new_user.id),
+            details={"error": str(e)}
+        )
     
     await log_audit_event(
         event="doctor_registered",
@@ -263,26 +268,8 @@ async def register_secretary(
     """
     Endpoint para registrar un nuevo secretario.
     Solo administradores pueden crear secretarios.
+    La contraseña se genera automáticamente y se envía por email.
     """
-    # Validar fortaleza de contraseña
-    is_valid, errors = validate_password_strength(data.password)
-    if not is_valid:
-        await log_audit_event(
-            event="register_secretary_failed",
-            user_email=data.email,
-            ip_address=request.client.host,
-            user_agent=request.headers.get("user-agent", ""),
-            user_id=str(current_user.id),
-            details={"reason": "weak_password", "errors": errors}
-        )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "error": "Password does not meet requirements",
-                "details": errors
-            }
-        )
-    
     # Verificar si el email ya existe
     existing_user = await User.find_one(User.email == data.email)
     if existing_user:
@@ -315,10 +302,13 @@ async def register_secretary(
             detail={"error": "Cedula already registered"}
         )
     
+    # Generar contraseña temporal
+    temporary_password = generate_temporary_password()
+    
     # Crear usuario secretario
     new_user = User(
         email=data.email,
-        password_hash=hash_password(data.password),
+        password_hash=hash_password(temporary_password),
         fullName=data.fullName,
         cedula=data.cedula,
         role=UserRole.SECRETARIO,
@@ -329,6 +319,24 @@ async def register_secretary(
     )
     
     await new_user.insert()
+    
+    # Enviar email con contraseña temporal
+    try:
+        await send_temporary_password_email(
+            to_email=data.email,
+            full_name=data.fullName,
+            temporary_password=temporary_password,
+            role="Secretario"
+        )
+    except EmailServiceError as e:
+        await log_audit_event(
+            event="email_send_failed",
+            user_email=data.email,
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            user_id=str(new_user.id),
+            details={"error": str(e)}
+        )
     
     await log_audit_event(
         event="secretary_registered",
@@ -358,26 +366,9 @@ async def register_patient(
     """
     Endpoint para registrar un nuevo paciente.
     Solo secretarios pueden crear pacientes.
+    La contraseña se genera automáticamente y se envía por email.
+    Se crea un PatientHistory inicial con los datos demográficos proporcionados.
     """
-    # Validar fortaleza de contraseña
-    is_valid, errors = validate_password_strength(data.password)
-    if not is_valid:
-        await log_audit_event(
-            event="register_patient_failed",
-            user_email=data.email,
-            ip_address=request.client.host,
-            user_agent=request.headers.get("user-agent", ""),
-            user_id=str(current_user.id),
-            details={"reason": "weak_password", "errors": errors}
-        )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "error": "Password does not meet requirements",
-                "details": errors
-            }
-        )
-    
     # Verificar si el email ya existe
     existing_user = await User.find_one(User.email == data.email)
     if existing_user:
@@ -410,21 +401,75 @@ async def register_patient(
             detail={"error": "Cedula already registered"}
         )
     
-    # Crear usuario paciente
+    # Generar contraseña temporal
+    temporary_password = generate_temporary_password()
+    
+    # Crear usuario paciente con datos demográficos
     new_user = User(
         email=data.email,
-        password_hash=hash_password(data.password),
+        password_hash=hash_password(temporary_password),
         fullName=data.fullName,
         cedula=data.cedula,
         role=UserRole.PACIENTE,
         status=UserStatus.ACTIVO,
         fechaNacimiento=data.fechaNacimiento,
         telefonoContacto=data.telefonoContacto,
+        direccion=data.direccion,
+        ciudad=data.ciudad,
+        pais=data.pais,
+        genero=data.genero,
+        estadoCivil=data.estadoCivil,
+        ocupacion=data.ocupacion,
+        grupoSanguineo=data.grupoSanguineo,
         permissions=["view_own_records", "view_appointments", "message_doctor"],
         member_since=datetime.utcnow().strftime("%B %Y")
     )
     
     await new_user.insert()
+    
+    # Crear PatientHistory inicial con datos demográficos
+    from models.models import MedicoAsignado, ContactoEmergencia
+    patient_history = PatientHistory(
+        patient_id=str(new_user.id),
+        tipoSangre=data.grupoSanguineo or "No especificado",
+        alergias=[],
+        condicionesCronicas=[],
+        medicamentosActuales=[],
+        medicoAsignado=MedicoAsignado(
+            nombre="Por asignar",
+            especialidad="General",
+            telefono="N/A"
+        ),
+        contactoEmergencia=ContactoEmergencia(
+            nombre="Por definir",
+            relacion="N/A",
+            telefono="N/A"
+        ),
+        consultas=[],
+        vacunas=[],
+        antecedentesFamiliares=[],
+        proximaCita=None
+    )
+    
+    await patient_history.insert()
+    
+    # Enviar email con contraseña temporal
+    try:
+        await send_temporary_password_email(
+            to_email=data.email,
+            full_name=data.fullName,
+            temporary_password=temporary_password,
+            role="Paciente"
+        )
+    except EmailServiceError as e:
+        await log_audit_event(
+            event="email_send_failed",
+            user_email=data.email,
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            user_id=str(new_user.id),
+            details={"error": str(e)}
+        )
     
     await log_audit_event(
         event="patient_registered",
@@ -435,7 +480,8 @@ async def register_patient(
         details={
             "registered_by": str(current_user.id),
             "registered_by_email": current_user.email,
-            "role": "Paciente"
+            "role": "Paciente",
+            "demographic_data_included": True
         }
     )
     

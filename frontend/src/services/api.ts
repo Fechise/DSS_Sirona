@@ -84,35 +84,6 @@ export class AuthApiService {
   }
 
   /**
-   * Login con reconocimiento facial
-   */
-  static async loginWithFace(email: string, faceImage: File): Promise<LoginResponse> {
-    try {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('face_image', faceImage);
-
-      const response = await fetch(`${API_BASE_URL}/api/auth/login/face`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const responseData = await response.json();
-      
-      console.log('Face login response:', responseData);
-
-      if (!response.ok) {
-        throw responseData;
-      }
-
-      return responseData;
-    } catch (error) {
-      console.error('Face login error:', error);
-      throw error;
-    }
-  }
-
-  /**
    * Registrar un nuevo doctor (solo Secretarios)
    */
   static async registerDoctor(token: string, data: any): Promise<{ message: string }> {

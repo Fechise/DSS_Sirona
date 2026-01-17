@@ -1,11 +1,69 @@
 @use '../../../styles/tokens/_index' as *;
 
+.sectionTitle {
+  grid-column: 1 / -1;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-border-light);
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.select {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--role-patient-color);
+    box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.1);
+  }
+}
+
+.infoNote {
+  grid-column: 1 / -1;
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+
+    strong {
+      color: var(--color-text-primary);
+    }
+  }
+}
+
+// Layout de columnas
 .firstName {
   grid-column: 1 / span 2;
 }
@@ -15,23 +73,47 @@
 }
 
 .cedula {
-  grid-column: 1 / span 1;
+  grid-column: 1 / span 2;
 }
 
 .email {
-  grid-column: 2 / span 1;
+  grid-column: 3 / span 2;
 }
 
 .phone {
-  grid-column: 3 / span 1;
+  grid-column: 1 / span 2;
 }
 
 .fecha {
-  grid-column: 4 / span 1;
+  grid-column: 3 / span 2;
 }
 
-.password {
-  grid-column: 2 / span 2;
+.genero {
+  grid-column: 1 / span 2;
+}
+
+.estadoCivil {
+  grid-column: 3 / span 2;
+}
+
+.direccion {
+  grid-column: 1 / -1;
+}
+
+.ciudad {
+  grid-column: 1 / span 2;
+}
+
+.pais {
+  grid-column: 3 / span 2;
+}
+
+.ocupacion {
+  grid-column: 1 / span 2;
+}
+
+.grupoSanguineo {
+  grid-column: 3 / span 2;
 }
 
 @media (max-width: 1100px) {
@@ -41,7 +123,13 @@
   .email,
   .phone,
   .fecha,
-  .password {
+  .genero,
+  .estadoCivil,
+  .direccion,
+  .ciudad,
+  .pais,
+  .ocupacion,
+  .grupoSanguineo {
     grid-column: auto !important;
   }
 }
@@ -53,7 +141,13 @@
   .email,
   .phone,
   .fecha,
-  .password {
+  .genero,
+  .estadoCivil,
+  .direccion,
+  .ciudad,
+  .pais,
+  .ocupacion,
+  .grupoSanguineo {
     grid-column: auto !important;
   }
 }

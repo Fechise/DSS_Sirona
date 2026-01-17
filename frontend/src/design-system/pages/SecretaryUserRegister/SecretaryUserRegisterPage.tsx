@@ -22,7 +22,6 @@ export const SecretaryUserRegisterPage: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
     cedula: '',
     especialidad: '',
     numeroLicencia: '',
@@ -33,10 +32,16 @@ export const SecretaryUserRegisterPage: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
     cedula: '',
     fechaNacimiento: '',
     telefonoContacto: '',
+    direccion: '',
+    ciudad: '',
+    pais: 'Costa Rica',
+    genero: '',
+    estadoCivil: '',
+    ocupacion: '',
+    grupoSanguineo: '',
   });
 
   const handleDoctorChange = (field: keyof DoctorFormData) => (
@@ -60,7 +65,6 @@ export const SecretaryUserRegisterPage: React.FC = () => {
       firstName: '',
       lastName: '',
       email: '',
-      password: '',
       cedula: '',
       especialidad: '',
       numeroLicencia: '',
@@ -69,10 +73,16 @@ export const SecretaryUserRegisterPage: React.FC = () => {
       firstName: '',
       lastName: '',
       email: '',
-      password: '',
       cedula: '',
       fechaNacimiento: '',
       telefonoContacto: '',
+      direccion: '',
+      ciudad: '',
+      pais: 'Costa Rica',
+      genero: '',
+      estadoCivil: '',
+      ocupacion: '',
+      grupoSanguineo: '',
     });
   };
 

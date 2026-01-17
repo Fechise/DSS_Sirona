@@ -25,7 +25,6 @@ class UserStatus(str, Enum):
 class SecuritySettings(BaseModel):
     mfa_enabled: bool = False
     mfa_secret: Optional[str] = None
-    biometric_template: Optional[bytes] = None
     failed_attempts: int = 0
     lockout_until: Optional[datetime] = None
 
@@ -122,6 +121,15 @@ class User(Document):
     fechaNacimiento: Optional[date] = None  # Para Paciente
     telefonoContacto: Optional[str] = None  # Para Paciente
     departamento: Optional[str] = None  # Para Secretario
+    
+    # Campos demográficos adicionales (Para Paciente)
+    direccion: Optional[str] = None
+    ciudad: Optional[str] = None
+    pais: Optional[str] = None
+    genero: Optional[str] = None
+    estadoCivil: Optional[str] = None
+    ocupacion: Optional[str] = None
+    grupoSanguineo: Optional[str] = None
     
     # Permisos
     permissions: List[str] = []
