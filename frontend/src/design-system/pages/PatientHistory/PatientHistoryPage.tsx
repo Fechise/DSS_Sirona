@@ -7,9 +7,7 @@ import {
   ArrowLeft,
   AlertCircle,
   FileText,
-  Calendar,
-  User,
-  Clock
+  User
 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
@@ -24,7 +22,7 @@ import {
 } from '../../organisms/SectionsPatientHistory';
 import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
-import { PatientApiService, type AppointmentResponse } from '../../../services/api';
+import { PatientApiService } from '../../../services/api';
 
 type MedicalRecord = {
   id: string;
@@ -89,7 +87,6 @@ export const PatientHistoryPage: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [record, setRecord] = useState<MedicalRecord | null>(null);
-  const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<number | null>(null);
 
@@ -107,13 +104,8 @@ export const PatientHistoryPage: React.FC = () => {
       setErrorCode(null);
       
       try {
-        // Cargar citas del paciente (siempre disponible)
-        const appointmentsData = await PatientApiService.getMyAppointments(token);
-        setAppointments(appointmentsData);
-        
-        // Intentar cargar historial médico
-        try {
-          const data = await PatientApiService.getMyHistory(token);
+        // Cargar historial médico
+        const data = await PatientApiService.getMyHistory(token);
         
         // Mapear respuesta del backend al formato esperado
         const mappedRecord: MedicalRecord = {
@@ -163,32 +155,24 @@ export const PatientHistoryPage: React.FC = () => {
         };
         
         setRecord(mappedRecord);
-        } catch (historyErr: unknown) {
-          // Si no hay historial, no es error crítico - el paciente puede ver sus citas
-          const histErr = historyErr as { status?: number };
-          if (histErr.status !== 404) {
-            console.error('Error loading history:', historyErr);
-          }
-          // record queda como null, lo cual es válido
-        }
-      } catch (err: unknown) {
-        console.error('Error loading patient data:', err);
-        const errorObj = err as { status?: number; detail?: string; message?: string };
-        
-        if (errorObj.status === 401) {
+      } catch (historyErr: unknown) {
+        // Si no hay historial
+        const histErr = historyErr as { status?: number };
+        if (histErr.status === 404) {
+          setError('Aún no tienes un historial médico registrado');
+          setErrorCode(404);
+        } else if (histErr.status === 401) {
           setErrorCode(401);
           setError('Sesión expirada. Redirigiendo al login...');
           setTimeout(() => navigate('/login'), 2000);
-          return;
-        }
-        if (errorObj.status === 403) {
+        } else if (histErr.status === 403) {
           setErrorCode(403);
           setError('No tienes permisos para ver esta información');
-          return;
+        } else {
+          console.error('Error loading history:', historyErr);
+          setError('Error al cargar el historial médico');
+          setErrorCode(500);
         }
-        
-        setError(errorObj.detail || errorObj.message || 'Error al cargar los datos');
-        setErrorCode(500);
       } finally {
         setLoading(false);
       }
@@ -305,7 +289,6 @@ export const PatientHistoryPage: React.FC = () => {
                   <div className={styles.infoField}>
                     <label>Última Actualización</label>
                     <div className={styles.fieldValue}>
-                      <Calendar size={16} />
                       <span>
                         {new Date(record.ultimaModificacion).toLocaleDateString('es-ES', {
                           year: 'numeric',
@@ -359,53 +342,11 @@ export const PatientHistoryPage: React.FC = () => {
             </div>
           )}
 
-          {/* Sección de Citas Agendadas - siempre visible si hay citas */}
-          {!loading && !error && appointments.length > 0 && (
-            <div className={styles.recordCard}>
-              <div className={styles.cardHeader}>
-                <h2><Clock size={20} /> Mis Citas Agendadas</h2>
-                <span className={styles.badge}>{appointments.length} cita{appointments.length !== 1 ? 's' : ''}</span>
-              </div>
-              <div className={styles.appointmentsList}>
-                {appointments.map((apt) => (
-                  <div key={apt.id} className={`${styles.appointmentItem} ${styles[`status${apt.estado.replace(' ', '')}`]}`}>
-                    <div className={styles.appointmentDate}>
-                      <Calendar size={16} />
-                      <span>{new Date(apt.fecha).toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}</span>
-                    </div>
-                    <div className={styles.appointmentDetails}>
-                      <strong>{apt.doctorName}</strong>
-                      <span>{apt.motivo}</span>
-                    </div>
-                    <span className={`${styles.statusBadge} ${styles[`status${apt.estado.replace(' ', '')}`]}`}>
-                      {apt.estado}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!loading && !error && !record && appointments.length === 0 && (
-            <div className={styles.emptyContainer}>
-              <FileText size={48} className={styles.emptyIcon} />
-              <h2>Sin Historial Clínico ni Citas</h2>
-              <p>Aún no tienes registros clínicos ni citas agendadas. Contacta con tu centro médico para agendar una cita.</p>
-            </div>
-          )}
-
-          {!loading && !error && !record && appointments.length > 0 && (
+          {!loading && !error && !record && (
             <div className={styles.emptyContainer}>
               <FileText size={48} className={styles.emptyIcon} />
               <h2>Sin Historial Clínico</h2>
-              <p>Aún no tienes registros clínicos, pero tienes citas agendadas. Tu historial se creará después de tu primera consulta.</p>
+              <p>Aún no tienes un historial clínico registrado. Contacta con tu centro médico para tu primera consulta.</p>
             </div>
           )}
         </div>
