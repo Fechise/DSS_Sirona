@@ -12,6 +12,7 @@ import {
   Clock
 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import {
   PersonalInfoSection,
   ContactInfoSection,
@@ -203,10 +204,12 @@ export const PatientHistoryPage: React.FC = () => {
           </div>
 
           {loading && (
-            <div className={styles.loadingContainer}>
-              <div className={styles.spinner} />
-              <p>Cargando tu historial...</p>
-            </div>
+            <LoadingSpinner
+              variant="bouncing-role"
+              role="Paciente"
+              message="Cargando tu historial..."
+              size="large"
+            />
           )}
 
           {error && (

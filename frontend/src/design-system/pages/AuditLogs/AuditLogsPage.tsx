@@ -4,6 +4,7 @@ import { Container } from '../../atoms/Container/Container';
 import { FileText, RefreshCw, Filter, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Input } from '../../atoms/Input/Input';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
 import { AdminApiService, type AuditLogEntry } from '../../../services/api';
@@ -186,10 +187,12 @@ export const AuditLogsPage: React.FC = () => {
 
         {/* Table */}
         {loading ? (
-          <div className={styles.loadingState}>
-            <RefreshCw size={32} className={styles.spinner} />
-            <p>Cargando logs...</p>
-          </div>
+          <LoadingSpinner
+            variant="bouncing-role"
+            role="Administrador"
+            message="Cargando logs..."
+            size="large"
+          />
         ) : logs.length === 0 ? (
           <div className={styles.emptyState}>
             <FileText size={48} />

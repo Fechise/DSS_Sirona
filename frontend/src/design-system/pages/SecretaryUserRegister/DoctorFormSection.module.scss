@@ -1,0 +1,59 @@
+@use '../../../styles/tokens/_index' as *;
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.firstName {
+  grid-column: 1 / span 2;
+}
+
+.lastName {
+  grid-column: 3 / span 2;
+}
+
+.cedula {
+  grid-column: 1 / span 1;
+}
+
+.email {
+  grid-column: 2 / span 1;
+}
+
+.licencia {
+  grid-column: 3 / span 1;
+}
+
+.especialidad {
+  grid-column: 4 / span 1;
+}
+
+.password {
+  grid-column: 2 / span 2;
+}
+
+@media (max-width: 1100px) {
+  .firstName,
+  .lastName,
+  .cedula,
+  .email,
+  .licencia,
+  .especialidad,
+  .password {
+    grid-column: auto !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .firstName,
+  .lastName,
+  .cedula,
+  .email,
+  .licencia,
+  .especialidad,
+  .password {
+    grid-column: auto !important;
+  }
+}

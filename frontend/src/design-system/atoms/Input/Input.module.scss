@@ -33,15 +33,34 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
   width: 100%;
   min-width: 0;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  height: auto;
+  box-sizing: border-box;
+
+  &[type="date"],
+  &[type="time"] {
+    // Normalizar altura de inputs tipo date/time
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    line-height: normal;
+    padding: 0.625rem 0.75rem;
+    min-height: 2.625rem;
+    display: flex;
+    align-items: center;
+  }
 
   &::placeholder {
     color: color-mix(in srgb, $text-color 40%, transparent);
     opacity: 1;
+    font-size: 0.875rem;
   }
 
   &:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent);
+    border-color: var(--input-focus-color, var(--primary-color));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--input-focus-color, var(--primary-color)) 25%, transparent);
   }
 }
 

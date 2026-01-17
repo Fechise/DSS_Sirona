@@ -4,8 +4,10 @@ import { Container } from '../../atoms/Container/Container';
 import { Users, RefreshCw, FileText, Calendar } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Badge } from '../../atoms/Badge/Badge';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { DoctorApiService } from '../../../services/api';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -75,15 +77,18 @@ export const DoctorPatientsPage: React.FC = () => {
     {
       key: 'id',
       label: 'Acciones',
+      align: 'center',
       render: (_, row) => (
-        <Button
-          variant="filled"
-          color="primary"
-          onClick={() => handleVerHistorial(row.id)}
-          startIcon={<FileText size={16} />}
-        >
-          Ver Historial
-        </Button>
+        <div className={styles.actions}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => handleVerHistorial(row.id)}
+            startIcon={<FileText size={16} />}
+          >
+            Ver Historial
+          </Button>
+        </div>
       ),
     },
   ];
@@ -139,21 +144,11 @@ export const DoctorPatientsPage: React.FC = () => {
   return (
     <Container>
       <main className={styles.main}>
-        <div className={styles.headerWrapper}>
-          <PageHeader title="Mis Pacientes Asignados" icon={<Users size={28} />} />
-          <p className={styles.subtitle}>
-            Lista de pacientes bajo tu cuidado médico
-          </p>
-          <Button
-            variant="filled"
-            color="secondary"
-            onClick={loadPacientes}
-            disabled={loading}
-            startIcon={<RefreshCw size={16} />}
-          >
-            Actualizar
-          </Button>
-        </div>
+        <PageHeader 
+        title="Mis Pacientes Asignados" 
+        icon={<Users size={28} />} 
+        subtitle="Lista de pacientes bajo tu cuidado médico"
+        />
 
         {error && (
           <div className={styles.errorMessage}>
@@ -161,11 +156,27 @@ export const DoctorPatientsPage: React.FC = () => {
           </div>
         )}
 
+        <TableToolbar
+          right={
+            <Button
+              variant="filled"
+              color="primary"
+              onClick={loadPacientes}
+              disabled={loading}
+              startIcon={<RefreshCw size={16} />}
+            >
+              Actualizar
+            </Button>
+          }
+        />
+
         {loading ? (
-          <div className={styles.loadingState}>
-            <RefreshCw size={32} className={styles.spinner} />
-            <p>Cargando pacientes...</p>
-          </div>
+          <LoadingSpinner
+            variant="bouncing-role"
+            role="Médico"
+            message="Cargando pacientes..."
+            size="large"
+          />
         ) : pacientes.length === 0 ? (
           <div className={styles.emptyState}>
             <Users size={48} />

@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styles from './DoctorAvailabilityPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
-import { Calendar, Clock, Plus, RefreshCw, Trash2, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Plus, RefreshCw, Trash2, ToggleLeft, ToggleRight, Loader2, X } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Input } from '../../atoms/Input/Input';
+import { Badge } from '../../atoms/Badge/Badge';
+import { Modal } from '../../atoms/Modal/Modal';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
 import { useAuth } from '../../../contexts/AuthContext';
 import { DoctorApiService, type DoctorAvailability } from '../../../services/api';
 
@@ -144,31 +148,33 @@ export const DoctorAvailabilityPage: React.FC = () => {
       key: 'activo',
       label: 'Estado',
       render: (value) => (
-        <span className={`${styles.statusBadge} ${value ? styles.activo : styles.inactivo}`}>
-          {value ? 'Disponible' : 'No disponible'}
-        </span>
+        <Badge
+          value={value ? 'Activo' : 'Inactivo'}
+          type="status"
+        />
       ),
     },
     {
       key: 'id',
       label: 'Acciones',
+      align: 'center',
       render: (_, row) => (
         <div className={styles.actions}>
           <Button
-            variant="ghost"
+            variant="outlined"
             color={row.activo ? 'secondary' : 'primary'}
             onClick={() => handleToggle(row.id)}
-            aria-label={row.activo ? 'Desactivar' : 'Activar'}
+            startIcon={row.activo ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
           >
-            {row.activo ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+            {row.activo ? 'Desactivar' : 'Activar'}
           </Button>
           <Button
-            variant="ghost"
+            variant="outlined"
             color="error"
             onClick={() => handleDelete(row.id)}
-            aria-label="Eliminar"
+            startIcon={<Trash2 size={16} />}
           >
-            <Trash2 size={20} />
+            Eliminar
           </Button>
         </div>
       ),
@@ -180,42 +186,54 @@ export const DoctorAvailabilityPage: React.FC = () => {
       <main className={styles.main}>
         <PageHeader
           title="Mi Disponibilidad"
-          icon={<Calendar size={32} />}
+          icon={<Calendar size={28} />}
+          subtitle="Configura los días y horarios en los que estás disponible para citas"
         />
 
-        <div className={styles.headerActions}>
-          <p className={styles.subtitle}>
-            Configura los días y horarios en los que estás disponible para citas
-          </p>
-          <div className={styles.buttons}>
-            <Button
-              variant="filled"
-              color="primary"
-              onClick={() => setShowForm(!showForm)}
-              startIcon={<Plus size={16} />}
-            >
-              Agregar Disponibilidad
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={loadAvailabilities}
-              disabled={loading}
-              startIcon={<RefreshCw size={16} />}
-            >
-              Actualizar
-            </Button>
-          </div>
-        </div>
+        <TableToolbar
+          right={
+            <>
+              <Button
+                variant="filled"
+                color="primary"
+                onClick={() => setShowForm(true)}
+                startIcon={<Plus size={16} />}
+              >
+                Agregar Disponibilidad
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={loadAvailabilities}
+                disabled={loading}
+                startIcon={<RefreshCw size={16} />}
+              >
+                Actualizar
+              </Button>
+            </>
+          }
+        />
 
         {/* Mensajes */}
         {error && <div className={styles.errorMessage}>{error}</div>}
         {success && <div className={styles.successMessage}>{success}</div>}
 
-        {/* Formulario de nueva disponibilidad */}
-        {showForm && (
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <h3>Nueva Disponibilidad</h3>
+        {/* Modal de nueva disponibilidad */}
+        <Modal
+          isOpen={showForm}
+          onClose={() => {
+            setShowForm(false);
+            setFormData({
+              fecha: '',
+              horaInicio: '08:00',
+              horaFin: '17:00',
+              duracionCita: 30,
+            });
+          }}
+          title="Agregar Nueva Disponibilidad"
+          maxWidth="1400px"
+        >
+          <form className={styles.modalForm} onSubmit={handleSubmit}>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <Input
@@ -225,6 +243,8 @@ export const DoctorAvailabilityPage: React.FC = () => {
                   value={formData.fecha}
                   onChange={handleFormChange('fecha')}
                   min={new Date().toISOString().split('T')[0]}
+                  icon={<Calendar size={16} />}
+                  focusColor="var(--primary-color)"
                 />
               </div>
               <div className={styles.formGroup}>
@@ -234,6 +254,8 @@ export const DoctorAvailabilityPage: React.FC = () => {
                   type="time"
                   value={formData.horaInicio}
                   onChange={handleFormChange('horaInicio')}
+                  icon={<Clock size={16} />}
+                  focusColor="var(--primary-color)"
                 />
               </div>
               <div className={styles.formGroup}>
@@ -243,11 +265,17 @@ export const DoctorAvailabilityPage: React.FC = () => {
                   type="time"
                   value={formData.horaFin}
                   onChange={handleFormChange('horaFin')}
+                  icon={<Clock size={16} />}
+                  focusColor="var(--primary-color)"
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Duración de Cita</label>
+                <label htmlFor="duration-select" className={styles.label}>
+                  <Clock size={16} style={{ marginRight: '0.5rem', color: 'var(--primary-color)' }} />
+                  Duración de Cita
+                </label>
                 <select
+                  id="duration-select"
                   className={styles.select}
                   value={formData.duracionCita}
                   onChange={handleSelectChange('duracionCita')}
@@ -259,12 +287,21 @@ export const DoctorAvailabilityPage: React.FC = () => {
                 </select>
               </div>
             </div>
-            <div className={styles.formActions}>
+            <div className={styles.modalActions}>
               <Button
                 type="button"
                 variant="outlined"
                 color="secondary"
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setFormData({
+                    fecha: '',
+                    horaInicio: '08:00',
+                    horaFin: '17:00',
+                    duracionCita: 30,
+                  });
+                }}
+                startIcon={<X size={16} />}
               >
                 Cancelar
               </Button>
@@ -275,18 +312,20 @@ export const DoctorAvailabilityPage: React.FC = () => {
                 disabled={submitting}
                 startIcon={submitting ? <Loader2 size={16} className={styles.spinner} /> : <Plus size={16} />}
               >
-                {submitting ? 'Guardando...' : 'Guardar'}
+                {submitting ? 'Guardando...' : 'Agregar'}
               </Button>
             </div>
           </form>
-        )}
+        </Modal>
 
         {/* Tabla de disponibilidad */}
         {loading ? (
-          <div className={styles.loadingState}>
-            <RefreshCw size={32} className={styles.spinner} />
-            <p>Cargando disponibilidad...</p>
-          </div>
+          <LoadingSpinner
+            variant="bouncing-role"
+            role="Médico"
+            message="Cargando disponibilidad..."
+            size="large"
+          />
         ) : availabilities.length === 0 ? (
           <div className={styles.emptyState}>
             <Calendar size={48} />
@@ -296,14 +335,12 @@ export const DoctorAvailabilityPage: React.FC = () => {
             </span>
           </div>
         ) : (
-          <div className={styles.tableContainer}>
-            <Table
-              columns={columns}
-              data={availabilities}
-              emptyMessage="No hay disponibilidad configurada"
-              rowKey="id"
-            />
-          </div>
+          <Table
+            columns={columns}
+            data={availabilities}
+            emptyMessage="No hay disponibilidad configurada"
+            rowKey="id"
+          />
         )}
       </main>
     </Container>

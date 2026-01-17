@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styles from './DoctorAppointmentsPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
-import { Calendar, Clock, User, RefreshCw, FileText, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, User, RefreshCw, FileText, CheckCircle, X } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
+import { Badge } from '../../atoms/Badge/Badge';
 import { Modal } from '../../atoms/Modal/Modal';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
 import { useAuth } from '../../../contexts/AuthContext';
 import { DoctorApiService, type AppointmentResponse } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -87,20 +90,6 @@ export const DoctorAppointmentsPage: React.FC = () => {
     });
   };
 
-  const getStatusBadgeClass = (estado: string) => {
-    switch (estado) {
-      case 'Programada':
-        return styles.statusProgramada;
-      case 'Completada':
-        return styles.statusCompletada;
-      case 'Cancelada':
-        return styles.statusCancelada;
-      case 'No Asistió':
-        return styles.statusNoAsistio;
-      default:
-        return '';
-    }
-  };
 
   const columns: TableColumn<AppointmentResponse>[] = [
     {
@@ -140,22 +129,19 @@ export const DoctorAppointmentsPage: React.FC = () => {
     {
       key: 'estado',
       label: 'Estado',
-      render: (value) => (
-        <span className={`${styles.statusBadge} ${getStatusBadgeClass(value)}`}>
-          {value}
-        </span>
-      ),
+      render: (value) => <Badge value={value} type="status" />,
     },
     {
       key: 'patient_id',
       label: 'Acciones',
+      align: 'center',
       render: (_, row) => (
         <div className={styles.actionsCell}>
           <Button
             variant="outlined"
             color="primary"
             onClick={() => navigate(`/medico/pacientes/${row.patient_id}/historial`)}
-            startIcon={<FileText size={14} />}
+            startIcon={<FileText size={16} />}
           >
             Historial
           </Button>
@@ -164,7 +150,7 @@ export const DoctorAppointmentsPage: React.FC = () => {
               variant="filled"
               color="tertiary"
               onClick={() => handleCompleteAppointment(row)}
-              startIcon={<CheckCircle size={14} />}
+              startIcon={<CheckCircle size={16} />}
             >
               Completar
             </Button>
@@ -179,14 +165,12 @@ export const DoctorAppointmentsPage: React.FC = () => {
       <main className={styles.main}>
         <PageHeader
           title="Mis Citas"
-          icon={<Calendar size={32} />}
+          icon={<Calendar size={28} />}
+          subtitle="Visualiza y gestiona tus citas programadas"
         />
 
-        <div className={styles.headerActions}>
-          <p className={styles.subtitle}>
-            Visualiza y gestiona tus citas programadas
-          </p>
-          <div className={styles.filters}>
+        <TableToolbar
+          left={
             <select
               className={styles.select}
               value={statusFilter}
@@ -198,6 +182,8 @@ export const DoctorAppointmentsPage: React.FC = () => {
               <option value="Cancelada">Canceladas</option>
               <option value="No Asistió">No Asistió</option>
             </select>
+          }
+          right={
             <Button
               variant="outlined"
               color="secondary"
@@ -207,16 +193,18 @@ export const DoctorAppointmentsPage: React.FC = () => {
             >
               Actualizar
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         {error && <div className={styles.errorMessage}>{error}</div>}
 
         {loading ? (
-          <div className={styles.loadingState}>
-            <RefreshCw size={32} className={styles.spinner} />
-            <p>Cargando citas...</p>
-          </div>
+          <LoadingSpinner
+            variant="bouncing-role"
+            role="Médico"
+            message="Cargando citas..."
+            size="large"
+          />
         ) : appointments.length === 0 ? (
           <div className={styles.emptyState}>
             <Calendar size={48} />
@@ -261,6 +249,7 @@ export const DoctorAppointmentsPage: React.FC = () => {
                     color="secondary"
                     onClick={() => setShowCompleteModal(false)}
                     disabled={completing}
+                    startIcon={<X size={16} />}
                   >
                     Cancelar
                   </Button>

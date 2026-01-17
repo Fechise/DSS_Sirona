@@ -66,6 +66,12 @@ $quaternary-color-active: color.mix($quaternary-color, #000, 8%);
   --tertiary-color-active: #{$tertiary-color-active};
   --quaternary-color-hover: #{$quaternary-color-hover};
   --quaternary-color-active: #{$quaternary-color-active};
+
+  // Fixed role colors (no cambian con el usuario logueado)
+  --role-doctor-color: #{$primary-color};
+  --role-patient-color: #{$secondary-color};
+  --role-secretary-color: #{$tertiary-color};
+  --role-admin-color: #{$quaternary-color};
 }
 
 // Override primary color based on user role

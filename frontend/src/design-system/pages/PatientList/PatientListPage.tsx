@@ -9,9 +9,10 @@ import { Input } from '../../atoms/Input/Input';
 import { Container } from '../../atoms/Container/Container';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 
 export const PatientListPage: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [patients, setPatients] = useState<PatientInfo[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<PatientInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,9 +115,13 @@ export const PatientListPage: React.FC = () => {
   if (loading) {
     return (
       <Container>
-        <div className={styles.loadingState}>
-          <p>Cargando lista de pacientes...</p>
-        </div>
+        <LoadingSpinner
+          variant="bouncing-role"
+          role={user?.role as 'Médico' | 'Paciente' | 'Secretario' | 'Administrador'}
+          message="Cargando lista de pacientes..."
+          size="medium"
+          customIcon={<Users size={36} />}
+        />
       </Container>
     );
   }

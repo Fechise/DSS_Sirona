@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, FileText, Plus, Save } from 'lucide-react';
+import { AlertCircle, ArrowLeft, FileText, Plus, Save, Edit2, X } from 'lucide-react';
 
 import { useAuth } from '../../../contexts/AuthContext';
 import { DoctorApiService, type PatientHistoryResponse } from '../../../services/api';
 import { Button } from '../../atoms/Button/Button';
 import { Container } from '../../atoms/Container/Container';
 import { Input } from '../../atoms/Input/Input';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
+import { Modal } from '../../atoms/Modal/Modal';
 import styles from './PatientRecordPage.module.scss';
 
 /**
@@ -187,10 +189,12 @@ export const PatientRecordPage: React.FC = () => {
   if (loading) {
     return (
       <Container>
-        <div className={styles.loading}>
-          <div className={styles.spinner} />
-          <p>Cargando historial médico...</p>
-        </div>
+        <LoadingSpinner
+          variant="bouncing-role"
+          role="Médico"
+          message="Cargando historial médico..."
+          size="large"
+        />
       </Container>
     );
   }
@@ -306,7 +310,7 @@ export const PatientRecordPage: React.FC = () => {
           <div className={styles.sectionHeader}>
             <h3>Datos Médicos</h3>
             {!editingHistory ? (
-              <Button variant="outlined" color="primary" onClick={() => setEditingHistory(true)}>
+              <Button variant="outlined" color="primary" onClick={() => setEditingHistory(true)} startIcon={<Edit2 size={16} />}>
                 Editar
               </Button>
             ) : (
@@ -319,7 +323,7 @@ export const PatientRecordPage: React.FC = () => {
                     medicamentosActuales: history.medicamentosActuales.join('\n'),
                     antecedentesFamiliares: history.antecedentesFamiliares.join('\n'),
                   });
-                }}>
+                }} startIcon={<X size={16} />}>
                   Cancelar
                 </Button>
                 <Button 
@@ -327,7 +331,7 @@ export const PatientRecordPage: React.FC = () => {
                   color="primary" 
                   onClick={handleSaveHistory}
                   disabled={savingHistory}
-                  startIcon={<Save size={14} />}
+                  startIcon={<Save size={16} />}
                 >
                   {savingHistory ? 'Guardando...' : 'Guardar'}
                 </Button>
@@ -373,35 +377,43 @@ export const PatientRecordPage: React.FC = () => {
           ) : (
             <div className={styles.editForm}>
               <div className={styles.formGroup}>
-                <label>Alergias (una por línea)</label>
+                <label>Alergias</label>
                 <textarea
+                  className={styles.textarea}
                   value={historyForm.alergias}
                   onChange={(e) => setHistoryForm({ ...historyForm, alergias: e.target.value })}
-                  rows={3}
+                  placeholder="Una alergia por línea (ej: Penicilina, Cacahuete)"
+                  rows={4}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Condiciones Crónicas (una por línea)</label>
+                <label>Condiciones Crónicas</label>
                 <textarea
+                  className={styles.textarea}
                   value={historyForm.condicionesCronicas}
                   onChange={(e) => setHistoryForm({ ...historyForm, condicionesCronicas: e.target.value })}
-                  rows={3}
+                  placeholder="Una condición por línea (ej: Diabetes, Hipertensión)"
+                  rows={4}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Medicamentos Actuales (uno por línea)</label>
+                <label>Medicamentos Actuales</label>
                 <textarea
+                  className={styles.textarea}
                   value={historyForm.medicamentosActuales}
                   onChange={(e) => setHistoryForm({ ...historyForm, medicamentosActuales: e.target.value })}
-                  rows={3}
+                  placeholder="Un medicamento por línea (ej: Metformina 500mg)"
+                  rows={4}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Antecedentes Familiares (uno por línea)</label>
+                <label>Antecedentes Familiares</label>
                 <textarea
+                  className={styles.textarea}
                   value={historyForm.antecedentesFamiliares}
                   onChange={(e) => setHistoryForm({ ...historyForm, antecedentesFamiliares: e.target.value })}
-                  rows={3}
+                  placeholder="Un antecedente por línea (ej: Madre - Cáncer de mama)"
+                  rows={4}
                 />
               </div>
             </div>
@@ -445,67 +457,11 @@ export const PatientRecordPage: React.FC = () => {
               variant="filled" 
               color="primary" 
               onClick={() => setShowConsultationForm(true)}
-              startIcon={<Plus size={14} />}
+              startIcon={<Plus size={16} />}
             >
               Nueva Consulta
             </Button>
           </div>
-
-          {showConsultationForm && (
-            <div className={styles.consultationForm}>
-              <h4>Agregar Nueva Consulta</h4>
-              <div className={styles.formGrid}>
-                <Input
-                  id="motivo"
-                  label="Motivo de Consulta *"
-                  value={consultationForm.motivo}
-                  onChange={(e) => setConsultationForm({ ...consultationForm, motivo: e })}
-                  placeholder="Ej: Control de presión arterial"
-                />
-                <Input
-                  id="diagnostico"
-                  label="Diagnóstico *"
-                  value={consultationForm.diagnostico}
-                  onChange={(e) => setConsultationForm({ ...consultationForm, diagnostico: e })}
-                  placeholder="Ej: Hipertensión controlada"
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Tratamiento</label>
-                <textarea
-                  value={consultationForm.tratamiento}
-                  onChange={(e) => setConsultationForm({ ...consultationForm, tratamiento: e.target.value })}
-                  placeholder="Indicaciones de tratamiento..."
-                  rows={3}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Notas del Médico</label>
-                <textarea
-                  value={consultationForm.notasMedico}
-                  onChange={(e) => setConsultationForm({ ...consultationForm, notasMedico: e.target.value })}
-                  placeholder="Observaciones adicionales..."
-                  rows={3}
-                />
-              </div>
-              <div className={styles.formActions}>
-                <Button variant="outlined" color="secondary" onClick={() => {
-                  setShowConsultationForm(false);
-                  setConsultationForm({ motivo: '', diagnostico: '', tratamiento: '', notasMedico: '' });
-                }}>
-                  Cancelar
-                </Button>
-                <Button 
-                  variant="filled" 
-                  color="primary" 
-                  onClick={handleAddConsultation}
-                  disabled={savingConsultation}
-                >
-                  {savingConsultation ? 'Guardando...' : 'Guardar Consulta'}
-                </Button>
-              </div>
-            </div>
-          )}
 
           {history.consultas.length > 0 ? (
             <div className={styles.consultationsList}>
@@ -562,6 +518,77 @@ export const PatientRecordPage: React.FC = () => {
             </div>
           </section>
         )}
+
+        {/* Modal para Nueva Consulta */}
+        <Modal
+          isOpen={showConsultationForm}
+          onClose={() => {
+            setShowConsultationForm(false);
+            setConsultationForm({ motivo: '', diagnostico: '', tratamiento: '', notasMedico: '' });
+          }}
+          title="Agregar Nueva Consulta"
+        >
+          <div className={styles.modalContent}>
+            <div className={styles.formGrid}>
+              <Input
+                id="motivo"
+                label="Motivo de Consulta *"
+                value={consultationForm.motivo}
+                onChange={(e) => setConsultationForm({ ...consultationForm, motivo: e })}
+                placeholder="Ej: Control de presión arterial"
+              />
+              <Input
+                id="diagnostico"
+                label="Diagnóstico *"
+                value={consultationForm.diagnostico}
+                onChange={(e) => setConsultationForm({ ...consultationForm, diagnostico: e })}
+                placeholder="Ej: Hipertensión controlada"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Tratamiento</label>
+              <textarea
+                className={styles.textarea}
+                value={consultationForm.tratamiento}
+                onChange={(e) => setConsultationForm({ ...consultationForm, tratamiento: e.target.value })}
+                placeholder="Indicaciones de tratamiento..."
+                rows={3}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Notas del Médico</label>
+              <textarea
+                className={styles.textarea}
+                value={consultationForm.notasMedico}
+                onChange={(e) => setConsultationForm({ ...consultationForm, notasMedico: e.target.value })}
+                placeholder="Observaciones adicionales..."
+                rows={3}
+              />
+            </div>
+            <div className={styles.modalActions}>
+              <Button 
+                variant="outlined" 
+                color="secondary" 
+                onClick={() => {
+                  setShowConsultationForm(false);
+                  setConsultationForm({ motivo: '', diagnostico: '', tratamiento: '', notasMedico: '' });
+                }}
+                startIcon={<X size={16} />}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                variant="filled" 
+                color="primary" 
+                onClick={handleAddConsultation}
+                disabled={savingConsultation}
+                startIcon={<Save size={16} />}
+              >
+                {savingConsultation ? 'Guardando...' : 'Guardar Consulta'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     </Container>
   );

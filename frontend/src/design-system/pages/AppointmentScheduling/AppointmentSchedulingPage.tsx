@@ -7,6 +7,7 @@ import { SectionHeader } from '../../atoms/SectionHeader/SectionHeader';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table } from '../../molecules/Table/Table';
 import { Modal } from '../../atoms/Modal/Modal';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { useAuth } from '../../../contexts/AuthContext';
 import { PatientApiService, AppointmentApiService } from '../../../services/api';
 import styles from './AppointmentSchedulingPage.module.scss';
@@ -43,7 +44,7 @@ type AppointmentForm = {
 };
 
 export const AppointmentSchedulingPage: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -226,10 +227,12 @@ export const AppointmentSchedulingPage: React.FC = () => {
   if (loading) {
     return (
       <Container>
-        <div className={styles.loading}>
-          <div className={styles.spinner} />
-          <p>Cargando agendamiento...</p>
-        </div>
+        <LoadingSpinner
+          variant="bouncing-role"
+          role={user?.role as 'Médico' | 'Paciente' | 'Secretario' | 'Administrador'}
+          message="Cargando agendamiento..."
+          size="medium"
+        />
       </Container>
     );
   }

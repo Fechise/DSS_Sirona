@@ -1,0 +1,243 @@
+@use 'sass:color';
+@use '../../../styles/tokens/_index' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  min-height: 200px;
+  padding: $spacing-xl;
+}
+
+.messageContainer {
+  color: color.adjust($text-color, $lightness: 20%);
+  font-size: $font-size-base;
+  margin: 0;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1px;
+}
+
+.messageLetter {
+  display: inline-block;
+  animation: letter-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes letter-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-8px);
+  }
+}
+
+.message {
+  color: color.adjust($text-color, $lightness: 20%);
+  font-size: $font-size-base;
+  margin: 0;
+  text-align: center;
+}
+
+/* ========== Spinner Tradicional ========== */
+.spinner {
+  border: 3px solid $border-color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  &.small {
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+  }
+
+  &.medium {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  &.large {
+    width: 56px;
+    height: 56px;
+    border-width: 4px;
+  }
+
+  &.primary {
+    border-top-color: $primary-color;
+  }
+
+  &.secondary {
+    border-top-color: $secondary-color;
+  }
+
+  &.tertiary {
+    border-top-color: $tertiary-color;
+  }
+
+  &.quaternary {
+    border-top-color: $quaternary-color;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========== Iconos Saltando (todos los roles) ========== */
+.bouncingIcons {
+  display: flex;
+  gap: $spacing-md;
+  align-items: flex-end;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-medium;
+  animation: bounce 1.2s ease-in-out infinite;
+
+  &.primary {
+    background-color: rgba($primary-color, 0.15);
+    color: $primary-color;
+  }
+
+  &.secondary {
+    background-color: rgba($secondary-color, 0.15);
+    color: $secondary-color;
+  }
+
+  &.tertiary {
+    background-color: rgba($tertiary-color, 0.15);
+    color: $tertiary-color;
+  }
+
+  &.quaternary {
+    background-color: rgba($quaternary-color, 0.15);
+    color: $quaternary-color;
+  }
+
+  &.delay1 {
+    animation-delay: 0s;
+  }
+
+  &.delay2 {
+    animation-delay: 0.15s;
+  }
+
+  &.delay3 {
+    animation-delay: 0.3s;
+  }
+
+  &.delay4 {
+    animation-delay: 0.45s;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* ========== Ícono del Rol Actual Saltando ========== */
+.bouncingRole {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-large;
+  animation: bounce-pulse 1s ease-in-out infinite;
+
+  &.small {
+    width: 56px;
+    height: 56px;
+    padding: $spacing-sm;
+  }
+
+  &.medium {
+    width: 80px;
+    height: 80px;
+    padding: $spacing-md;
+  }
+
+  &.large {
+    width: 104px;
+    height: 104px;
+    padding: $spacing-lg;
+  }
+
+  &.primary {
+    background-color: rgba($primary-color, 0.15);
+    color: $primary-color;
+    box-shadow: 0 4px 12px rgba($primary-color, 0.2);
+  }
+
+  &.secondary {
+    background-color: rgba($secondary-color, 0.15);
+    color: $secondary-color;
+    box-shadow: 0 4px 12px rgba($secondary-color, 0.2);
+  }
+
+  &.tertiary {
+    background-color: rgba($tertiary-color, 0.15);
+    color: $tertiary-color;
+    box-shadow: 0 4px 12px rgba($tertiary-color, 0.2);
+  }
+
+  &.quaternary {
+    background-color: rgba($quaternary-color, 0.15);
+    color: $quaternary-color;
+    box-shadow: 0 4px 12px rgba($quaternary-color, 0.2);
+  }
+}
+
+.customIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@keyframes bounce-pulse {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.05);
+  }
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 640px) {
+  .bouncingIcons {
+    gap: $spacing-sm;
+  }
+
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}

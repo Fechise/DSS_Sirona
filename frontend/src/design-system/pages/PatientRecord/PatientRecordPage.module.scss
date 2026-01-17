@@ -351,35 +351,35 @@
   gap: $spacing-lg;
 }
 
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-xs;
+.textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: $text-color;
+  background: #fafafa;
+  border: 1px solid $border-color;
+  border-radius: $radius-small;
+  padding: $spacing-md;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s ease;
 
-  label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: $text-color;
+  &::placeholder {
+    color: rgba($text-color, 0.5);
+    font-size: 0.9rem;
   }
 
-  textarea {
-    width: 100%;
-    font-family: inherit;
-    font-size: 0.9375rem;
-    color: $text-color;
-    background: #fafafa;
-    border: 1px solid $border-color;
-    border-radius: $radius-small;
-    padding: $spacing-md;
-    resize: vertical;
-    min-height: 80px;
-    transition: all 0.2s ease;
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    background: #fff;
+  }
 
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-    }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
@@ -439,49 +439,6 @@
     font-weight: 600;
     color: $text-color;
     margin: 0 0 $spacing-lg 0;
-  }
-}
-
-/* Consultations list */
-.consultationsList {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-}
-
-.consultationCard {
-  background: #fafafa;
-  border-radius: $radius-small;
-  padding: $spacing-lg;
-  border: 1px solid $border-color;
-}
-
-.consultationHeader {
-  margin-bottom: $spacing-md;
-  padding-bottom: $spacing-sm;
-  border-bottom: 1px solid $border-color;
-}
-
-.consultationDate {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: $primary-color;
-}
-
-.consultationContent {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-}
-
-.consultationField {
-  font-size: 0.9375rem;
-  color: $text-color;
-  line-height: 1.5;
-
-  strong {
-    color: rgba($text-color, 0.75);
-    margin-right: $spacing-xs;
   }
 }
 
@@ -546,6 +503,32 @@
   }
 
   .formActions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+/* Modal content */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+}
+
+@media (max-width: 640px) {
+  .modalActions {
     flex-direction: column;
 
     button {

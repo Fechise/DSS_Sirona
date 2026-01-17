@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../styles/tokens/_index' as *;
 
 .landingPage {
@@ -37,7 +38,7 @@
   letter-spacing: -0.5px;
   
   // Gradiente sutil en el texto
-  background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 15%) 100%);
+  background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: -15%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -99,7 +100,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, $primary-color 0%, darken($primary-color, 10%) 100%);
+    background: linear-gradient(90deg, $primary-color 0%, color.adjust($primary-color, $lightness: -10%) 100%);
     border-radius: $radius-full;
   }
 }
@@ -107,13 +108,13 @@
 .subtitle {
   font-size: $font-size-h3;
   font-weight: $font-weight-bold;
-  color: darken($text-color, 5%);
+  color: color.adjust($text-color, $lightness: -5%);
   margin: 0;
 }
 
 .description {
   font-size: $font-size-lg;
-  color: lighten($text-color, 15%);
+  color: color.adjust($text-color, $lightness: 15%);
   line-height: 1.6;
   margin: 0;
 }
@@ -237,7 +238,7 @@
 
 .roleDescription {
   font-size: $font-size-sm;
-  color: lighten($text-color, 20%);
+  color: color.adjust($text-color, $lightness: 20%);
   margin: 0;
   line-height: 1.5;
 }
@@ -252,7 +253,7 @@
 
 .footerText {
   text-align: center;
-  color: lighten($text-color, 20%);
+  color: color.adjust($text-color, $lightness: 20%);
   font-size: $font-size-sm;
   margin: 0;
 }

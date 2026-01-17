@@ -5,6 +5,7 @@ import { Badge } from '../../atoms/Badge/Badge';
 import { Users, RefreshCw, AlertCircle, Pencil, Edit2, CheckCircle, Trash2, Plus, Loader2 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Modal } from '../../atoms/Modal/Modal';
+import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
@@ -405,10 +406,12 @@ export const UserManagementPage: React.FC = () => {
         {success && <div className={styles.successMessage}>{success}</div>}
 
         {loading ? (
-          <div className={styles.loadingState}>
-            <RefreshCw size={32} className={styles.spinner} />
-            <p>Cargando usuarios...</p>
-          </div>
+          <LoadingSpinner
+            variant="bouncing-role"
+            role="Administrador"
+            message="Cargando usuarios..."
+            size="large"
+          />
         ) : (
           <div className={styles.tableContainer}>
             <Table<UserListItem>
