@@ -236,34 +236,3 @@
     font-size: 1rem;
   }
 }
-
-.foot {
-  display: flex;
-  justify-content: center;
-  margin-top: -$spacing-xs;
-
-  @media (max-height: 800px) {
-    margin-top: 0;
-  }
-}
-
-.links {
-  display: grid;
-  gap: $spacing-sm;
-  justify-items: center;
-
-  @media (max-height: 800px) {
-    gap: $spacing-xs;
-  }
-}
-
-.demoButtons {
-  display: flex;
-  gap: $spacing-sm;
-  flex-wrap: wrap;
-  justify-content: center;
-
-  @media (max-height: 800px) {
-    gap: $spacing-xs;
-  }
-}

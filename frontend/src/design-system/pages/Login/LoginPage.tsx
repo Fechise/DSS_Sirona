@@ -118,59 +118,6 @@ export const LoginPage: React.FC = () => {
             </form>
           </div>
         )}
-
-        <div className={styles.foot}>
-          <div className={styles.demoButtons}>
-            <Button
-              type="button"
-              variant="filled"
-              color="secondary"
-              onClick={() => {
-                const mockToken = 'mock_jwt_token_demo';
-                login('demo@sirona.local', mockToken, 'Paciente', 'Demo Paciente');
-                navigate('/inicio');
-              }}
-            >
-              Demo Paciente
-            </Button>
-            <Button
-              type="button"
-              variant="filled"
-              color="primary"
-              onClick={() => {
-                const mockToken = 'mock_jwt_token_doctor';
-                login('doctor@sirona.local', mockToken, 'Médico', 'Dr. Demo');
-                navigate('/inicio');
-              }}
-            >
-              Demo Médico
-            </Button>
-            <Button
-              type="button"
-              variant="filled"
-              color="quaternary"
-              onClick={() => {
-                const mockToken = 'mock_jwt_token_admin';
-                login('admin@sirona.local', mockToken, 'Administrador', 'Admin');
-                navigate('/inicio');
-              }}
-            >
-              Demo Admin
-            </Button>
-            <Button
-              type="button"
-              variant="filled"
-              color="tertiary"
-              onClick={() => {
-                const mockToken = 'mock_jwt_token_secretary';
-                login('secretario@sirona.local', mockToken, 'Secretario', 'Secretario Demo');
-                navigate('/inicio');
-              }}
-            >
-              Demo Secretario
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );
