@@ -5,6 +5,7 @@ from datetime import date, datetime
 
 # --- PATIENT HISTORY (Historial del Paciente) ---
 class MedicoAsignadoResponse(BaseModel):
+    medicoId: Optional[str] = None
     nombre: str
     especialidad: str
     telefono: str
@@ -39,6 +40,14 @@ class ProximaCitaResponse(BaseModel):
 
 class PatientHistoryResponse(BaseModel):
     id: str
+    # Datos demográficos
+    direccion: Optional[str] = None
+    ciudad: Optional[str] = None
+    pais: Optional[str] = None
+    genero: Optional[str] = None
+    estadoCivil: Optional[str] = None
+    ocupacion: Optional[str] = None
+    # Información médica
     tipoSangre: str
     alergias: List[str]
     condicionesCronicas: List[str]

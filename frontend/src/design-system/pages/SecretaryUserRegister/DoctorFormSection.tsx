@@ -1,8 +1,8 @@
 import React from 'react';
-import { User, CreditCard, Mail, ShieldCheck, Stethoscope, FileBadge2 } from 'lucide-react';
+import { User, CreditCard, Mail, ShieldCheck, Stethoscope } from 'lucide-react';
 import styles from './DoctorFormSection.module.scss';
 import { Input } from '../../atoms/Input/Input';
-import { PasswordStrengthIndicator } from '../../molecules/PasswordStrengthIndicator/PasswordStrengthIndicator';
+import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { type DoctorFormData } from './SecretaryUserRegister.types';
 
 interface DoctorFormSectionProps {
@@ -24,6 +24,8 @@ export const DoctorFormSection: React.FC<DoctorFormSectionProps> = ({ form, onCh
         placeholder="Juan Ramón"
         icon={<User size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
@@ -37,10 +39,12 @@ export const DoctorFormSection: React.FC<DoctorFormSectionProps> = ({ form, onCh
         placeholder="Pérez Gómez"
         icon={<User size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
-    {/* Fila 2: Cédula, Email, Licencia, Especialidad */}
+    {/* Fila 2: Cédula y Email */}
     <div className={`${styles.formGroup} ${styles.cedula}`}>
       <Input
         id="doctor-cedula"
@@ -51,6 +55,8 @@ export const DoctorFormSection: React.FC<DoctorFormSectionProps> = ({ form, onCh
         placeholder="1234567890"
         icon={<CreditCard size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
@@ -64,9 +70,12 @@ export const DoctorFormSection: React.FC<DoctorFormSectionProps> = ({ form, onCh
         placeholder="doctor@sirona.com"
         icon={<Mail size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
+    {/* Fila 3: Licencia y Especialidad */}
     <div className={`${styles.formGroup} ${styles.licencia}`}>
       <Input
         id="doctor-numeroLicencia"
@@ -77,6 +86,8 @@ export const DoctorFormSection: React.FC<DoctorFormSectionProps> = ({ form, onCh
         placeholder="MED-12345"
         icon={<ShieldCheck size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
@@ -90,22 +101,19 @@ export const DoctorFormSection: React.FC<DoctorFormSectionProps> = ({ form, onCh
         placeholder="Medicina General"
         icon={<Stethoscope size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
-    {/* Fila 3: Contraseña centrada */}
-    <div className={`${styles.formGroup} ${styles.password}`}>
-      <Input
-        id="doctor-password"
-        label="Contraseña"
-        type="password"
-        value={form.password}
-        onChange={onChange('password')}
-        placeholder="Mínimo 12 caracteres"
-        icon={<FileBadge2 size={16} style={{ color: iconColor }} />}
-        focusColor={iconColor}
-      />
-      <PasswordStrengthIndicator password={form.password} />
+    {/* Nota informativa */}
+    <div style={{ gridColumn: '1 / -1' }}>
+      <AlertNote
+        title="Nota"
+        color="primary"
+      >
+        Se generará una contraseña temporal que será enviada al correo electrónico del médico. Se recomienda cambiarla en el primer inicio de sesión.
+      </AlertNote>
     </div>
   </>
 );

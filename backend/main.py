@@ -34,11 +34,8 @@ app = FastAPI(
 
 # Configurar CORS
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost", "https://www.ecuconsult.net"],  # Frontend URLs
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CustomCORSMiddleware,
+    allowed_origins=["http://localhost", "https://www.ecuconsult.net"]  # Frontend URLs
 )
 
 # Configurar Rate Limiting (100 req/min para desarrollo)

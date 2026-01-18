@@ -201,3 +201,47 @@
   justify-content: center;
   gap: $spacing-sm;
 }
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  strong {
+    margin: 0;
+  }
+}
+
+.email {
+  font-size: 0.875rem;
+  color: rgba($text-color, 0.65);
+  margin: 0;
+}
+
+.infoNote {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  border-radius: $radius-small;
+  margin-top: $spacing-sm;
+
+  svg {
+    color: #2196f3;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: rgba($text-color, 0.85);
+    line-height: 1.5;
+
+    strong {
+      color: $text-color;
+    }
+  }
+}

@@ -84,35 +84,6 @@ export class AuthApiService {
   }
 
   /**
-   * Login con reconocimiento facial
-   */
-  static async loginWithFace(email: string, faceImage: File): Promise<LoginResponse> {
-    try {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('face_image', faceImage);
-
-      const response = await fetch(`${API_BASE_URL}/api/auth/login/face`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const responseData = await response.json();
-      
-      console.log('Face login response:', responseData);
-
-      if (!response.ok) {
-        throw responseData;
-      }
-
-      return responseData;
-    } catch (error) {
-      console.error('Face login error:', error);
-      throw error;
-    }
-  }
-
-  /**
    * Registrar un nuevo doctor (solo Secretarios)
    */
   static async registerDoctor(token: string, data: any): Promise<{ message: string }> {
@@ -206,6 +177,14 @@ export interface ProximaCita {
 
 export interface PatientHistoryResponse {
   id: string;
+  // Datos demográficos
+  direccion: string | null;
+  ciudad: string | null;
+  pais: string | null;
+  genero: string | null;
+  estadoCivil: string | null;
+  ocupacion: string | null;
+  // Información médica
   tipoSangre: string;
   alergias: string[];
   condicionesCronicas: string[];
@@ -224,13 +203,13 @@ export interface PatientInfo {
   fullName: string;
   email: string;
   cedula: string;
+  fechaNacimiento?: string;
+  telefonoContacto?: string;
   status: string;
-  role: string;
-  created_at: string;
 }
 
 export interface PatientListResponse {
-  total: number;
+  total?: number;
   patients: PatientInfo[];
 }
 
@@ -365,6 +344,13 @@ export interface AvailableSlot {
   disponible: boolean;
 }
 
+export interface DoctorScheduleResponse {
+  doctor_id: string;
+  doctorName: string;
+  fecha: string;
+  slots: AvailableSlot[];
+}
+
 export interface CreateAvailabilityRequest {
   fecha: string;
   horaInicio: string;
@@ -383,11 +369,12 @@ export interface PatientMinimalInfo {
 
 export interface DoctorAssignedPatient {
   id: string;
-  fullName: string;
+  full_name: string;
   email: string;
   cedula: string;
-  fechaNacimiento?: string;
-  ultimaConsulta?: string;
+  fecha_nacimiento?: string;
+  ultima_consulta?: string;
+  diagnosticos?: number;
   condicionesCronicas?: string[];
 }
 
@@ -517,7 +504,7 @@ export class AppointmentApiService {
   /**
    * Obtener horario de un médico (slots disponibles)
    */
-  static async getDoctorSchedule(token: string, doctorId: string, fecha: string): Promise<AvailableSlot[]> {
+  static async getDoctorSchedule(token: string, doctorId: string, fecha: string): Promise<DoctorScheduleResponse> {
     return authenticatedFetch(`${API_BASE_URL}/api/doctors/${doctorId}/schedule?fecha=${fecha}`, token);
   }
 
@@ -565,139 +552,19 @@ export interface UserListItem {
   numeroLicencia?: string;
   departamento?: string;
   telefonoContacto?: string;
+  fechaNacimiento?: string;
+  direccion?: string;
+  ciudad?: string;
+  pais?: string;
+  genero?: string;
+  estadoCivil?: string;
+  ocupacion?: string;
+  grupoSanguineo?: string;
 }
 
 export interface UsersListResponse {
   total: number;
   users: UserListItem[];
-}
-
-export interface CreateUserRequest {
-  email: string;
-  password: string;
-  fullName: string;
-  cedula: string;
-  role: string;
-  especialidad?: string;
-  numeroLicencia?: string;
-  departamento?: string;
-  telefonoContacto?: string;
-  fechaNacimiento?: string;
-}
-
-export interface UpdateUserRequest {
-  fullName?: string;
-  email?: string;
-  role?: string;
-  status?: string;
-  especialidad?: string;
-  numeroLicencia?: string;
-  departamento?: string;
-  telefonoContacto?: string;
-}
-
-// ============================================================
-// ADMIN SERVICE
-// ============================================================
-
-export class AdminApiService {
-  /**
-   * Obtener logs de auditoría (solo Administradores)
-   */
-  static async getAuditLogs(
-    token: string, 
-    skip: number = 0, 
-    limit: number = 50,
-    eventType?: string,
-    userEmail?: string
-  ): Promise<AuditLogsResponse> {
-    const params = new URLSearchParams();
-    params.append('offset', skip.toString());
-    params.append('limit', limit.toString());
-    if (eventType) params.append('event_type', eventType);
-    if (userEmail) params.append('user_email', userEmail);
-    
-    return authenticatedFetch(`${API_BASE_URL}/api/admin/audit/logs?${params.toString()}`, token);
-  }
-
-  /**
-   * Obtener tipos de eventos de auditoría
-   */
-  static async getAuditEventTypes(token: string): Promise<{ event_types: string[] }> {
-    return authenticatedFetch(`${API_BASE_URL}/api/admin/audit/events`, token);
-  }
-
-  /**
-   * Listar todos los usuarios (solo Administradores)
-   */
-  static async listUsers(
-    token: string, 
-    filters?: { role?: string; status?: string; search?: string }
-  ): Promise<UsersListResponse> {
-    const params = new URLSearchParams();
-    if (filters?.role) params.append('role', filters.role);
-    if (filters?.status) params.append('status_filter', filters.status);
-    if (filters?.search) params.append('search', filters.search);
-    
-    const queryString = params.toString();
-    const url = `${API_BASE_URL}/api/admin/users${queryString ? `?${queryString}` : ''}`;
-    
-    return authenticatedFetch(url, token);
-  }
-
-  /**
-   * Obtener un usuario específico
-   */
-  static async getUser(token: string, userId: string): Promise<UserListItem> {
-    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}`, token);
-  }
-
-  /**
-   * Crear un nuevo usuario (cualquier rol)
-   */
-  static async createUser(token: string, data: CreateUserRequest): Promise<UserListItem> {
-    return authenticatedFetch(`${API_BASE_URL}/api/admin/users`, token, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
-   * Actualizar un usuario
-   */
-  static async updateUser(token: string, userId: string, data: UpdateUserRequest): Promise<UserListItem> {
-    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}`, token, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
-   * Cambiar el rol de un usuario
-   */
-  static async changeUserRole(token: string, userId: string, newRole: string): Promise<UserListItem> {
-    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}/role`, token, {
-      method: 'PATCH',
-      body: JSON.stringify({ role: newRole }),
-    });
-  }
-
-  /**
-   * Eliminar (desactivar) un usuario
-   */
-  static async deleteUser(token: string, userId: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw data;
-    }
-  }
 }
 
 // ============================================================
@@ -826,6 +693,165 @@ export class DoctorApiService {
     return authenticatedFetch(`${API_BASE_URL}/api/paciente/pacientes/${patientId}/consultas`, token, {
       method: 'POST',
       body: JSON.stringify({ patient_id: patientId, ...data }),
+    });
+  }
+}
+
+// ============================================================
+// ADMIN SERVICES
+// ============================================================
+
+export interface CreateUserRequest {
+  email: string;
+  fullName: string;
+  cedula: string;
+  // role se establece automáticamente como 'Secretario' en el servicio
+  especialidad?: string;
+  numeroLicencia?: string;
+  departamento?: string;
+  telefonoContacto?: string;
+  fechaNacimiento?: string;
+  direccion?: string;
+  ciudad?: string;
+  pais?: string;
+  genero?: string;
+  estadoCivil?: string;
+  ocupacion?: string;
+  grupoSanguineo?: string;
+}
+
+export interface UpdateUserRequest {
+  fullName?: string;
+  email?: string;
+  role?: string;
+  status?: string;
+  especialidad?: string;
+  numeroLicencia?: string;
+  departamento?: string;
+  telefonoContacto?: string;
+}
+
+export interface UpdateUserRoleRequest {
+  role: string;
+}
+
+export class AdminApiService {
+  /**
+   * Obtener logs de auditoría (solo Administradores)
+   */
+  static async getAuditLogs(
+    token: string, 
+    skip: number = 0, 
+    limit: number = 50,
+    eventType?: string,
+    userEmail?: string
+  ): Promise<AuditLogsResponse> {
+    const params = new URLSearchParams();
+    params.append('offset', skip.toString());
+    params.append('limit', limit.toString());
+    if (eventType) params.append('event_type', eventType);
+    if (userEmail) params.append('user_email', userEmail);
+    
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/audit/logs?${params.toString()}`, token);
+  }
+
+  /**
+   * Obtener tipos de eventos de auditoría
+   */
+  static async getAuditEventTypes(token: string): Promise<{ event_types: string[] }> {
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/audit/events`, token);
+  }
+
+  /**
+   * Listar todos los secretarios del sistema
+   */
+  static async listUsers(
+    token: string,
+    filters?: {
+      status?: string;
+      search?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<UsersListResponse> {
+    const params = new URLSearchParams();
+    // Siempre filtrar por rol Secretario
+    params.append('role', 'Secretario');
+    if (filters?.status) params.append('status_filter', filters.status);
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.offset) params.append('offset', filters.offset.toString());
+
+    const queryString = params.toString();
+    const url = `${API_BASE_URL}/api/admin/users${queryString ? `?${queryString}` : ''}`;
+
+    return authenticatedFetch(url, token);
+  }
+
+  /**
+   * Obtener un secretario específico
+   */
+  static async getUser(token: string, userId: string): Promise<UserListItem> {
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}`, token);
+  }
+
+  /**
+   * Crear un nuevo secretario
+   */
+  static async createUser(token: string, data: CreateUserRequest): Promise<UserListItem> {
+    // Forzar rol de Secretario
+    const secretaryData = { ...data, role: 'Secretario' };
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/users`, token, {
+      method: 'POST',
+      body: JSON.stringify(secretaryData),
+    });
+  }
+
+  /**
+   * Actualizar un secretario existente
+   */
+  static async updateUser(
+    token: string,
+    userId: string,
+    data: UpdateUserRequest
+  ): Promise<UserListItem> {
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}`, token, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * Cambiar el rol de un usuario (no usado en gestión de secretarios)
+   */
+  static async updateUserRole(
+    token: string,
+    userId: string,
+    data: UpdateUserRoleRequest
+  ): Promise<UserListItem> {
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}/role`, token, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * Desactivar un secretario
+   */
+  static async deactivateUser(token: string, userId: string): Promise<{ message: string }> {
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}`, token, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'Inactivo' }),
+    });
+  }
+
+  /**
+   * Reactivar un secretario
+   */
+  static async reactivateUser(token: string, userId: string): Promise<{ message: string }> {
+    return authenticatedFetch(`${API_BASE_URL}/api/admin/users/${userId}`, token, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'Activo' }),
     });
   }
 }

@@ -9,6 +9,7 @@ type FilterSelectProps = {
   placeholder?: string;
   options: Array<{ value: string; label: string }>;
   disabled?: boolean;
+  themeColor?: string;
 };
 
 /**
@@ -24,6 +25,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
   placeholder = 'Filtrar...',
   options,
   disabled = false,
+  themeColor = 'var(--primary-color)',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -67,9 +69,11 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
     <div
       ref={wrapperRef}
       className={`${styles.wrapper} ${isOpen ? styles.open : ''}`}
+      style={{ '--filter-theme-color': themeColor } as React.CSSProperties}
     >
       <button
         ref={buttonRef}
+        type="button"
         id={id}
         className={styles.button}
         onClick={() => setIsOpen(!isOpen)}

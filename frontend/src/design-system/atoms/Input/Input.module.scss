@@ -17,6 +17,11 @@
   font-weight: 600;
 }
 
+.required {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
 .labelIcon {
   display: inline-flex;
   align-items: center;
@@ -46,11 +51,9 @@
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    line-height: normal;
+    line-height: 1.5;
     padding: 0.625rem 0.75rem;
-    min-height: 2.625rem;
-    display: flex;
-    align-items: center;
+    height: 2.5rem;
   }
 
   &::placeholder {

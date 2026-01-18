@@ -7,18 +7,19 @@ import { Input } from '../../atoms/Input/Input';
 import { Badge } from '../../atoms/Badge/Badge';
 import { Modal } from '../../atoms/Modal/Modal';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
+import { NoResults } from '../../molecules/NoResults/NoResults';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
 import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useToast } from '../../../hooks/useToast';
 import { DoctorApiService, type DoctorAvailability } from '../../../services/api';
 
 export const DoctorAvailabilityPage: React.FC = () => {
   const { token } = useAuth();
+  const toast = useToast();
   const [availabilities, setAvailabilities] = useState<DoctorAvailability[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -33,13 +34,12 @@ export const DoctorAvailabilityPage: React.FC = () => {
   const loadAvailabilities = async () => {
     if (!token) return;
     setLoading(true);
-    setError(null);
 
     try {
       const data = await DoctorApiService.getMyAvailability(token);
       setAvailabilities(data);
     } catch (err: any) {
-      setError(err?.detail || 'Error al cargar disponibilidad');
+      toast.error(err?.detail || 'Error al cargar disponibilidad');
     } finally {
       setLoading(false);
     }
@@ -68,12 +68,10 @@ export const DoctorAvailabilityPage: React.FC = () => {
     if (!token) return;
 
     setSubmitting(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       await DoctorApiService.createMyAvailability(token, formData);
-      setSuccess('Disponibilidad creada exitosamente');
+      toast.success('Disponibilidad creada exitosamente');
       setShowForm(false);
       setFormData({
         fecha: '',
@@ -83,7 +81,7 @@ export const DoctorAvailabilityPage: React.FC = () => {
       });
       loadAvailabilities();
     } catch (err: any) {
-      setError(err?.detail || 'Error al crear disponibilidad');
+      toast.error(err?.detail || 'Error al crear disponibilidad');
     } finally {
       setSubmitting(false);
     }
@@ -94,9 +92,10 @@ export const DoctorAvailabilityPage: React.FC = () => {
 
     try {
       await DoctorApiService.toggleMyAvailability(token, id);
+      toast.success('Estado actualizado correctamente');
       loadAvailabilities();
     } catch (err: any) {
-      setError(err?.detail || 'Error al cambiar estado');
+      toast.error(err?.detail || 'Error al cambiar estado');
     }
   };
 
@@ -106,10 +105,10 @@ export const DoctorAvailabilityPage: React.FC = () => {
 
     try {
       await DoctorApiService.deleteMyAvailability(token, id);
-      setSuccess('Disponibilidad eliminada');
+      toast.success('Disponibilidad eliminada correctamente');
       loadAvailabilities();
     } catch (err: any) {
-      setError(err?.detail || 'Error al eliminar disponibilidad');
+      toast.error(err?.detail || 'Error al eliminar disponibilidad');
     }
   };
 
@@ -202,7 +201,7 @@ export const DoctorAvailabilityPage: React.FC = () => {
                 Agregar Disponibilidad
               </Button>
               <Button
-                variant="outlined"
+                variant="filled"
                 color="secondary"
                 onClick={loadAvailabilities}
                 disabled={loading}
@@ -213,10 +212,6 @@ export const DoctorAvailabilityPage: React.FC = () => {
             </>
           }
         />
-
-        {/* Mensajes */}
-        {error && <div className={styles.errorMessage}>{error}</div>}
-        {success && <div className={styles.successMessage}>{success}</div>}
 
         {/* Modal de nueva disponibilidad */}
         <Modal
@@ -327,13 +322,12 @@ export const DoctorAvailabilityPage: React.FC = () => {
             size="large"
           />
         ) : availabilities.length === 0 ? (
-          <div className={styles.emptyState}>
-            <Calendar size={48} />
-            <p>No tienes horarios configurados</p>
-            <span className={styles.hint}>
-              Agrega tu disponibilidad para que los pacientes puedan agendar citas
-            </span>
-          </div>
+          <NoResults
+            title="No tienes horarios configurados"
+            description="Agrega tu disponibilidad para que los pacientes puedan agendar citas"
+            icon={<Calendar size={48} />}
+            fullHeight
+          />
         ) : (
           <Table
             columns={columns}

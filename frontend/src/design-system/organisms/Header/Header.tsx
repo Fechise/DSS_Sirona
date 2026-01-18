@@ -90,6 +90,12 @@ export const Header: React.FC = () => {
           label: 'Mi Historial',
           path: '/paciente/mi-historial',
         });
+        items.push({
+          id: 'appointments',
+          icon: <Calendar size={18} />,
+          label: 'Mis Citas',
+          path: '/paciente/mis-citas',
+        });
         break;
       case 'Secretario':
         items.push({

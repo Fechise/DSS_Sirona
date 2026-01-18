@@ -29,7 +29,6 @@ class AccountLockedResponse(BaseModel):
 # --- REGISTER ---
 class RegisterDoctorRequest(BaseModel):
     email: EmailStr
-    password: str
     fullName: str
     cedula: str
     especialidad: str
@@ -38,7 +37,6 @@ class RegisterDoctorRequest(BaseModel):
 
 class RegisterSecretaryRequest(BaseModel):
     email: EmailStr
-    password: str
     fullName: str
     cedula: str
     departamento: str
@@ -46,11 +44,18 @@ class RegisterSecretaryRequest(BaseModel):
 
 class RegisterPatientRequest(BaseModel):
     email: EmailStr
-    password: str
     fullName: str
     cedula: str
     fechaNacimiento: date
     telefonoContacto: str
+    # Campos demográficos adicionales
+    direccion: Optional[str] = None
+    ciudad: Optional[str] = None
+    pais: Optional[str] = ""
+    genero: Optional[str] = None
+    estadoCivil: Optional[str] = None
+    ocupacion: Optional[str] = None
+    grupoSanguineo: Optional[str] = None
 
 
 class RegisterResponse(BaseModel):

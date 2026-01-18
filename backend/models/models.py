@@ -25,12 +25,12 @@ class UserStatus(str, Enum):
 class SecuritySettings(BaseModel):
     mfa_enabled: bool = False
     mfa_secret: Optional[str] = None
-    biometric_template: Optional[bytes] = None
     failed_attempts: int = 0
     lockout_until: Optional[datetime] = None
 
 # --- SUB-MODELOS HISTORIAL PACIENTE ---
 class MedicoAsignado(BaseModel):
+    medicoId: Optional[str] = None  # ID del médico asignado para verificación de acceso (opcional para compatibilidad con registros antiguos)
     nombre: str
     especialidad: str
     telefono: str
@@ -123,6 +123,15 @@ class User(Document):
     telefonoContacto: Optional[str] = None  # Para Paciente
     departamento: Optional[str] = None  # Para Secretario
     
+    # Campos demográficos adicionales (Para Paciente)
+    direccion: Optional[str] = None
+    ciudad: Optional[str] = None
+    pais: Optional[str] = None
+    genero: Optional[str] = None
+    estadoCivil: Optional[str] = None
+    ocupacion: Optional[str] = None
+    grupoSanguineo: Optional[str] = None
+    
     # Permisos
     permissions: List[str] = []
     
@@ -181,6 +190,16 @@ class MFASecret(Document):
 # 4. Historial Clínico del Paciente (Solo Lectura para Paciente)
 class PatientHistory(Document):
     patient_id: Indexed(str, unique=True)  # Referencia al User ID del paciente
+    
+    # Datos demográficos
+    direccion: Optional[str] = None
+    ciudad: Optional[str] = None
+    pais: Optional[str] = None
+    genero: Optional[str] = None
+    estadoCivil: Optional[str] = None
+    ocupacion: Optional[str] = None
+    
+    # Información médica
     tipoSangre: str
     alergias: List[str] = []
     condicionesCronicas: List[str] = []

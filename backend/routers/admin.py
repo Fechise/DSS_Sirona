@@ -1,14 +1,8 @@
 """
-<<<<<<< HEAD
-Router de Administración - Gestión de Integridad y Auditoría
-=============================================================
-Endpoints para administradores del sistema:
-=======
 Router de Administración - Gestión de Usuarios, Integridad y Auditoría
 =======================================================================
 Endpoints para administradores del sistema:
 - CRUD de usuarios (PBI-18)
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
 - Validación de integridad de historiales (PBI-20)
 - Consulta de logs de auditoría (PBI-15)
 """
@@ -16,14 +10,6 @@ Endpoints para administradores del sistema:
 from fastapi import APIRouter, HTTPException, status, Depends, Request, BackgroundTasks
 from typing import List, Optional
 from datetime import datetime
-<<<<<<< HEAD
-from pydantic import BaseModel
-
-from models.models import PatientHistory, User, UserRole, AuditLog
-from services.auth import get_admin_user
-from services.integrity import integrity_service
-from services.audit import audit_logger, AuditEventType
-=======
 from pydantic import BaseModel, EmailStr
 from enum import Enum
 
@@ -32,14 +18,11 @@ from services.auth import get_admin_user
 from services.integrity import integrity_service
 from services.audit import audit_logger, AuditEventType
 from services.security import hash_password, validate_password_strength
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
+from services.email_service import generate_temporary_password, send_temporary_password_email, EmailServiceError
 
 router = APIRouter()
 
 
-<<<<<<< HEAD
-# --- SCHEMAS ---
-=======
 # ==================== USER SCHEMAS ====================
 class UserListItemResponse(BaseModel):
     """Datos de usuario para listado."""
@@ -67,7 +50,6 @@ class UsersListResponse(BaseModel):
 class CreateUserRequest(BaseModel):
     """Crear un nuevo usuario (Admin)."""
     email: EmailStr
-    password: str
     fullName: str
     cedula: str
     role: str  # Administrador, Médico, Paciente, Secretario
@@ -77,6 +59,14 @@ class CreateUserRequest(BaseModel):
     departamento: Optional[str] = None
     telefonoContacto: Optional[str] = None
     fechaNacimiento: Optional[str] = None
+    # Campos demográficos adicionales (Para Paciente)
+    direccion: Optional[str] = None
+    ciudad: Optional[str] = None
+    pais: Optional[str] = None
+    genero: Optional[str] = None
+    estadoCivil: Optional[str] = None
+    ocupacion: Optional[str] = None
+    grupoSanguineo: Optional[str] = None
 
 
 class UpdateUserRequest(BaseModel):
@@ -238,6 +228,7 @@ async def create_user(
     """
     Crear un nuevo usuario de cualquier rol.
     Solo administradores pueden crear usuarios.
+    La contraseña se genera automáticamente y se envía por email.
     """
     # Validar rol
     try:
@@ -246,17 +237,6 @@ async def create_user(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid role. Valid roles: {[r.value for r in UserRole]}"
-        )
-    
-    # Validar contraseña
-    is_valid, errors = validate_password_strength(data.password)
-    if not is_valid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "error": "Password does not meet requirements",
-                "details": errors
-            }
         )
     
     # Verificar email único
@@ -275,10 +255,13 @@ async def create_user(
             detail="Cedula already registered"
         )
     
+    # Generar contraseña temporal
+    temporary_password = generate_temporary_password()
+    
     # Crear usuario
     new_user = User(
         email=data.email,
-        password_hash=hash_password(data.password),
+        password_hash=hash_password(temporary_password),
         fullName=data.fullName,
         cedula=data.cedula,
         role=user_role,
@@ -287,10 +270,37 @@ async def create_user(
         numeroLicencia=data.numeroLicencia if user_role == UserRole.MEDICO else None,
         departamento=data.departamento if user_role == UserRole.SECRETARIO else None,
         telefonoContacto=data.telefonoContacto if user_role == UserRole.PACIENTE else None,
+        direccion=data.direccion if user_role == UserRole.PACIENTE else None,
+        ciudad=data.ciudad if user_role == UserRole.PACIENTE else None,
+        pais=data.pais if user_role == UserRole.PACIENTE else None,
+        genero=data.genero if user_role == UserRole.PACIENTE else None,
+        estadoCivil=data.estadoCivil if user_role == UserRole.PACIENTE else None,
+        ocupacion=data.ocupacion if user_role == UserRole.PACIENTE else None,
+        grupoSanguineo=data.grupoSanguineo if user_role == UserRole.PACIENTE else None,
         member_since=datetime.utcnow().strftime("%B %Y")
     )
     
     await new_user.insert()
+    
+    # Enviar email con contraseña temporal
+    try:
+        await send_temporary_password_email(
+            to_email=data.email,
+            full_name=data.fullName,
+            temporary_password=temporary_password,
+            role=data.role
+        )
+    except EmailServiceError as e:
+        # Log pero no fallar el registro
+        await audit_logger.log_event(
+            event_type=AuditEventType.ERROR_SISTEMA,
+            user_id=str(current_user.id),
+            user_email=current_user.email,
+            user_role=current_user.role.value,
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            details={"error": "email_send_failed", "message": str(e)}
+        )
     
     # Log de auditoría
     await audit_logger.log_event(
@@ -563,7 +573,6 @@ async def delete_user(
 
 
 # ==================== INTEGRITY SCHEMAS ====================
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
 class IntegrityCheckResult(BaseModel):
     """Resultado de verificación de integridad de un historial."""
     history_id: str
@@ -753,15 +762,9 @@ async def get_corrupted_histories(
     Obtener lista de historiales marcados como corruptos.
     Solo administradores pueden ver esta información.
     """
-<<<<<<< HEAD
-    corrupted = await PatientHistory.find(
-        PatientHistory.is_corrupted == True
-    ).to_list()
-=======
     corrupted = await PatientHistory.find({
         "is_corrupted": True
     }).to_list()
->>>>>>> c0bfe8053f57a941960b020e285bb9ef323643eb
     
     results = []
     for history in corrupted:

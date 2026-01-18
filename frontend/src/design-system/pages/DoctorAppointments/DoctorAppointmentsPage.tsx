@@ -5,10 +5,12 @@ import { Calendar, Clock, User, RefreshCw, FileText, CheckCircle, X } from 'luci
 import { Button } from '../../atoms/Button/Button';
 import { Badge } from '../../atoms/Badge/Badge';
 import { Modal } from '../../atoms/Modal/Modal';
+import { NoResults } from '../../molecules/NoResults/NoResults';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
 import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
+import { FilterSelect } from '../../atoms/FilterSelect/FilterSelect';
 import { useAuth } from '../../../contexts/AuthContext';
 import { DoctorApiService, type AppointmentResponse } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -171,21 +173,24 @@ export const DoctorAppointmentsPage: React.FC = () => {
 
         <TableToolbar
           left={
-            <select
-              className={styles.select}
+            <FilterSelect
+              id="status-filter"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="">Todas las citas</option>
-              <option value="Programada">Programadas</option>
-              <option value="Completada">Completadas</option>
-              <option value="Cancelada">Canceladas</option>
-              <option value="No Asistió">No Asistió</option>
-            </select>
+              onChange={setStatusFilter}
+              placeholder="Todas las citas"
+              themeColor="var(--role-doctor-color)"
+              options={[
+                { value: '', label: 'Todas las citas' },
+                { value: 'Programada', label: 'Programadas' },
+                { value: 'Completada', label: 'Completadas' },
+                { value: 'Cancelada', label: 'Canceladas' },
+                { value: 'No Asistió', label: 'No Asistió' },
+              ]}
+            />
           }
           right={
             <Button
-              variant="outlined"
+              variant="filled"
               color="secondary"
               onClick={loadAppointments}
               disabled={loading}
@@ -206,10 +211,10 @@ export const DoctorAppointmentsPage: React.FC = () => {
             size="large"
           />
         ) : appointments.length === 0 ? (
-          <div className={styles.emptyState}>
-            <Calendar size={48} />
-            <p>No tienes citas {statusFilter ? `con estado "${statusFilter}"` : ''}</p>
-          </div>
+          <NoResults
+            title={`No tienes citas${statusFilter ? ` con estado "${statusFilter}"` : ''}`}
+            icon={<Calendar size={48} />}
+          />
         ) : (
           <div className={styles.tableContainer}>
             <Table

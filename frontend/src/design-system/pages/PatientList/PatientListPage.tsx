@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { PatientApiService, type PatientInfo } from '../../../services/api';
 import styles from './PatientListPage.module.scss';
-import { AlertCircle, Users, Search, Eye, Pencil } from 'lucide-react';
+import { Users, Search } from 'lucide-react';
 import { Badge } from '../../atoms/Badge/Badge';
-import { Button } from '../../atoms/Button/Button';
 import { Input } from '../../atoms/Input/Input';
 import { Container } from '../../atoms/Container/Container';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
+import { NoResults } from '../../molecules/NoResults/NoResults';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 
 export const PatientListPage: React.FC = () => {
@@ -23,50 +23,30 @@ export const PatientListPage: React.FC = () => {
   const columns: TableColumn<PatientInfo>[] = [
     {
       key: 'fullName',
-      label: 'Nombre',
-    },
-    {
-      key: 'email',
-      label: 'Email',
+      label: 'Nombre Completo',
     },
     {
       key: 'cedula',
       label: 'Cédula',
     },
     {
+      key: 'fechaNacimiento',
+      label: 'Fecha de Nacimiento',
+      render: (value: string) => value ? new Date(value).toLocaleDateString('es-ES') : '-',
+    },
+    {
+      key: 'telefonoContacto',
+      label: 'Teléfono',
+    },
+    {
+      key: 'email',
+      label: 'Email',
+    },
+    {
       key: 'status',
       label: 'Estado',
       render: (value: string) => (
         <Badge value={value} type="status" />
-      ),
-    },
-    {
-      key: 'created_at',
-      label: 'Registrado',
-      render: (value: string) => new Date(value).toLocaleDateString('es-ES'),
-    },
-    {
-      key: 'id',
-      label: 'Acciones',
-      render: (_value: string, patient: PatientInfo) => (
-        <div className={styles.actionButtons}>
-          <Button
-            variant="outlined"
-            color="quaternary"
-            onClick={() => handleViewHistory(patient.id)}
-            startIcon={<Eye size={16} />}
-          >
-            Ver
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => handleEditPatient(patient.id)}
-            startIcon={<Pencil size={16} />}
-          >
-            Editar
-          </Button>
-        </div>
       ),
     },
   ];
@@ -102,16 +82,6 @@ export const PatientListPage: React.FC = () => {
     setFilteredPatients(filtered);
   };
 
-  const handleViewHistory = (patientId: string) => {
-    // TODO: Navegar a historial del paciente
-    console.log('Ver historial del paciente:', patientId);
-  };
-
-  const handleEditPatient = (patientId: string) => {
-    // TODO: Abrir modal de edición o navegar a página de edición
-    console.log('Editar paciente:', patientId);
-  };
-
   if (loading) {
     return (
       <Container>
@@ -129,11 +99,12 @@ export const PatientListPage: React.FC = () => {
   if (error) {
     return (
       <Container>
-        <div className={styles.errorState}>
-          <AlertCircle size={48} />
-          <h2>Error al cargar pacientes</h2>
-          <p>{error}</p>
-        </div>
+        <NoResults 
+          title="Error al cargar pacientes" 
+          description={error}
+          icon={<Users size={48} />}
+          fullHeight
+        />
       </Container>
     );
   }
@@ -167,14 +138,11 @@ export const PatientListPage: React.FC = () => {
             />
           </div>
         ) : (
-          <div className={styles.emptyState}>
-            <Users size={48} />
-            <p>
-              {searchQuery 
-                ? 'No se encontraron pacientes con los criterios de búsqueda.' 
-                : 'No hay pacientes registrados aún.'}
-            </p>
-          </div>
+          <NoResults 
+            title={searchQuery ? 'Sin resultados de búsqueda' : 'No hay pacientes registrados'}
+            description={searchQuery ? 'No se encontraron pacientes con los criterios de búsqueda.' : undefined}
+            icon={<Users size={48} />}
+          />
         )}
       </div>
     </Container>

@@ -54,11 +54,37 @@
   }
 }
 
+.modalColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xl;
+  margin-bottom: $spacing-lg;
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-lg;
+  background-color: rgba($secondary-color, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba($border-color, 0.5);
+}
+
 .formGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: $spacing-md;
-  margin-bottom: $spacing-lg;
 }
 
 .formGroup {
@@ -110,6 +136,48 @@
   @media (max-width: 768px) {
     flex-direction: column;
   }
+}
+
+.availabilitySection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  width: 100%;
+  align-items: center;
+}
+
+.availabilityList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  width: 100%;
+  margin-top: $spacing-md;
+  
+  p {
+    margin: 0;
+    font-weight: 600;
+    color: rgba($text-color, 0.85);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+}
+
+.timeSlots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: $spacing-sm;
+  width: 100%;
+  
+  button {
+    padding: $spacing-sm;
+    font-size: 0.9rem;
+  }
+}
+
+.selectedSlot {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  border-color: var(--primary-color) !important;
 }
 
 .tableSection {

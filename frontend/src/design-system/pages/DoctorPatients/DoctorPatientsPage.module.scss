@@ -51,29 +51,6 @@
   align-items: center;
 }
 
-.loadingState,
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-  color: color-mix(in srgb, var(--text-color) 60%, white);
-}
-
-.loadingState p,
-.emptyState p {
-  margin: 1rem 0 0;
-  font-size: 0.9375rem;
-  font-weight: 500;
-}
-
-.emptyState .hint {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: color-mix(in srgb, var(--text-color) 50%, white);
-}
-
 .spinner {
   animation: spin 1s linear infinite;
 }

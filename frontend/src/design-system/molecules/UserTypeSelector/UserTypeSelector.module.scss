@@ -1,0 +1,146 @@
+@use 'sass:color';
+@use '../../../styles/tokens/_index' as *;
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  background: white;
+  border: 2px solid $border-color;
+  border-radius: $radius-medium;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: $text-color;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: $spacing-md;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 40%, white);
+    background: color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 3%, white);
+  }
+
+  &.open {
+    border-color: var(--selector-theme-color, var(--primary-color));
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background: color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 5%, white);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 15%, transparent);
+  }
+}
+
+.triggerContent {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+}
+
+.icon {
+  color: var(--selector-theme-color, var(--primary-color));
+  flex-shrink: 0;
+}
+
+.label {
+  flex: 1;
+  text-align: left;
+}
+
+.chevron {
+  color: $text-color;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+
+  .open & {
+    transform: rotate(180deg);
+  }
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid var(--selector-theme-color, var(--primary-color));
+  border-top: none;
+  border-bottom-left-radius: $radius-medium;
+  border-bottom-right-radius: $radius-medium;
+  box-shadow: 0 8px 16px color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 12%, transparent);
+  overflow: hidden;
+  z-index: 10;
+  animation: slideDown 0.2s ease;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  background: white;
+  border: none;
+  font-size: 0.9375rem;
+  color: $text-color;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  gap: $spacing-sm;
+  text-align: left;
+  position: relative;
+
+  &:hover {
+    background: color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 8%, white);
+  }
+
+  &.selected {
+    background: color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 12%, white);
+    color: color-mix(in srgb, var(--selector-theme-color, var(--primary-color)) 8%, black);
+    font-weight: 500;
+  }
+
+  & + & {
+    border-top: 1px solid color.mix($border-color, white, 50%);
+  }
+}
+
+.optionIcon {
+  color: var(--selector-theme-color, var(--primary-color));
+  flex-shrink: 0;
+}
+
+.optionLabel {
+  flex: 1;
+}
+
+.selectedIndicator {
+  width: 8px;
+  height: 8px;
+  background: var(--selector-theme-color, var(--primary-color));
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+  }
+}

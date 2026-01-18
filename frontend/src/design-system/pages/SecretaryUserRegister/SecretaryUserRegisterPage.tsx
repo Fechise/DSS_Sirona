@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styles from './SecretaryUserRegisterPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
-import { UserPlus, Loader2, Stethoscope, User } from 'lucide-react';
+import { UserPlus, Loader2 } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
+import { UserTypeSelector } from '../../molecules/UserTypeSelector/UserTypeSelector';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { useAuth } from '../../../contexts/AuthContext';
 import { AuthApiService } from '../../../services/api';
@@ -22,7 +23,6 @@ export const SecretaryUserRegisterPage: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
     cedula: '',
     especialidad: '',
     numeroLicencia: '',
@@ -33,10 +33,16 @@ export const SecretaryUserRegisterPage: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
     cedula: '',
     fechaNacimiento: '',
     telefonoContacto: '',
+    direccion: '',
+    ciudad: '',
+    pais: 'Costa Rica',
+    genero: '',
+    estadoCivil: '',
+    ocupacion: '',
+    grupoSanguineo: '',
   });
 
   const handleDoctorChange = (field: keyof DoctorFormData) => (
@@ -60,7 +66,6 @@ export const SecretaryUserRegisterPage: React.FC = () => {
       firstName: '',
       lastName: '',
       email: '',
-      password: '',
       cedula: '',
       especialidad: '',
       numeroLicencia: '',
@@ -69,20 +74,84 @@ export const SecretaryUserRegisterPage: React.FC = () => {
       firstName: '',
       lastName: '',
       email: '',
-      password: '',
       cedula: '',
       fechaNacimiento: '',
       telefonoContacto: '',
+      direccion: '',
+      ciudad: '',
+      pais: 'Costa Rica',
+      genero: '',
+      estadoCivil: '',
+      ocupacion: '',
+      grupoSanguineo: '',
     });
+  };
+
+  const validateForm = (): boolean => {
+    if (userType === 'doctor') {
+      const { firstName, lastName, email, cedula, especialidad, numeroLicencia } = doctorForm;
+      if (!firstName.trim()) {
+        setError('El nombre es requerido');
+        return false;
+      }
+      if (!lastName.trim()) {
+        setError('El apellido es requerido');
+        return false;
+      }
+      if (!email.trim()) {
+        setError('El correo electrónico es requerido');
+        return false;
+      }
+      if (!cedula.trim()) {
+        setError('La cédula es requerida');
+        return false;
+      }
+      if (!especialidad.trim()) {
+        setError('La especialidad es requerida');
+        return false;
+      }
+      if (!numeroLicencia.trim()) {
+        setError('El número de licencia es requerido');
+        return false;
+      }
+    } else {
+      const { firstName, lastName, email, cedula, fechaNacimiento } = patientForm;
+      if (!firstName.trim()) {
+        setError('El nombre es requerido');
+        return false;
+      }
+      if (!lastName.trim()) {
+        setError('El apellido es requerido');
+        return false;
+      }
+      if (!email.trim()) {
+        setError('El correo electrónico es requerido');
+        return false;
+      }
+      if (!cedula.trim()) {
+        setError('La cédula es requerida');
+        return false;
+      }
+      if (!fechaNacimiento.trim()) {
+        setError('La fecha de nacimiento es requerida');
+        return false;
+      }
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
 
-    setLoading(true);
     setError(null);
     setSuccess(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       if (userType === 'doctor') {
@@ -123,25 +192,11 @@ export const SecretaryUserRegisterPage: React.FC = () => {
         />
 
         {/* Selector de tipo de usuario */}
-        <div className={styles.userTypeSelector}>
-          <Button
-            variant={userType === 'patient' ? 'filled' : 'outlined'}
-            color={userType === 'patient' ? 'secondary' : 'secondary'}
-            fullWidth
-            onClick={() => setUserType('patient')}
-            startIcon={<User size={16} />}
-          >
-            Paciente
-          </Button>
-          <Button
-            variant={userType === 'doctor' ? 'filled' : 'outlined'}
-            color={userType === 'doctor' ? 'primary' : 'primary'}
-            fullWidth
-            onClick={() => setUserType('doctor')}
-            startIcon={<Stethoscope size={16} />}
-          >
-            Médico
-          </Button>
+        <div className={styles.selectorWrapper}>
+          <UserTypeSelector 
+            value={userType} 
+            onChange={setUserType}
+          />
         </div>
 
         {/* Mensajes */}

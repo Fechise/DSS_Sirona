@@ -4,6 +4,7 @@ import { Container } from '../../atoms/Container/Container';
 import { Users, RefreshCw, FileText, Calendar } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Badge } from '../../atoms/Badge/Badge';
+import { NoResults } from '../../molecules/NoResults/NoResults';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
@@ -106,12 +107,12 @@ export const DoctorPatientsPage: React.FC = () => {
       // Mapear la respuesta del backend al formato esperado
       const mappedPacientes: PacienteAsignado[] = response.pacientes.map((p) => ({
         id: p.id,
-        fullName: p.fullName,
+        fullName: p.full_name,
         email: p.email,
         cedula: p.cedula,
-        fechaNacimiento: p.fechaNacimiento || '',
-        ultimaConsulta: p.ultimaConsulta || null,
-        diagnosticos: 0,
+        fechaNacimiento: p.fecha_nacimiento || '',
+        ultimaConsulta: p.ultima_consulta || null,
+        diagnosticos: p.diagnosticos || 0,
       }));
       setPacientes(mappedPacientes);
       success('Pacientes cargados exitosamente');
@@ -155,7 +156,7 @@ export const DoctorPatientsPage: React.FC = () => {
           right={
             <Button
               variant="filled"
-              color="primary"
+              color="secondary"
               onClick={loadPacientes}
               disabled={loading}
               startIcon={<RefreshCw size={16} />}
@@ -173,13 +174,11 @@ export const DoctorPatientsPage: React.FC = () => {
             size="large"
           />
         ) : pacientes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <Users size={48} />
-            <p>No tienes pacientes asignados</p>
-            <span className={styles.hint}>
-              Contacta con el administrador para que te asigne pacientes
-            </span>
-          </div>
+          <NoResults
+            title="No tienes pacientes asignados"
+            description="Contacta con el administrador para que te asigne pacientes"
+            icon={<Users size={48} />}
+          />
         ) : (
           <Table
             columns={columns}

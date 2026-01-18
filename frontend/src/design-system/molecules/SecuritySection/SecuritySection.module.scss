@@ -14,7 +14,7 @@
   margin-bottom: $spacing-md;
 
   h2 {
-    font-size: 24px;
+    font-size: 1.75rem;
     font-weight: 600;
     color: $text-color;
     margin: 0;
@@ -22,49 +22,35 @@
 }
 
 .subtitle {
-  font-size: 14px;
-  color: #8b8b8b;
+  font-size: 0.9375rem;
+  color: rgba($text-color, 0.7);
   margin: 0;
-}
-
-.successAlert {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: $spacing-md $spacing-lg;
-  background-color: #ecf7ee;
-  border-left: 4px solid #4caf50;
-  border-radius: 8px;
-  color: #2e7d32;
-  font-size: 14px;
-  font-weight: 500;
-
-  svg {
-    color: #4caf50;
-    flex-shrink: 0;
-  }
 }
 
 .card {
   background: #ffffff;
   border: 1px solid $border-color;
-  border-radius: 12px;
+  border-radius: $radius-large;
   padding: $spacing-xl;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-xl;
   box-shadow: $shadow-medium;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(var(--primary-color), 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
 }
 
-.cardHeader {
+.cardContent {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: $spacing-lg;
+  gap: $spacing-xl;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
+    gap: $spacing-lg;
 
     button {
       width: 100%;
@@ -72,77 +58,96 @@
   }
 }
 
-.cardTitleGroup {
+.cardInfo {
   display: flex;
-  gap: $spacing-md;
+  gap: $spacing-lg;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-medium;
+  background: rgba(var(--primary-color-rgb, 123, 105, 201), 0.12);
+  color: var(--primary-color, #7B69C9);
+  flex-shrink: 0;
+}
+
+.textContent {
   flex: 1;
 
-  svg {
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
   h3 {
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: 600;
     color: $text-color;
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  p {
+    font-size: 0.9375rem;
+    color: rgba($text-color, 0.65);
     margin: 0;
+    line-height: 1.5;
   }
 }
 
-.cardSubtitle {
-  font-size: 14px;
-  color: #8b8b8b;
-  margin: $spacing-xs 0 0 0;
-}
-
-.securityInfo {
-  background: #fafafa;
-  padding: $spacing-lg $spacing-xl;
-  border-radius: 8px;
-
-  h4 {
-    font-size: 14px;
-    font-weight: 600;
-    color: $text-color;
-    margin: 0 0 $spacing-sm 0;
-  }
-
-  ul {
-    list-style: disc;
-    margin: 0;
-    padding-left: $spacing-lg;
-    font-size: 13px;
-    color: #8b8b8b;
-    line-height: 1.6;
-
-    li {
-      margin-bottom: $spacing-sm;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-}
-
-// Variantes por rol
+// Variantes de color por rol
 .primary {
-  .cardTitleGroup svg { color: $primary-color; }
-  .securityInfo { border-left: 4px solid $primary-color; }
+  .iconWrapper {
+    background: rgba($primary-color, 0.12);
+    color: $primary-color;
+  }
 }
 
 .secondary {
-  .cardTitleGroup svg { color: $secondary-color; }
-  .securityInfo { border-left: 4px solid $secondary-color; }
+  .iconWrapper {
+    background: rgba($secondary-color, 0.12);
+    color: $secondary-color;
+  }
 }
 
 .tertiary {
-  .cardTitleGroup svg { color: $tertiary-color; }
-  .securityInfo { border-left: 4px solid $tertiary-color; }
+  .iconWrapper {
+    background: rgba($tertiary-color, 0.12);
+    color: $tertiary-color;
+  }
 }
 
 .quaternary {
-  .cardTitleGroup svg { color: $quaternary-color; }
-  .securityInfo { border-left: 4px solid $quaternary-color; }
+  .iconWrapper {
+    background: rgba($quaternary-color, 0.12);
+    color: $quaternary-color;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .card {
+    padding: $spacing-lg;
+  }
+
+  .cardInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .textContent {
+    h3 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.875rem;
+    }
+  }
 }
