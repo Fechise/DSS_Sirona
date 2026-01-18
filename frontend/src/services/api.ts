@@ -7,9 +7,9 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string;  // Cambio: era access_token
+  token: string;
   role: string;
-  requires_mfa: boolean;  // Cambio: era mfa_required
+  requires_mfa: boolean;
   user?: {
     email: string;
     fullName: string;
@@ -17,6 +17,33 @@ export interface LoginResponse {
     role: string;
     status: string;
   };
+}
+
+// Respuesta cuando se requiere MFA (primer paso de autenticación)
+export interface MFARequiredResponse {
+  requires_mfa: true;
+  mfa_setup_required: boolean;  // true = primera vez, mostrar QR
+  temp_token: string;           // Token temporal para verificar OTP
+  qr_code?: string;             // Base64 del QR (solo si mfa_setup_required)
+  secret_key?: string;          // Secreto manual (solo si mfa_setup_required)
+  message: string;
+}
+
+// Request para verificar OTP
+export interface OTPVerifyRequest {
+  temp_token: string;
+  otp_code: string;
+  secret_key?: string;  // Solo requerido si es setup inicial
+}
+
+// Respuesta exitosa de verificación OTP
+export interface OTPVerifyResponse {
+  access_token: string;
+  token_type: string;
+  role: string;
+  user_id: string;
+  email: string;
+  message: string;
 }
 
 export interface ApiError {
@@ -82,20 +109,38 @@ export class AuthApiService {
 
   /**
    * Verificar código OTP para MFA
+   * 
+   * @param tempToken - Token temporal recibido en login
+   * @param otpCode - Código de 6 dígitos del autenticador
+   * @param secretKey - Secreto (solo requerido en setup inicial)
    */
-  static async verifyOtp(email: string, otp: string): Promise<LoginResponse> {
+  static async verifyOtp(
+    tempToken: string, 
+    otpCode: string, 
+    secretKey?: string
+  ): Promise<OTPVerifyResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/otp/verify`, {
+      const body: OTPVerifyRequest = {
+        temp_token: tempToken,
+        otp_code: otpCode,
+      };
+      
+      // Solo incluir secret_key si es setup inicial
+      if (secretKey) {
+        body.secret_key = secretKey;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify(body),
       });
 
       const responseData = await response.json();
       
-      console.log('OTP Response:', responseData);
+      console.log('OTP Verify Response:', responseData);
 
       if (!response.ok) {
         throw responseData;
@@ -103,7 +148,7 @@ export class AuthApiService {
 
       return responseData;
     } catch (error) {
-      console.error('OTP error:', error);
+      console.error('OTP verification error:', error);
       throw error;
     }
   }

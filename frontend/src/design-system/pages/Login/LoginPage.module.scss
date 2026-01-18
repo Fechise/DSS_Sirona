@@ -267,3 +267,109 @@
     gap: $spacing-xs;
   }
 }
+
+// ========================================
+// MFA Setup Styles
+// ========================================
+
+.mfaIcon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $spacing-sm;
+  color: $primary-color;
+}
+
+.qrContainer {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-md;
+  margin: $spacing-sm 0;
+  background: #fff;
+  border-radius: $radius-medium;
+  border: 1px solid $border-color;
+}
+
+.qrImage {
+  width: 200px;
+  height: 200px;
+  border-radius: $radius-small;
+
+  @media (max-height: 800px) {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+.secretContainer {
+  margin: $spacing-sm 0;
+  padding: $spacing-sm;
+  background: color-mix(in srgb, $primary-color 5%, white);
+  border-radius: $radius-medium;
+  border: 1px dashed color-mix(in srgb, $primary-color 30%, white);
+}
+
+.secretLabel {
+  margin: 0 0 $spacing-xs;
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, $text-color 70%, white);
+  text-align: center;
+}
+
+.secretKey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  
+  code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: $text-color;
+    background: #fff;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-small;
+    border: 1px solid $border-color;
+    word-break: break-all;
+  }
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xs;
+  border: none;
+  background: transparent;
+  color: $primary-color;
+  cursor: pointer;
+  border-radius: $radius-small;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background: color-mix(in srgb, $primary-color 15%, white);
+  }
+
+  &:active {
+    background: color-mix(in srgb, $primary-color 25%, white);
+  }
+}
+
+.backLink {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: $spacing-xs;
+  padding: $spacing-xs;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, $text-color 70%, white);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: $primary-color;
+  }
+}
