@@ -22,6 +22,11 @@ type ChangePasswordModalProps = {
    * Si se está cargando
    */
   loading?: boolean;
+
+  /**
+   * Color del botón según el rol
+   */
+  buttonColor?: 'primary' | 'secondary' | 'tertiary' | 'quaternary';
 };
 
 export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
@@ -29,14 +34,15 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   onClose,
   onSubmit,
   loading = false,
+  buttonColor = 'primary',
 }) => {
   const handleSubmit = async (data: { currentPassword: string; newPassword: string }) => {
     await onSubmit?.(data);
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Cambiar Contraseña" maxWidth="450px">
-      <ChangePasswordForm onSubmit={handleSubmit} loading={loading} />
+    <Modal isOpen={isOpen} onClose={onClose} title="Cambiar Contraseña" maxWidth="700px">
+      <ChangePasswordForm onSubmit={handleSubmit} loading={loading} buttonColor={buttonColor} />
     </Modal>
   );
 };

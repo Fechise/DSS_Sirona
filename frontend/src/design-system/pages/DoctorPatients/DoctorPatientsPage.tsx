@@ -4,6 +4,7 @@ import { Container } from '../../atoms/Container/Container';
 import { Users, RefreshCw, FileText, Calendar } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Badge } from '../../atoms/Badge/Badge';
+import { NoResults } from '../../molecules/NoResults/NoResults';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
 import { Table, type TableColumn } from '../../molecules/Table/Table';
@@ -11,6 +12,7 @@ import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { DoctorApiService } from '../../../services/api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useToast } from '../../../hooks/useToast';
 
 type PacienteAsignado = {
   id: string;
@@ -25,9 +27,9 @@ type PacienteAsignado = {
 export const DoctorPatientsPage: React.FC = () => {
   const [pacientes, setPacientes] = useState<PacienteAsignado[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { token } = useAuth();
+  const { error, success } = useToast();
 
   const columns: TableColumn<PacienteAsignado>[] = [
     {
@@ -96,11 +98,10 @@ export const DoctorPatientsPage: React.FC = () => {
   // Cargar pacientes asignados desde el backend
   const loadPacientes = async () => {
     if (!token) {
-      setError('No se encontró token de autenticación');
+      error('No se encontró token de autenticación');
       return;
     }
     setLoading(true);
-    setError(null);
     try {
       const response = await DoctorApiService.getMyPatients(token);
       // Mapear la respuesta del backend al formato esperado
@@ -114,9 +115,10 @@ export const DoctorPatientsPage: React.FC = () => {
         diagnosticos: p.diagnosticos || 0,
       }));
       setPacientes(mappedPacientes);
+      success('Pacientes cargados exitosamente');
     } catch (err) {
       console.error('Error loading pacientes:', err);
-      setError('Error al cargar los pacientes. Por favor, intente nuevamente.');
+      error('Error al cargar los pacientes. Por favor, intente nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -150,17 +152,11 @@ export const DoctorPatientsPage: React.FC = () => {
         subtitle="Lista de pacientes bajo tu cuidado médico"
         />
 
-        {error && (
-          <div className={styles.errorMessage}>
-            {error}
-          </div>
-        )}
-
         <TableToolbar
           right={
             <Button
               variant="filled"
-              color="primary"
+              color="secondary"
               onClick={loadPacientes}
               disabled={loading}
               startIcon={<RefreshCw size={16} />}
@@ -178,13 +174,11 @@ export const DoctorPatientsPage: React.FC = () => {
             size="large"
           />
         ) : pacientes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <Users size={48} />
-            <p>No tienes pacientes asignados</p>
-            <span className={styles.hint}>
-              Contacta con el administrador para que te asigne pacientes
-            </span>
-          </div>
+          <NoResults
+            title="No tienes pacientes asignados"
+            description="Contacta con el administrador para que te asigne pacientes"
+            icon={<Users size={48} />}
+          />
         ) : (
           <Table
             columns={columns}

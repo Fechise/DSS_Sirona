@@ -3,13 +3,17 @@ import styles from './ChangePasswordForm.module.scss';
 import { Input } from '../../atoms/Input/Input';
 import { Button } from '../../atoms/Button/Button';
 import { PasswordStrengthIndicator, validatePasswordStrength } from '../PasswordStrengthIndicator/PasswordStrengthIndicator';
+import { KeyRound, CheckCircle, AlertCircle } from 'lucide-react';
+import { useToast } from '../../../hooks/useToast';
 
 type Props = {
   onSubmit?: (data: { currentPassword: string; newPassword: string }) => Promise<void> | void;
   loading?: boolean;
+  buttonColor?: 'primary' | 'secondary' | 'tertiary' | 'quaternary';
 };
 
-export const ChangePasswordForm: React.FC<Props> = ({ onSubmit, loading = false }) => {
+export const ChangePasswordForm: React.FC<Props> = ({ onSubmit, loading = false, buttonColor = 'primary' }) => {
+  const { success, error: showError } = useToast();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,6 +24,8 @@ export const ChangePasswordForm: React.FC<Props> = ({ onSubmit, loading = false 
   }>({});
 
   const passwordValidation = React.useMemo(() => validatePasswordStrength(newPassword), [newPassword]);
+
+  const passwordsMatch = newPassword && confirmPassword && newPassword === confirmPassword;
 
   const validate = () => {
     const next: typeof errors = {};
@@ -47,53 +53,94 @@ export const ChangePasswordForm: React.FC<Props> = ({ onSubmit, loading = false 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    await onSubmit?.({ currentPassword, newPassword });
+    try {
+      await onSubmit?.({ currentPassword, newPassword });
+      success('Contraseña actualizada exitosamente');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setErrors({});
+    } catch (err) {
+      const apiError = err as { detail?: string };
+      showError(apiError?.detail || 'Error al cambiar la contraseña');
+    }
   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Cambiar contraseña</h2>
-        <p className={styles.subtitle}>Actualiza tu contraseña con una nueva y segura</p>
+      <div className={styles.container}>
+        {/* Columna 1: Inputs */}
+        <div className={styles.column}>
+          <div className={styles.fieldGroup}>
+            <Input
+              id="currentPassword"
+              label="Contraseña actual"
+              type="password"
+              value={currentPassword}
+              placeholder="••••••••"
+              onChange={setCurrentPassword}
+              error={errors.currentPassword}
+              autoComplete="current-password"
+              icon={<KeyRound size={18} />}
+            />
+          </div>
+
+          <div className={styles.columnDivider}></div>
+
+          <div className={styles.fieldGroup}>
+            <Input
+              id="newPassword"
+              label="Nueva contraseña"
+              type="password"
+              value={newPassword}
+              placeholder="••••••••"
+              onChange={setNewPassword}
+              error={errors.newPassword}
+              autoComplete="new-password"
+              icon={<KeyRound size={18} />}
+            />
+
+            <Input
+              id="confirmPassword"
+              label="Confirmar nueva contraseña"
+              type="password"
+              value={confirmPassword}
+              placeholder="••••••••"
+              onChange={setConfirmPassword}
+              error={errors.confirmPassword}
+              autoComplete="new-password"
+              icon={<KeyRound size={18} />}
+            />
+          </div>
+        </div>
+
+        {/* Columna 2: Indicador de fortaleza */}
+        <div className={styles.column}>
+          <PasswordStrengthIndicator password={newPassword} />
+
+          {confirmPassword && (
+            <div
+              className={`${styles.panel} ${passwordsMatch ? styles.matchPanel : styles.mismatchPanel}`}
+            >
+              {passwordsMatch ? (
+                <div className={styles.matchIndicator}>
+                  <CheckCircle size={18} className={styles.matchIcon} />
+                  <span className={styles.matchText}>Las contraseñas coinciden</span>
+                </div>
+              ) : (
+                <div className={styles.matchIndicator}>
+                  <AlertCircle size={18} className={styles.mismatchIcon} />
+                  <span className={styles.mismatchText}>Las contraseñas no coinciden</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className={styles.fields}>
-        <Input
-          id="currentPassword"
-          label="Contraseña actual"
-          type="password"
-          value={currentPassword}
-          placeholder="••••••••"
-          onChange={setCurrentPassword}
-          error={errors.currentPassword}
-          autoComplete="current-password"
-        />
+      <div className={styles.divider}></div>
 
-        <Input
-          id="newPassword"
-          label="Nueva contraseña"
-          type="password"
-          value={newPassword}
-          placeholder="••••••••"
-          onChange={setNewPassword}
-          error={errors.newPassword}
-          autoComplete="new-password"
-        />
-        {newPassword && <PasswordStrengthIndicator password={newPassword} />}
-
-        <Input
-          id="confirmPassword"
-          label="Confirmar nueva contraseña"
-          type="password"
-          value={confirmPassword}
-          placeholder="••••••••"
-          onChange={setConfirmPassword}
-          error={errors.confirmPassword}
-          autoComplete="new-password"
-        />
-      </div>
-
-      <Button type="submit" variant="filled" color="primary" fullWidth disabled={loading || !passwordValidation.valid}>
+      <Button type="submit" variant="filled" color={buttonColor} fullWidth disabled={loading || !passwordValidation.valid}>
         {loading ? 'Cambiando contraseña...' : 'Cambiar contraseña'}
       </Button>
     </form>

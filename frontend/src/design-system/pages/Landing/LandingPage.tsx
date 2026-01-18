@@ -33,12 +33,6 @@ export const LandingPage: React.FC = () => {
               >
                 Iniciar sesión
               </Button>
-              <Button
-                variant="filled"
-                onClick={() => navigate('/register')}
-              >
-                Registrarse
-              </Button>
             </div>
           </div>
         </Container>
@@ -62,12 +56,6 @@ export const LandingPage: React.FC = () => {
               <div className={styles.ctaButtons}>
                 <Button
                   variant="filled"
-                  onClick={() => navigate('/register')}
-                >
-                  Comenzar ahora
-                </Button>
-                <Button
-                  variant="outlined"
                   onClick={() => navigate('/login')}
                 >
                   Ya tengo cuenta

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import styles from './AppLayout.module.scss';
 import { Header } from '../organisms/Header/Header';
+import { ToastContainer } from '../organisms/ToastContainer/ToastContainer';
 import { useAuth } from '../../contexts/AuthContext';
 
 type AppLayoutProps = {
@@ -40,6 +41,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className={`${styles.appContainer} ${styles[variant]}`}>
       <Header />
+      <ToastContainer />
       <main className={styles.mainContent}>
         {children}
       </main>

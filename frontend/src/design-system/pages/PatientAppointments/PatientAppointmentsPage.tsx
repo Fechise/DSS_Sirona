@@ -7,6 +7,7 @@ import { ArrowLeft, AlertCircle, Calendar, Clock, User } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
+import { NoResults } from '../../molecules/NoResults/NoResults';
 import { PatientApiService, type AppointmentResponse } from '../../../services/api';
 
 export const PatientAppointmentsPage: React.FC = () => {
@@ -108,11 +109,12 @@ export const PatientAppointmentsPage: React.FC = () => {
         )}
 
         {!loading && !error && appointments.length === 0 && (
-          <div className={styles.emptyState}>
-            <Calendar size={64} className={styles.emptyIcon} />
-            <h2>Sin Citas Registradas</h2>
-            <p>Aún no tienes citas médicas agendadas. Contacta con tu centro médico para agendar una cita.</p>
-          </div>
+          <NoResults
+            title="Sin Citas Registradas"
+            description="Aún no tienes citas médicas agendadas. Contacta con tu centro médico para agendar una cita."
+            icon={<Calendar size={48} />}
+            fullHeight
+          />
         )}
 
         {!loading && !error && appointments.length > 0 && (

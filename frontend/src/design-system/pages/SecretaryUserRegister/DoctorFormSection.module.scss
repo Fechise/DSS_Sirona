@@ -8,20 +8,20 @@
 
 .infoNote {
   grid-column: 1 / -1;
-  background-color: #f3e5f5;
-  border-left: 4px solid #9c27b0;
+  background-color: color-mix(in srgb, $primary-color 8%, white);
+  border-left: 4px solid $primary-color;
   padding: 1rem;
-  border-radius: var(--radius-md);
-  margin-top: 1rem;
+  border-radius: $radius-medium;
 
   p {
     margin: 0;
     font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    color: $text-color;
     line-height: 1.5;
 
     strong {
-      color: var(--color-text-primary);
+      color: $text-color;
+      font-weight: 600;
     }
   }
 }

@@ -2,6 +2,8 @@ import React from 'react';
 import { User, CreditCard, Mail, Phone, CalendarDays, MapPin, Building2, Globe, UserCircle, Heart, Briefcase, Droplet } from 'lucide-react';
 import styles from './PatientFormSection.module.scss';
 import { Input } from '../../atoms/Input/Input';
+import { FilterSelect } from '../../atoms/FilterSelect/FilterSelect';
+import { AlertNote } from '../../molecules/AlertNote/AlertNote';
 import { type PatientFormData } from './SecretaryUserRegister.types';
 
 interface PatientFormSectionProps {
@@ -19,28 +21,30 @@ export const PatientFormSection: React.FC<PatientFormSectionProps> = ({ form, on
     <div className={`${styles.formGroup} ${styles.firstName}`}>
       <Input
         id="patient-firstName"
-        label="Nombres *"
+        label="Nombres"
         type="text"
         value={form.firstName}
         onChange={onChange('firstName')}
         placeholder="María Luisa"
         icon={<User size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
-        required
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
     <div className={`${styles.formGroup} ${styles.lastName}`}>
       <Input
         id="patient-lastName"
-        label="Apellidos *"
+        label="Apellidos"
         type="text"
         value={form.lastName}
         onChange={onChange('lastName')}
         placeholder="González López"
         icon={<User size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
-        required
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
@@ -48,28 +52,30 @@ export const PatientFormSection: React.FC<PatientFormSectionProps> = ({ form, on
     <div className={`${styles.formGroup} ${styles.cedula}`}>
       <Input
         id="patient-cedula"
-        label="Cédula *"
+        label="Cédula"
         type="text"
         value={form.cedula}
         onChange={onChange('cedula')}
         placeholder="1234567890"
         icon={<CreditCard size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
-        required
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
     <div className={`${styles.formGroup} ${styles.email}`}>
       <Input
         id="patient-email"
-        label="Correo Electrónico *"
+        label="Correo Electrónico"
         type="email"
         value={form.email}
         onChange={onChange('email')}
         placeholder="paciente@email.com"
         icon={<Mail size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
-        required
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
@@ -77,27 +83,29 @@ export const PatientFormSection: React.FC<PatientFormSectionProps> = ({ form, on
     <div className={`${styles.formGroup} ${styles.phone}`}>
       <Input
         id="patient-telefonoContacto"
-        label="Teléfono de Contacto *"
+        label="Teléfono de Contacto"
         type="tel"
         value={form.telefonoContacto}
         onChange={onChange('telefonoContacto')}
         placeholder="+506 8888 8888"
         icon={<Phone size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
-        required
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
     <div className={`${styles.formGroup} ${styles.fecha}`}>
       <Input
         id="patient-fechaNacimiento"
-        label="Fecha de Nacimiento *"
+        label="Fecha de Nacimiento"
         type="date"
         value={form.fechaNacimiento}
         onChange={onChange('fechaNacimiento')}
         icon={<CalendarDays size={16} style={{ color: iconColor }} />}
         focusColor={iconColor}
-        required
+        isRequired
+        requiredColor={iconColor}
       />
     </div>
 
@@ -106,42 +114,44 @@ export const PatientFormSection: React.FC<PatientFormSectionProps> = ({ form, on
 
     {/* Fila 4: Género y Estado Civil */}
     <div className={`${styles.formGroup} ${styles.genero}`}>
-      <label htmlFor="patient-genero" className={styles.label}>
+      <label className={styles.label}>
         <UserCircle size={16} style={{ color: iconColor }} />
         <span>Género</span>
       </label>
-      <select
+      <FilterSelect
         id="patient-genero"
         value={form.genero || ''}
-        onChange={(e) => onChange('genero')(e.target.value)}
-        className={styles.select}
-      >
-        <option value="">Seleccione...</option>
-        <option value="Masculino">Masculino</option>
-        <option value="Femenino">Femenino</option>
-        <option value="Otro">Otro</option>
-        <option value="Prefiero no decir">Prefiero no decir</option>
-      </select>
+        onChange={onChange('genero')}
+        placeholder="Seleccione..."
+        themeColor={iconColor}
+        options={[
+          { value: 'Masculino', label: 'Masculino' },
+          { value: 'Femenino', label: 'Femenino' },
+          { value: 'Otro', label: 'Otro' },
+          { value: 'Prefiero no decir', label: 'Prefiero no decir' },
+        ]}
+      />
     </div>
 
     <div className={`${styles.formGroup} ${styles.estadoCivil}`}>
-      <label htmlFor="patient-estadoCivil" className={styles.label}>
+      <label className={styles.label}>
         <Heart size={16} style={{ color: iconColor }} />
         <span>Estado Civil</span>
       </label>
-      <select
+      <FilterSelect
         id="patient-estadoCivil"
         value={form.estadoCivil || ''}
-        onChange={(e) => onChange('estadoCivil')(e.target.value)}
-        className={styles.select}
-      >
-        <option value="">Seleccione...</option>
-        <option value="Soltero">Soltero/a</option>
-        <option value="Casado">Casado/a</option>
-        <option value="Divorciado">Divorciado/a</option>
-        <option value="Viudo">Viudo/a</option>
-        <option value="Unión Libre">Unión Libre</option>
-      </select>
+        onChange={onChange('estadoCivil')}
+        placeholder="Seleccione..."
+        themeColor={iconColor}
+        options={[
+          { value: 'Soltero', label: 'Soltero/a' },
+          { value: 'Casado', label: 'Casado/a' },
+          { value: 'Divorciado', label: 'Divorciado/a' },
+          { value: 'Viudo', label: 'Viudo/a' },
+          { value: 'Unión Libre', label: 'Unión Libre' },
+        ]}
+      />
     </div>
 
     {/* Fila 5: Dirección */}
@@ -200,34 +210,37 @@ export const PatientFormSection: React.FC<PatientFormSectionProps> = ({ form, on
     </div>
 
     <div className={`${styles.formGroup} ${styles.grupoSanguineo}`}>
-      <label htmlFor="patient-grupoSanguineo" className={styles.label}>
+      <label className={styles.label}>
         <Droplet size={16} style={{ color: iconColor }} />
         <span>Grupo Sanguíneo</span>
       </label>
-      <select
+      <FilterSelect
         id="patient-grupoSanguineo"
         value={form.grupoSanguineo || ''}
-        onChange={(e) => onChange('grupoSanguineo')(e.target.value)}
-        className={styles.select}
-      >
-        <option value="">Seleccione...</option>
-        <option value="A+">A+</option>
-        <option value="A-">A-</option>
-        <option value="B+">B+</option>
-        <option value="B-">B-</option>
-        <option value="AB+">AB+</option>
-        <option value="AB-">AB-</option>
-        <option value="O+">O+</option>
-        <option value="O-">O-</option>
-      </select>
+        onChange={onChange('grupoSanguineo')}
+        placeholder="Seleccione..."
+        themeColor={iconColor}
+        options={[
+          { value: 'A+', label: 'A+' },
+          { value: 'A-', label: 'A-' },
+          { value: 'B+', label: 'B+' },
+          { value: 'B-', label: 'B-' },
+          { value: 'AB+', label: 'AB+' },
+          { value: 'AB-', label: 'AB-' },
+          { value: 'O+', label: 'O+' },
+          { value: 'O-', label: 'O-' },
+        ]}
+      />
     </div>
 
     {/* Nota informativa */}
-    <div className={styles.infoNote}>
-      <p>
-        <strong>Nota:</strong> Se generará una contraseña temporal que será enviada al correo electrónico del paciente. 
-        Se recomienda cambiarla en el primer inicio de sesión.
-      </p>
+    <div style={{ gridColumn: '1 / -1' }}>
+      <AlertNote
+        title="Nota"
+        color="secondary"
+      >
+        Se generará una contraseña temporal que será enviada al correo electrónico del paciente. Se recomienda cambiarla en el primer inicio de sesión.
+      </AlertNote>
     </div>
   </>
 );

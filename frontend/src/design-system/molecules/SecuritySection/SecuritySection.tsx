@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import styles from './SecuritySection.module.scss';
 import { Button } from '../../atoms/Button/Button';
-import { KeyRound, CheckCircle } from 'lucide-react';
+import { KeyRound } from 'lucide-react';
 import { ChangePasswordModal } from '../ChangePasswordModal/ChangePasswordModal';
 
 type SecuritySectionProps = {
@@ -17,7 +17,6 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
 }) => {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [passwordChanged, setPasswordChanged] = useState(false);
 
   const getColorByRole = (): 'primary' | 'secondary' | 'tertiary' | 'quaternary' => {
     switch (user?.role) {
@@ -41,12 +40,7 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
     newPassword: string;
   }) => {
     await onPasswordChange?.(data);
-    setPasswordChanged(true);
-    
-    // Ocultar mensaje después de 3 segundos
-    setTimeout(() => {
-      setPasswordChanged(false);
-    }, 3000);
+    setIsModalOpen(false);
   };
 
   return (
@@ -58,43 +52,27 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
         </p>
       </div>
 
-      {passwordChanged && (
-        <div className={styles.successAlert}>
-          <CheckCircle size={20} />
-          <span>Contraseña actualizada exitosamente</span>
-        </div>
-      )}
-
       <div className={styles.card}>
-        <div className={styles.cardHeader}>
-          <div className={styles.cardTitleGroup}>
-            <KeyRound size={24} />
-            <div>
+        <div className={styles.cardContent}>
+          <div className={styles.cardInfo}>
+            <div className={styles.iconWrapper}>
+              <KeyRound size={28} />
+            </div>
+            <div className={styles.textContent}>
               <h3>Contraseña</h3>
-              <p className={styles.cardSubtitle}>
-                Cambia tu contraseña periódicamente para mantener tu cuenta segura
+              <p>
+                Cambia tu contraseña periódicamente para mantener tu cuenta segura y protegida
               </p>
             </div>
           </div>
           <Button
             variant="filled"
-            color="primary"
+            color={roleColor}
             onClick={() => setIsModalOpen(true)}
             startIcon={<KeyRound size={16} />}
           >
             Cambiar Contraseña
           </Button>
-        </div>
-
-        <div className={styles.securityInfo}>
-          <h4>Requisitos de contraseña:</h4>
-          <ul>
-            <li>Mínimo 12 caracteres</li>
-            <li>Al menos una mayúscula</li>
-            <li>Al menos una minúscula</li>
-            <li>Al menos un número</li>
-            <li>Al menos un símbolo especial</li>
-          </ul>
         </div>
       </div>
 
@@ -102,6 +80,7 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handlePasswordChange}
+        buttonColor={roleColor}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, Edit2, X, AlertCircle, User, Stethoscope, Clock } from 'lucide-react';
+import { Calendar, Plus, Edit2, X, User, Stethoscope, Clock } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Badge } from '../../atoms/Badge/Badge';
 import { Container } from '../../atoms/Container/Container';
@@ -7,8 +7,10 @@ import { SectionHeader } from '../../atoms/SectionHeader/SectionHeader';
 import { PageHeader } from '../../molecules/PageHeader/PageHeader';
 import { Table } from '../../molecules/Table/Table';
 import { Modal } from '../../atoms/Modal/Modal';
+import { NoResults } from '../../molecules/NoResults/NoResults';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useToast } from '../../../hooks/useToast';
 import { PatientApiService, AppointmentApiService } from '../../../services/api';
 import styles from './AppointmentSchedulingPage.module.scss';
 
@@ -48,6 +50,7 @@ type AppointmentForm = {
 
 export const AppointmentSchedulingPage: React.FC = () => {
   const { token, user } = useAuth();
+  const toast = useToast();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -129,12 +132,12 @@ export const AppointmentSchedulingPage: React.FC = () => {
 
   const handleAddAppointment = async () => {
     if (!formData.patientId || !formData.doctorId || !formData.date || !formData.time) {
-      setError('Por favor completa todos los campos');
+      toast.error('Por favor completa todos los campos');
       return;
     }
 
     if (!token) {
-      setError('No se encontró token de autenticación');
+      toast.error('No se encontró token de autenticación');
       return;
     }
 
@@ -142,7 +145,7 @@ export const AppointmentSchedulingPage: React.FC = () => {
     const doctor = doctors.find((d) => d.id === formData.doctorId);
 
     if (!patient || !doctor) {
-      setError('Paciente o médico no encontrado');
+      toast.error('Paciente o médico no encontrado');
       return;
     }
 
@@ -195,13 +198,14 @@ export const AppointmentSchedulingPage: React.FC = () => {
         setAppointments([...appointments, newAppointment]);
       }
 
+      toast.success(editingId ? 'Cita actualizada exitosamente' : 'Cita creada exitosamente');
       setFormData({ patientId: '', doctorId: '', date: '', time: '' });
       setShowForm(false);
       setError(null);
     } catch (err: unknown) {
       console.error('Error saving appointment:', err);
       const errorObj = err as { detail?: string };
-      setError(errorObj.detail || 'Error al guardar la cita');
+      toast.error(errorObj.detail || 'Error al guardar la cita');
     }
   };
 
@@ -221,7 +225,7 @@ export const AppointmentSchedulingPage: React.FC = () => {
 
   const handleCancelAppointment = async (id: string) => {
     if (!token) {
-      setError('No se encontró token de autenticación');
+      toast.error('No se encontró token de autenticación');
       return;
     }
 
@@ -235,10 +239,11 @@ export const AppointmentSchedulingPage: React.FC = () => {
       setAppointments(appointments.map(apt => 
         apt.id === id ? { ...apt, estado: 'Cancelada' } : apt
       ));
+      toast.success('Cita cancelada exitosamente');
     } catch (err: unknown) {
       console.error('Error cancelling appointment:', err);
       const errorObj = err as { detail?: string };
-      setError(errorObj.detail || 'Error al cancelar la cita');
+      toast.error(errorObj.detail || 'Error al cancelar la cita');
     }
   };
 
@@ -252,18 +257,17 @@ export const AppointmentSchedulingPage: React.FC = () => {
 
   const handleCheckAvailability = async () => {
     if (!formData.doctorId || !formData.date) {
-      setError('Por favor selecciona un médico y una fecha para consultar disponibilidad');
+      toast.warning('Por favor selecciona un médico y una fecha para consultar disponibilidad');
       return;
     }
 
     if (!token) {
-      setError('No se encontró token de autenticación');
+      toast.error('No se encontró token de autenticación');
       return;
     }
 
     try {
       setLoadingAvailability(true);
-      setError(null);
       
       const scheduleData = await AppointmentApiService.getDoctorSchedule(token, formData.doctorId, formData.date);
       
@@ -278,18 +282,19 @@ export const AppointmentSchedulingPage: React.FC = () => {
         
         if (availableTimes.length > 0) {
           setAvailability(availableTimes);
+          toast.success(`Se encontraron ${availableTimes.length} horarios disponibles`);
         } else {
           setAvailability([]);
-          setError('No hay horarios disponibles para esta fecha');
+          toast.warning('No hay horarios disponibles para esta fecha');
         }
       } else {
         setAvailability([]);
-        setError('El médico no tiene disponibilidad configurada para esta fecha');
+        toast.warning('El médico no tiene disponibilidad configurada para esta fecha');
       }
     } catch (err: unknown) {
       console.error('Error checking availability:', err);
       const errorObj = err as { detail?: string };
-      setError(errorObj.detail || 'Error al consultar disponibilidad');
+      toast.error(errorObj.detail || 'Error al consultar disponibilidad');
       setAvailability([]);
     } finally {
       setLoadingAvailability(false);
@@ -332,124 +337,132 @@ export const AppointmentSchedulingPage: React.FC = () => {
 
         {/* Error Alert */}
         {error && (
-          <div className={styles.alert}>
-            <AlertCircle size={20} />
-            <span>{error}</span>
-          </div>
+          <NoResults 
+            title="Error al gestionar citas" 
+            description={error}
+            icon={<Calendar size={32} />}
+          />
         )}
 
         <Modal
           isOpen={showForm}
           onClose={handleCancel}
           title={editingId ? 'Editar Cita' : 'Crear Nueva Cita'}
-          maxWidth="640px"
+          maxWidth="1200px"
         >
           <div className={styles.formSection}>
-            <div className={styles.formGrid}>
-              <div className={styles.formGroup}>
-                <label htmlFor="patient">
-                  <User size={16} className={styles.labelIcon} />
-                  Paciente
-                </label>
-                <select
-                  id="patient"
-                  value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
-                  className={styles.select}
-                  disabled={!!editingId}
-                >
-                  <option value="">Selecciona un paciente</option>
-                  {patients.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.cedula})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="doctor">
-                  <Stethoscope size={16} className={styles.labelIcon} />
-                  Médico
-                </label>
-                <select
-                  id="doctor"
-                  value={formData.doctorId}
-                  onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
-                  className={styles.select}
-                  disabled={!!editingId}
-                >
-                  <option value="">Selecciona un médico</option>
-                  {doctors.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name} - {d.specialization}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="date">
-                  <Calendar size={16} className={styles.labelIcon} />
-                  Fecha
-                </label>
-                <input
-                  id="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className={styles.input}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="time">
-                  <Clock size={16} className={styles.labelIcon} />
-                  Hora
-                </label>
-                <input
-                  id="time"
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className={styles.input}
-                />
-              </div>
-            </div>
-
-            {/* Botón para consultar disponibilidad */}
-            {!editingId && (
-              <div className={styles.availabilitySection}>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleCheckAvailability}
-                  disabled={!formData.doctorId || !formData.date || loadingAvailability}
-                  startIcon={<Calendar size={16} />}
-                >
-                  {loadingAvailability ? 'Consultando...' : 'Consultar Disponibilidad'}
-                </Button>
-                
-                {availability.length > 0 && (
-                  <div className={styles.availabilityList}>
-                    <p><strong>Horarios disponibles:</strong></p>
-                    <div className={styles.timeSlots}>
-                      {availability.map((time, index) => (
-                        <Button
-                          key={index}
-                          variant="outlined"
-                          color="tertiary"
-                          onClick={() => setFormData({ ...formData, time: time })}
-                          className={formData.time === time ? styles.selectedSlot : ''}
-                        >
-                          {time}
-                        </Button>
+            <div className={styles.modalColumns}>
+              {/* Columna Izquierda: Formulario */}
+              <div className={styles.leftColumn}>
+                <div className={styles.formGrid}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="patient">
+                      <User size={16} className={styles.labelIcon} />
+                      Paciente
+                    </label>
+                    <select
+                      id="patient"
+                      value={formData.patientId}
+                      onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+                      className={styles.select}
+                      disabled={!!editingId}
+                    >
+                      <option value="">Selecciona un paciente</option>
+                      {patients.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.cedula})
+                        </option>
                       ))}
-                    </div>
+                    </select>
                   </div>
-                )}
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="doctor">
+                      <Stethoscope size={16} className={styles.labelIcon} />
+                      Médico
+                    </label>
+                    <select
+                      id="doctor"
+                      value={formData.doctorId}
+                      onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                      className={styles.select}
+                      disabled={!!editingId}
+                    >
+                      <option value="">Selecciona un médico</option>
+                      {doctors.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name} - {d.specialization}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="date">
+                      <Calendar size={16} className={styles.labelIcon} />
+                      Fecha
+                    </label>
+                    <input
+                      id="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      className={styles.input}
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="time">
+                      <Clock size={16} className={styles.labelIcon} />
+                      Hora
+                    </label>
+                    <input
+                      id="time"
+                      type="time"
+                      value={formData.time}
+                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* Columna Derecha: Disponibilidad */}
+              {!editingId && (
+                <div className={styles.rightColumn}>
+                  <div className={styles.availabilitySection}>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={handleCheckAvailability}
+                      disabled={!formData.doctorId || !formData.date || loadingAvailability}
+                      startIcon={<Calendar size={16} />}
+                    >
+                      {loadingAvailability ? 'Consultando...' : 'Consultar Disponibilidad'}
+                    </Button>
+                    
+                    {availability.length > 0 && (
+                      <div className={styles.availabilityList}>
+                        <p><strong>Horarios disponibles:</strong></p>
+                        <div className={styles.timeSlots}>
+                          {availability.map((time, index) => (
+                            <Button
+                              key={index}
+                              variant="outlined"
+                              color="tertiary"
+                              onClick={() => setFormData({ ...formData, time: time })}
+                              className={formData.time === time ? styles.selectedSlot : ''}
+                            >
+                              {time}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className={styles.formActions}>
               <Button variant="outlined" color="error" onClick={handleCancel}>

@@ -1,5 +1,7 @@
 import { type ReactNode } from 'react';
+import { FileQuestion } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { NoResults } from '../NoResults/NoResults';
 import styles from './Table.module.scss';
 
 export type TableColumn<T> = {
@@ -50,9 +52,11 @@ function TableComponent<T extends { id?: any }>({
 
   if (data.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <p>{emptyMessage}</p>
-      </div>
+      <NoResults 
+        title={emptyMessage}
+        icon={<FileQuestion size={48} />}
+        fullHeight
+      />
     );
   }
 
@@ -61,9 +65,9 @@ function TableComponent<T extends { id?: any }>({
       <table className={`${styles.table} ${styles[roleColor]}`}>
         <thead>
           <tr>
-            {columns.map((column) => (
+            {columns.map((column, colIndex) => (
               <th
-                key={String(column.key)}
+                key={`${String(column.key)}-${colIndex}`}
                 style={{
                   textAlign: column.align || 'left',
                 }}
@@ -76,7 +80,7 @@ function TableComponent<T extends { id?: any }>({
         <tbody>
           {data.map((row, rowIndex) => (
             <tr key={getRowKey(row, rowIndex)}>
-              {columns.map((column) => {
+              {columns.map((column, colIndex) => {
                 const value = row[column.key];
                 const content = column.render
                   ? column.render(value, row, rowIndex)
@@ -84,7 +88,7 @@ function TableComponent<T extends { id?: any }>({
 
                 return (
                   <td
-                    key={String(column.key)}
+                    key={`${String(column.key)}-${colIndex}`}
                     style={{
                       textAlign: column.align || 'left',
                     }}

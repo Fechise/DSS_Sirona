@@ -17,6 +17,8 @@ type InputProps = {
   max?: string;
   focusColor?: string;
   required?: boolean;
+  isRequired?: boolean;
+  requiredColor?: string;
 };
 
 export const Input: React.FC<InputProps> = ({
@@ -35,6 +37,8 @@ export const Input: React.FC<InputProps> = ({
   max,
   focusColor,
   required,
+  isRequired,
+  requiredColor,
 }) => {
   return (
     <div className={styles.field}>
@@ -42,6 +46,9 @@ export const Input: React.FC<InputProps> = ({
         <label htmlFor={id} className={styles.label}>
           {icon && <span className={styles.labelIcon}>{icon}</span>}
           {label}
+          {(isRequired !== undefined ? isRequired : required) && (
+            <span className={styles.required} style={requiredColor ? { color: requiredColor } : undefined}>*</span>
+          )}
         </label>
       )}
       <input

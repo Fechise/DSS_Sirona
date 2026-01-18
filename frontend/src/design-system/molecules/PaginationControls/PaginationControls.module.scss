@@ -1,0 +1,33 @@
+@use '../../../styles/tokens/_index' as *;
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-md $spacing-lg;
+  background: color-mix(in srgb, var(--primary-color) 12%, white);
+  border: 1.5px solid color-mix(in srgb, var(--primary-color) 30%, white);
+  border-radius: $radius-large;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary-color) 16%, white);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.pageInfo {
+  font-size: $font-size-sm;
+  color: $text-color;
+  min-width: 160px;
+  text-align: center;
+  line-height: 1.5;
+
+  strong {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: $font-size-base;
+  }
+}

@@ -1,12 +1,12 @@
+@use '../../../styles/tokens/_index' as *;
+
 .main {
-  flex: 1;
-  padding: 2rem;
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+  max-width: $content-max-width;
+  margin: 0 auto;
 }
 
 .subtitle {
@@ -49,29 +49,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.loadingState,
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-  color: color-mix(in srgb, var(--text-color) 60%, white);
-}
-
-.loadingState p,
-.emptyState p {
-  margin: 1rem 0 0;
-  font-size: 0.9375rem;
-  font-weight: 500;
-}
-
-.emptyState .hint {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: color-mix(in srgb, var(--text-color) 50%, white);
 }
 
 .spinner {

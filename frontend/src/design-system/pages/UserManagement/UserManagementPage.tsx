@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styles from './UserManagementPage.module.scss';
 import { Container } from '../../atoms/Container/Container';
 import { Badge } from '../../atoms/Badge/Badge';
-import { Users, RefreshCw, AlertCircle, Edit2, CheckCircle, Trash2, Plus, Loader2 } from 'lucide-react';
+import { FilterSelect } from '../../atoms/FilterSelect/FilterSelect';
+import { Users, RefreshCw, AlertCircle, Edit2, CheckCircle, Trash2, Plus, Loader2, Search, User, Mail, FileText, Building } from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { Modal } from '../../atoms/Modal/Modal';
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner';
@@ -12,6 +13,7 @@ import { TableToolbar } from '../../molecules/TableToolbar/TableToolbar';
 import { Input } from '../../atoms/Input/Input';
 import type { UserRole, UserStatus } from '../../../types/user';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useToast } from '../../../hooks/useToast';
 import { AdminApiService, type UserListItem } from '../../../services/api';
 
 // Todos los estados disponibles
@@ -27,11 +29,10 @@ interface UserForm {
 
 export const UserManagementPage: React.FC = () => {
   const { token } = useAuth();
+  const { success, error } = useToast();
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   
   // Filtros
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -59,7 +60,6 @@ export const UserManagementPage: React.FC = () => {
   const loadUsers = async () => {
     if (!token) return;
     setLoading(true);
-    setError(null);
 
     try {
       const data = await AdminApiService.listUsers(token, {
@@ -69,7 +69,7 @@ export const UserManagementPage: React.FC = () => {
       setUsers(data.users as UserListItem[]);
     } catch (err: unknown) {
       const apiError = err as { detail?: string };
-      setError(apiError?.detail || 'Error al cargar secretarios');
+      error(apiError?.detail || 'Error al cargar secretarios');
     } finally {
       setLoading(false);
     }
@@ -91,11 +91,10 @@ export const UserManagementPage: React.FC = () => {
     e.preventDefault();
     if (!token) return;
     setCreating(true);
-    setError(null);
 
     try {
       await AdminApiService.createUser(token, createForm);
-      setSuccess('Secretario creado exitosamente. La contraseña temporal ha sido enviada por email.');
+      success('Secretario creado exitosamente. La contraseña temporal ha sido enviada por email.');
       setShowCreateModal(false);
       setCreateForm({
         fullName: '',
@@ -106,7 +105,7 @@ export const UserManagementPage: React.FC = () => {
       loadUsers();
     } catch (err: unknown) {
       const apiError = err as { detail?: string };
-      setError(apiError?.detail || 'Error al crear secretario');
+      error(apiError?.detail || 'Error al crear secretario');
     } finally {
       setCreating(false);
     }
@@ -128,18 +127,17 @@ export const UserManagementPage: React.FC = () => {
     if (!editingUser || !token) return;
     
     setSaving(true);
-    setError(null);
 
     try {
       await AdminApiService.updateUser(token, editingUser.id, editForm);
-      setSuccess('Secretario actualizado exitosamente');
+      success('Secretario actualizado exitosamente');
       setShowEditModal(false);
       setEditingUser(null);
       setEditForm({});
       loadUsers();
     } catch (err: unknown) {
       const apiError = err as { detail?: string };
-      setError(apiError?.detail || 'Error al actualizar secretario');
+      error(apiError?.detail || 'Error al actualizar secretario');
     } finally {
       setSaving(false);
     }
@@ -148,15 +146,14 @@ export const UserManagementPage: React.FC = () => {
   const handleReactivateUser = async (userId: string) => {
     if (!token) return;
     setUpdating(userId);
-    setError(null);
 
     try {
       await AdminApiService.reactivateUser(token, userId);
-      setSuccess('Secretario reactivado exitosamente');
+      success('Secretario reactivado exitosamente');
       loadUsers();
     } catch (err: unknown) {
       const apiError = err as { detail?: string };
-      setError(apiError?.detail || 'Error al reactivar secretario');
+      error(apiError?.detail || 'Error al reactivar secretario');
     } finally {
       setUpdating(null);
     }
@@ -167,15 +164,14 @@ export const UserManagementPage: React.FC = () => {
     if (!token) return;
     
     setUpdating(userId);
-    setError(null);
 
     try {
       await AdminApiService.deactivateUser(token, userId);
-      setSuccess('Secretario desactivado exitosamente');
+      success('Secretario desactivado exitosamente');
       loadUsers();
     } catch (err: unknown) {
       const apiError = err as { detail?: string };
-      setError(apiError?.detail || 'Error al desactivar secretario');
+      error(apiError?.detail || 'Error al desactivar secretario');
     } finally {
       setUpdating(null);
     }
@@ -219,36 +215,37 @@ export const UserManagementPage: React.FC = () => {
     {
       key: 'id',
       label: 'Acciones',
+      align: 'center',
       render: (_value: string, user: UserListItem) => (
         <div className={styles.actionsCell}>
           <Button
-            variant="ghost"
+            variant="outlined"
             color="primary"
             onClick={() => openEditModal(user)}
             disabled={updating === user.id}
-            aria-label="Editar usuario"
+            startIcon={<Edit2 size={16} />}
           >
-            <Edit2 size={18} />
+            Editar
           </Button>
           {user.status === 'Inactivo' || user.status === 'Bloqueado' ? (
             <Button
-              variant="ghost"
+              variant="outlined"
               color="tertiary"
               onClick={() => handleReactivateUser(user.id)}
               disabled={updating === user.id}
-              aria-label="Reactivar usuario"
+              startIcon={<CheckCircle size={16} />}
             >
-              <CheckCircle size={18} />
+              Activar
             </Button>
           ) : (
             <Button
-              variant="ghost"
+              variant="outlined"
               color="error"
               onClick={() => handleDeleteUser(user.id)}
               disabled={updating === user.id}
-              aria-label="Desactivar usuario"
+              startIcon={<Trash2 size={16} />}
             >
-              <Trash2 size={18} />
+              Desactivar
             </Button>
           )}
         </div>
@@ -258,7 +255,7 @@ export const UserManagementPage: React.FC = () => {
 
   return (
     <Container>
-      <main className={styles.main}>
+      <main className={styles.main} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <PageHeader
           title="Gestión de Secretarios"
           icon={<Users size={32} />}
@@ -266,18 +263,47 @@ export const UserManagementPage: React.FC = () => {
         />
 
         <TableToolbar
+          left={
+            <>
+              <FilterSelect
+                id="status-filter"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                placeholder="Todos los estados"
+                options={ALL_STATUSES.map((status) => ({ value: status, label: status }))}
+              />
+              <div className={styles.searchGroup}>
+                <Input
+                  id="search-users"
+                  type="text"
+                  placeholder="Buscar por nombre o email..."
+                  value={searchTerm}
+                  onChange={(value) => setSearchTerm(value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                />
+                <Button 
+                variant="filled" 
+                color="primary" 
+                onClick={handleSearch}
+                startIcon={<Search size={16} />}
+                >
+                  Buscar
+                </Button>
+              </div>
+            </>
+          }
           right={
             <div style={{ display: 'flex', gap: '1rem' }}>
               <Button
                 variant="filled"
-                color="primary"
+                color="quaternary"
                 onClick={() => setShowCreateModal(true)}
                 startIcon={<Plus size={16} />}
               >
                 Crear Secretario
               </Button>
               <Button
-                variant="outlined"
+                variant="filled"
                 color="secondary"
                 onClick={loadUsers}
                 disabled={loading}
@@ -289,36 +315,8 @@ export const UserManagementPage: React.FC = () => {
           }
         />
 
-        {/* Filters */}
-        <div className={styles.filters}>
-          <select
-            className={styles.filterSelect}
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">Todos los estados</option>
-            {ALL_STATUSES.map((status) => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
-          <div className={styles.searchGroup}>
-            <Input
-              id="search-users"
-              type="text"
-              placeholder="Buscar por nombre o email..."
-              value={searchTerm}
-              onChange={(value) => setSearchTerm(value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <Button variant="filled" color="primary" onClick={handleSearch}>
-              Buscar
-            </Button>
-          </div>
-        </div>
-
         {/* Messages */}
-        {error && <div className={styles.errorMessage}>{error}</div>}
-        {success && <div className={styles.successMessage}>{success}</div>}
+        {/* Mensajes ahora se muestran via Toast */}
 
         {loading ? (
           <LoadingSpinner
@@ -350,8 +348,10 @@ export const UserManagementPage: React.FC = () => {
                 id="create-fullName"
                 label="Nombre Completo"
                 type="text"
+                placeholder="Juan Pérez García"
                 value={createForm.fullName}
                 onChange={handleCreateFormChange('fullName')}
+                icon={<User size={18} />}
               />
             </div>
             <div className={styles.formGroup}>
@@ -359,8 +359,10 @@ export const UserManagementPage: React.FC = () => {
                 id="create-email"
                 label="Correo Electrónico"
                 type="email"
+                placeholder="secretario@sirona.com"
                 value={createForm.email}
                 onChange={handleCreateFormChange('email')}
+                icon={<Mail size={18} />}
               />
             </div>
             <div className={styles.formGroup}>
@@ -368,8 +370,10 @@ export const UserManagementPage: React.FC = () => {
                 id="create-cedula"
                 label="Cédula"
                 type="text"
+                placeholder="1234567890"
                 value={createForm.cedula}
                 onChange={handleCreateFormChange('cedula')}
+                icon={<FileText size={18} />}
               />
             </div>
             <div className={styles.formGroup}>
@@ -377,8 +381,10 @@ export const UserManagementPage: React.FC = () => {
                 id="create-departamento"
                 label="Departamento"
                 type="text"
+                placeholder="Recepción - Sede Central"
                 value={createForm.departamento}
                 onChange={handleCreateFormChange('departamento')}
+                icon={<Building size={18} />}
               />
             </div>
 
@@ -402,7 +408,7 @@ export const UserManagementPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="filled"
-                color="primary"
+                color="quaternary"
                 disabled={creating}
                 startIcon={creating ? <Loader2 size={16} className={styles.spinner} /> : <Plus size={16} />}
               >
@@ -424,8 +430,10 @@ export const UserManagementPage: React.FC = () => {
                 id="edit-fullName"
                 label="Nombre Completo"
                 type="text"
+                placeholder="Juan Pérez García"
                 value={editForm.fullName || ''}
                 onChange={handleEditFormChange('fullName')}
+                icon={<User size={18} />}
               />
             </div>
             <div className={styles.formGroup}>
@@ -433,8 +441,10 @@ export const UserManagementPage: React.FC = () => {
                 id="edit-email"
                 label="Correo Electrónico"
                 type="email"
+                placeholder="secretario@sirona.com"
                 value={editForm.email || ''}
                 onChange={handleEditFormChange('email')}
+                icon={<Mail size={18} />}
               />
             </div>
             <div className={styles.formGroup}>
@@ -442,8 +452,10 @@ export const UserManagementPage: React.FC = () => {
                 id="edit-departamento"
                 label="Departamento"
                 type="text"
+                placeholder="Recepción - Sede Central"
                 value={editForm.departamento || ''}
                 onChange={handleEditFormChange('departamento')}
+                icon={<Building size={18} />}
               />
             </div>
 
