@@ -12,10 +12,12 @@ from schemas.auth_schemas import (
     RegisterDoctorRequest,
     RegisterSecretaryRequest,
     RegisterPatientRequest,
-    RegisterResponse
+    RegisterResponse,
+    ChangePasswordRequest,
+    ChangePasswordResponse
 )
 from services.security import verify_password, create_access_token, hash_password, validate_password_strength
-from services.auth import get_admin_user, get_secretary_user
+from services.auth import get_admin_user, get_secretary_user, get_current_user
 from services.email_service import generate_temporary_password, send_temporary_password_email, EmailServiceError
 
 router = APIRouter()
@@ -154,7 +156,14 @@ async def login(login_data: LoginRequest, request: Request):
     return LoginResponse(
         token=token,
         role=user.role.value,
-        requires_mfa=False
+        requires_mfa=False,
+        user={
+            "email": user.email,
+            "fullName": user.fullName,
+            "cedula": user.cedula,
+            "role": user.role.value,
+            "status": user.status.value
+        }
     )
 
 
@@ -520,4 +529,79 @@ async def log_audit_event(
         details=details or {}
     )
     await audit_log.insert()
+
+
+@router.post("/change-password", response_model=ChangePasswordResponse)
+async def change_password(
+    data: ChangePasswordRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Permite a un usuario autenticado cambiar su contraseña.
+    Requiere la contraseña actual para validación.
+    La nueva contraseña debe cumplir los requisitos de seguridad.
+    """
+    # Verificar contraseña actual
+    if not verify_password(data.currentPassword, current_user.password_hash):
+        await log_audit_event(
+            event="password_change_failed",
+            user_email=current_user.email,
+            user_id=str(current_user.id),
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            details={"reason": "invalid_current_password"}
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect"
+        )
+    
+    # Validar fortaleza de la nueva contraseña (12 chars, uppercase, number, symbol)
+    if not validate_password_strength(data.newPassword):
+        await log_audit_event(
+            event="password_change_failed",
+            user_email=current_user.email,
+            user_id=str(current_user.id),
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            details={"reason": "weak_password"}
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 12 characters long and contain uppercase, number, and special character"
+        )
+    
+    # No permitir reutilizar la misma contraseña
+    if verify_password(data.newPassword, current_user.password_hash):
+        await log_audit_event(
+            event="password_change_failed",
+            user_email=current_user.email,
+            user_id=str(current_user.id),
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            details={"reason": "password_reuse"}
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different from current password"
+        )
+    
+    # Actualizar contraseña (bcrypt con 12 rounds)
+    current_user.password_hash = hash_password(data.newPassword)
+    current_user.security.password_changed_at = datetime.utcnow()
+    await current_user.save()
+    
+    await log_audit_event(
+        event="password_changed",
+        user_email=current_user.email,
+        user_id=str(current_user.id),
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent", ""),
+        details={"changed_by": "user"}
+    )
+    
+    return ChangePasswordResponse(
+        message="Password changed successfully"
+    )
     

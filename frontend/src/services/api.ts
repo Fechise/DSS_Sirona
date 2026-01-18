@@ -56,6 +56,31 @@ export class AuthApiService {
   }
 
   /**
+   * Cambiar contraseña del usuario autenticado
+   */
+  static async changePassword(
+    token: string,
+    data: { currentPassword: string; newPassword: string }
+  ): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw responseData;
+    }
+
+    return responseData;
+  }
+
+  /**
    * Verificar código OTP para MFA
    */
   static async verifyOtp(email: string, otp: string): Promise<LoginResponse> {

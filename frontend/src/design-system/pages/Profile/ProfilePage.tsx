@@ -28,30 +28,30 @@ export const ProfilePage: React.FC = () => {
     try {
       setError(null);
 
-      // TODO: Integrar con backend (POST /auth/change-password)
-      // const response = await fetch('/auth/change-password', {
-      //   method: 'POST',
-      //   headers: { 
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${token}`
-      //   },
-      //   body: JSON.stringify({
-      //     currentPassword: _data.currentPassword,
-      //     newPassword: _data.newPassword,
-      //   })
-      // });
-      // 
-      // if (!response.ok) {
-      //   const errorInfo = handleApiError(response.status);
-      //   setError(errorInfo.message);
-      //   throw new Error(errorInfo.message);
-      // }
+      // Llamar al endpoint de cambio de contraseña
+      if (!user) {
+        throw new Error('Usuario no autenticado');
+      }
 
-      // Mock: Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Obtener el token del contexto
+      const token = localStorage.getItem('sirona_token');
+      if (!token) {
+        throw new Error('Token no disponible');
+      }
+
+      // Importar AuthApiService si no está importado
+      const { AuthApiService } = await import('../../../services/api');
+      
+      await AuthApiService.changePassword(token, {
+        currentPassword: _data.currentPassword,
+        newPassword: _data.newPassword,
+      });
+
+      // Si llegamos aquí, el cambio fue exitoso
+      alert('Contraseña cambiada exitosamente');
       return;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al cambiar la contraseña';
+    } catch (err: any) {
+      const errorMessage = err?.detail || 'Error al cambiar la contraseña';
       setError(errorMessage);
       throw new Error(errorMessage);
     }

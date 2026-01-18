@@ -34,8 +34,10 @@ export const LoginPage: React.FC = () => {
         setMfaRequired(true);
         setPendingEmail(data.email);
       } else {
-        // Usar el email del formulario y el token de la respuesta
-        login(data.email, response.token, response.role, data.email.split('@')[0]);
+        // Usar datos del usuario desde response.user si están disponibles
+        const userName = response.user?.fullName || data.email.split('@')[0];
+        const userCedula = response.user?.cedula || '';
+        login(data.email, response.token, response.role, userName, userCedula);
         navigate('/inicio');
       }
     } catch (error: any) {

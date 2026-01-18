@@ -9,10 +9,19 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class UserInfo(BaseModel):
+    email: str
+    fullName: str
+    cedula: str
+    role: str
+    status: str
+
+
 class LoginResponse(BaseModel):
     token: str
     role: str
     requires_mfa: bool = False
+    user: Optional[UserInfo] = None
 
 
 class LoginMFAResponse(BaseModel):

@@ -81,6 +81,16 @@ export const GeneralSection: React.FC = () => {
             <div className={styles.infoValue}>{user.email}</div>
           </div>
 
+          {user.cedula && (
+            <div className={styles.infoItem}>
+              <div className={styles.infoLabel}>
+                <User size={18} />
+                <span>Cédula</span>
+              </div>
+              <div className={styles.infoValue}>{user.cedula}</div>
+            </div>
+          )}
+
           <div className={styles.infoItem}>
             <div className={styles.infoLabel}>
               <Shield size={18} />
