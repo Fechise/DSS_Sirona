@@ -13,7 +13,7 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from enum import Enum
 
-from models.models import PatientHistory, User, UserRole, UserStatus, AuditLog
+from models.models import PatientHistory, User, UserRole, UserStatus, AuditLog, SecuritySettings
 from services.auth import get_admin_user
 from services.integrity import integrity_service
 from services.audit import audit_logger, AuditEventType
@@ -258,7 +258,7 @@ async def create_user(
     # Generar contraseña temporal
     temporary_password = generate_temporary_password()
     
-    # Crear usuario
+    # Crear usuario con MFA obligatorio
     new_user = User(
         email=data.email,
         password_hash=hash_password(temporary_password),
@@ -277,7 +277,8 @@ async def create_user(
         estadoCivil=data.estadoCivil if user_role == UserRole.PACIENTE else None,
         ocupacion=data.ocupacion if user_role == UserRole.PACIENTE else None,
         grupoSanguineo=data.grupoSanguineo if user_role == UserRole.PACIENTE else None,
-        member_since=datetime.utcnow().strftime("%B %Y")
+        member_since=datetime.utcnow().strftime("%B %Y"),
+        security=SecuritySettings(mfa_enabled=True)  # MFA obligatorio
     )
     
     await new_user.insert()
