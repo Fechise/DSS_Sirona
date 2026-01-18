@@ -15,6 +15,7 @@ type InputProps = {
   disabled?: boolean;
   min?: string;
   max?: string;
+  maxLength?: number;
   focusColor?: string;
   required?: boolean;
   isRequired?: boolean;
@@ -35,6 +36,7 @@ export const Input: React.FC<InputProps> = ({
   disabled,
   min,
   max,
+  maxLength,
   focusColor,
   required,
   isRequired,
@@ -65,6 +67,7 @@ export const Input: React.FC<InputProps> = ({
         disabled={disabled}
         min={min}
         max={max}
+        maxLength={maxLength}
         required={required}
         style={focusColor ? {
           '--input-focus-color': focusColor,

@@ -2,10 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  user: { id: string; email: string; role: string; name: string; fullName: string; status: string } | null;
+  user: { id: string; email: string; role: string; name: string; fullName: string; status: string; cedula?: string } | null;
   token: string | null;
   isLoading: boolean;
-  login: (email: string, token: string, role?: string, name?: string) => void;
+  login: (email: string, token: string, role?: string, name?: string, cedula?: string) => void;
   logout: () => void;
 };
 
@@ -40,7 +40,7 @@ function decodeJWT(token: string): { sub?: string; email?: string; role?: string
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ id: string; email: string; role: string; name: string; fullName: string; status: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email: string; role: string; name: string; fullName: string; status: string; cedula?: string } | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * - Decodificamos el token para obtener datos del usuario
    * - No guardamos datos sensibles en localStorage
    */
-  const login = (email: string, tokenValue: string, role = 'usuario', name = '') => {
+  const login = (email: string, tokenValue: string, role = 'usuario', name = '', cedula = '') => {
     // Decodificar el token para obtener id y status
     const payload = decodeJWT(tokenValue);
     const userData = {
@@ -126,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name,
       fullName: name,
       status: payload?.status || 'ACTIVO',
+      cedula,
     };
     setToken(tokenValue);
     setUser(userData);

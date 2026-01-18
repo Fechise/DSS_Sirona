@@ -93,7 +93,7 @@ async def create_admin_user():
         # Hash de la contraseña (ahora soporta cualquier longitud)
         password_hash = hash_password(password)
         
-        # Crear el usuario administrador
+        # Crear el usuario administrador con MFA obligatorio
         admin_user = User(
             email=email,
             password_hash=password_hash,
@@ -113,7 +113,7 @@ async def create_admin_user():
                 "settings:write",
                 "audit:read"
             ],
-            security=SecuritySettings(),
+            security=SecuritySettings(mfa_enabled=True),  # MFA obligatorio
             created_at=datetime.utcnow(),
             member_since=datetime.utcnow().strftime("%Y-%m-%d")
         )
