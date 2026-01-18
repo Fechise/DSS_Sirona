@@ -27,6 +27,7 @@ class SecuritySettings(BaseModel):
     mfa_secret: Optional[str] = None
     failed_attempts: int = 0
     lockout_until: Optional[datetime] = None
+    password_changed_at: Optional[datetime] = None
 
 # --- SUB-MODELOS HISTORIAL PACIENTE ---
 class MedicoAsignado(BaseModel):
